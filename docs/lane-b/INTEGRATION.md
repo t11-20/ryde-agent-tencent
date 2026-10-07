@@ -30,9 +30,9 @@
   trace builder, the approach ping 15 s before arrival is 146.7 m from the pin (rounded 147 m, which is within 150 m),
   so `firstWithinThresholdTs` = A−15 and the exact wait is **225 s**. All other section 6.5 values come out exactly.
   The implementation keeps the exact rules. `waitedMinimum` is false either way and the expected outcome (refund
-  S$5.00) is unchanged. **Needs confirmation from the Lane B owner.** If 210 s is required, the fix belongs in the N3
-  fixture spec (for example a final point nearer the pin, or an approach origin that keeps A−15 outside 150 m), not
-  in the calculation.
+  S$5.00) is unchanged. **Decision: keep the exact rules (225 s).** The rules are what the tests and Lane A's
+  validator depend on; the 6.5 figure is a hand-computed reference that missed the A−15 ping. If 210 s is ever
+  required, change the N3 fixture spec (for example a final point nearer the pin), not the calculation.
 - **N2H / X2 invariance tests** compare records modulo the absolute time shift (each fixture is on a different
   date): timestamps are normalised to offsets from the first driver ping, and `provenance.fixtureId` is normalised.
 - **Evidence for missing families.** `get_evidence` returns `unavailable: [{ family, reason }]` for GPS or payment
@@ -45,6 +45,11 @@
   `apps/web/src/contracts/provisional.ts` (UI) and `packages/eval/src/contracts.ts` (eval, which only needs the
   fields it checks). Replace both with Lane A's package at integration. The eval's event names live in
   `packages/eval/src/traceRules.ts`.
+- **Contract artefacts.** `docs/lane-b/contracts/` holds JSON Schemas generated from the UI's provisional Zod
+  contracts and illustrative example responses (`npm run contracts:build` in `apps/web`; `contracts:check` in
+  `verify.sh`). An eval test runs the examples through the eval's own contract and checks, so the two provisional
+  mirrors cannot drift apart.
+- **Mock mode** is enabled with `vite --mode mock` (`npm run dev:mock`, cross-platform) or `VITE_API_MODE=mock`.
 - **Eval `release` preset.** The plan 12.3 gate needs the six golden fixtures plus X1, X2, X3 and N2H, with R1 and N2
   run three times. `--fixtures release` runs exactly that set. Gate fixtures that were not run fail as "not run".
 - **noReasoningLeak scope.** Strings are scanned in `cases`, `result`, `events[].summary` and `error`. The key
@@ -66,6 +71,8 @@ Lane B never edits root files. At integration, on `main` (human or Lane A):
    in `packages/eval`) can stay as they are, or become `"*"` under workspaces.
 5. Optional: a root `.nvmrc` with `22`.
 6. Optional: root scripts that delegate to the packages, e.g. `"verify:lane-b": "docs/lane-b/scripts/verify.sh"`.
+7. Optional CI (whoever owns `.github/`): one job on Node 22 that runs `docs/lane-b/scripts/verify.sh`. It needs no
+   secrets and no network beyond npm.
 
 ## Dev proxy and API
 
