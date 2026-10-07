@@ -24,6 +24,23 @@
 | Vite | latest stable (8.x) |
 | tsx | 4.x |
 
+## Decisions and known discrepancies
+
+- **N3 wait (handoff section 6.5 vs 6.1).** Section 6.5 says the N3 driver waited 210 s. With the exact section 6.1
+  trace builder, the approach ping 15 s before arrival is 146.7 m from the pin (rounded 147 m, which is within 150 m),
+  so `firstWithinThresholdTs` = A−15 and the exact wait is **225 s**. All other section 6.5 values come out exactly.
+  The implementation keeps the exact rules. `waitedMinimum` is false either way and the expected outcome (refund
+  S$5.00) is unchanged. **Needs confirmation from the Lane B owner.** If 210 s is required, the fix belongs in the N3
+  fixture spec (for example a final point nearer the pin, or an approach origin that keeps A−15 outside 150 m), not
+  in the calculation.
+- **N2H / X2 invariance tests** compare records modulo the absolute time shift (each fixture is on a different
+  date): timestamps are normalised to offsets from the first driver ping, and `provenance.fixtureId` is normalised.
+- **Evidence for missing families.** `get_evidence` returns `unavailable: [{ family, reason }]` for GPS or payment
+  missing, and for chat when a trip has no messages or calls.
+- **Dwell detection constants** (30 m radius, 120 s minimum, 150 m endpoint exclusion) are heuristics, not policy
+  thresholds, so they live in `calc/route.ts`. Every policy threshold comes from `demo-policy.v1.json`.
+- **Data export.** `@fairtrip/evidence/data/*` is exported so the browser can import fixtures for UI mock mode.
+
 ## Root changes needed at integration
 
 Lane B never edits root files. At integration, on `main`:

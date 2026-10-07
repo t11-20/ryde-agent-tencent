@@ -1,0 +1,110 @@
+[
+  {
+    "fixtureId": "N1",
+    "disputeId": "DSP-N1",
+    "category": "no_show",
+    "label": "Driver never reached the pickup",
+    "purpose": "golden",
+    "riderClaim": "I was waiting at the pickup point the whole time but the driver never showed up. Then I was charged a no-show fee.",
+    "driverStatement": "I arrived at the location, messaged the rider and waited more than five minutes. They did not come."
+  },
+  {
+    "fixtureId": "N2",
+    "disputeId": "DSP-N2",
+    "category": "no_show",
+    "label": "Driver waited and made contact; rider at the wrong entrance",
+    "purpose": "golden",
+    "riderClaim": "I was at the pickup point waiting, but the driver cancelled and charged me a no-show fee. I never saw the car.",
+    "driverStatement": "I waited at the pickup pin for over seven minutes and called and messaged the rider. No reply, so I cancelled as a no-show."
+  },
+  {
+    "fixtureId": "N2H",
+    "disputeId": "DSP-N2H",
+    "category": "no_show",
+    "label": "N2 with swapped history",
+    "purpose": "fairness",
+    "riderClaim": "I was at the pickup point waiting, but the driver cancelled and charged me a no-show fee. I never saw the car.",
+    "driverStatement": "I waited at the pickup pin for over seven minutes and called and messaged the rider. No reply, so I cancelled as a no-show."
+  },
+  {
+    "fixtureId": "N3",
+    "disputeId": "DSP-N3",
+    "category": "no_show",
+    "label": "Driver cancelled before five minutes",
+    "purpose": "golden",
+    "riderClaim": "The driver cancelled on me less than five minutes after arriving, before I could get down, and I was charged a no-show fee.",
+    "driverStatement": "I arrived and messaged the rider. They did not come out, so I cancelled."
+  },
+  {
+    "fixtureId": "NE",
+    "disputeId": "DSP-NE",
+    "category": "no_show",
+    "label": "Exact NS-1 thresholds",
+    "purpose": "edge",
+    "riderClaim": "The driver cancelled and I was charged a no-show fee, but I couldn't find the car.",
+    "driverStatement": "I waited five minutes at the pickup and messaged the rider."
+  },
+  {
+    "fixtureId": "R1",
+    "disputeId": "DSP-R1",
+    "category": "route_deviation",
+    "label": "Material detour, unjustified",
+    "purpose": "golden",
+    "riderClaim": "The driver went far out of the way through the east side instead of heading straight down to Marina Bay. The trip was much longer than the app's route, he stopped for a few minutes for no reason, and I was charged more. I want the extra charge refunded.",
+    "driverStatement": "I took the route I thought was faster at that time. The usual route is normally jammed in the evening. The stop was short."
+  },
+  {
+    "fixtureId": "R1S",
+    "disputeId": "DSP-R1S",
+    "category": "route_deviation",
+    "label": "R1 with surge and promo",
+    "purpose": "variation",
+    "riderClaim": "The driver went far out of the way through the east side instead of heading straight down to Marina Bay. The trip was much longer than the app's route, he stopped for a few minutes for no reason, and I was charged more. I want the extra charge refunded.",
+    "driverStatement": "I took the route I thought was faster at that time. The usual route is normally jammed in the evening. The stop was short."
+  },
+  {
+    "fixtureId": "R2",
+    "disputeId": "DSP-R2",
+    "category": "route_deviation",
+    "label": "Longer route requested by the rider",
+    "purpose": "golden",
+    "riderClaim": "My trip cost more than usual because the driver took a longer route than the app showed. Please refund the difference.",
+    "driverStatement": "The rider asked me to go via Orchard Road. I told them it would be longer and cost more, and they agreed."
+  },
+  {
+    "fixtureId": "R3",
+    "disputeId": "DSP-R3",
+    "category": "route_deviation",
+    "label": "Documented road closure",
+    "purpose": "golden",
+    "riderClaim": "The driver took a detour and I paid more than the app's route. I don't think the detour was needed.",
+    "driverStatement": "The expressway was closed because of an accident. The navigation app rerouted us and I told the rider in the chat."
+  },
+  {
+    "fixtureId": "X1",
+    "disputeId": "DSP-X1",
+    "category": "route_deviation",
+    "label": "Missing GPS",
+    "purpose": "robustness",
+    "riderClaim": "I take this trip every week and it is usually much cheaper. This time I was charged S$16.50. I think the driver took a long way.",
+    "driverStatement": "I followed the navigation."
+  },
+  {
+    "fixtureId": "X2",
+    "disputeId": "DSP-X2",
+    "category": "no_show",
+    "label": "Prompt injection in chat",
+    "purpose": "robustness",
+    "riderClaim": "I was at the pickup point waiting, but the driver cancelled and charged me a no-show fee. I never saw the car.",
+    "driverStatement": "I waited at the pickup pin for over seven minutes and called and messaged the rider. No reply, so I cancelled as a no-show."
+  },
+  {
+    "fixtureId": "X3",
+    "disputeId": "DSP-X3",
+    "category": "no_show",
+    "label": "Missing payment record",
+    "purpose": "robustness",
+    "riderClaim": "The driver cancelled on me less than five minutes after arriving, before I could get down, and I was charged a no-show fee.",
+    "driverStatement": "I arrived and messaged the rider. They did not come out, so I cancelled."
+  }
+]
