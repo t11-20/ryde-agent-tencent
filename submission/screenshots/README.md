@@ -3,7 +3,7 @@
 ## 1. CodeBuddy / WorkBuddy development evidence (eligibility E1, E2)
 
 The project must be **built using CodeBuddy or WorkBuddy**, with **at least three genuine development-chat
-screenshots**. Work done by Claude Code does **not** count. Do real work in CodeBuddy and capture it while you do it.
+screenshots**. Only work actually done in CodeBuddy or WorkBuddy counts. Do real work there and capture it while you do it.
 
 | # | When | What to do in CodeBuddy | What the screenshot must show |
 |---|---|---|---|
