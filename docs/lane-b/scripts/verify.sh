@@ -18,6 +18,6 @@ run_pkg() {
 run_pkg packages/evidence typecheck test build fixtures:check examples:build audit
 # Generated artefacts must match what is committed.
 git diff --exit-code -- packages/evidence/examples docs/lane-b/EVIDENCE_AUDIT.md || { echo "examples/ or EVIDENCE_AUDIT.md are stale: commit the regenerated files." >&2; exit 1; }
-run_pkg apps/web typecheck test build
+run_pkg apps/web typecheck test build contracts:check
 run_pkg packages/eval typecheck test eval:demo
 echo "verify.sh: all Lane B packages passed."

@@ -8,7 +8,8 @@ the handoff to the Judge), the evidence and DEMONSTRATION POLICY clauses, the Ju
 ```bash
 npm ci
 npm run dev        # live mode: talks to Lane A's API through the Vite proxy
-npm run dev:mock   # DEV MOCK mode (development only)
+npm run dev:mock   # DEV MOCK mode (development only; same as VITE_API_MODE=mock)
+npm run contracts:build   # regenerate docs/lane-b/contracts (JSON Schemas + example responses)
 npm test && npm run typecheck && npm run build
 ```
 
@@ -40,7 +41,7 @@ npm test && npm run typecheck && npm run build
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `VITE_API_MODE` | `live` | `live` or `mock` |
+| `VITE_API_MODE` | `live` | `live` or `mock` (`vite --mode mock` also enables mock) |
 | `VITE_API_BASE` | `""` | Prefix for API calls. Empty means same origin, forwarded by the dev proxy |
 | `VITE_API_PROXY_TARGET` | `http://localhost:3001` | Where the Vite dev proxy forwards `/api` |
 
@@ -71,6 +72,9 @@ See `.env.example`. Never commit `.env` files.
 - **Export:** downloads `fairtrip-<fixtureId>-<runId>.json` with the dispute, status, events, evidence, clauses, cases, result, error, missing evidence, usage, mode and `exportedAt`.
 
 `src/contracts/provisional.ts` is a **PROVISIONAL mirror of Lane A contracts**. Replace it with Lane A's package at integration.
+Its JSON Schemas and example responses are published for Lane A in `docs/lane-b/contracts/`. See `docs/lane-b/LANE_A_GUIDE.md`.
+
+The Judge's confidence is expected in `[0, 1]`. Off-scale values are shown as given and flagged, never rescaled.
 
 ## Demo operator script (projector, 1920×1080)
 

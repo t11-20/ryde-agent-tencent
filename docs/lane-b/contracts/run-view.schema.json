@@ -1,0 +1,681 @@
+{
+  "title": "GET /api/runs/:id response (PROVISIONAL)",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "runId": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "running",
+        "completed",
+        "incomplete",
+        "failed"
+      ]
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "runId": {
+            "type": "string"
+          },
+          "sequence": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "timestamp": {
+            "type": "string"
+          },
+          "actor": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "refs": {
+            "type": "object",
+            "properties": {
+              "evidenceIds": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "policyIds": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": {}
+          },
+          "data": {},
+          "dev": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "runId",
+          "sequence",
+          "timestamp",
+          "actor",
+          "type",
+          "summary"
+        ],
+        "additionalProperties": {}
+      }
+    },
+    "dispute": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "route_deviation",
+            "no_show"
+          ]
+        },
+        "tripId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "filedAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "riderClaim": {
+          "type": "string"
+        },
+        "driverStatement": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "category",
+        "tripId",
+        "filedAt",
+        "riderClaim",
+        "driverStatement"
+      ],
+      "additionalProperties": {}
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "family": {
+            "type": "string",
+            "enum": [
+              "gps",
+              "chat",
+              "payment",
+              "history"
+            ]
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "route_metrics",
+              "nav_event",
+              "traffic_advisory",
+              "pickup_metrics",
+              "rider_location",
+              "chat_message",
+              "call_log",
+              "contact_summary",
+              "fare_breakdown",
+              "remedy_basis",
+              "party_history"
+            ]
+          },
+          "timestamp": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "summary": {
+            "type": "string"
+          },
+          "facts": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          },
+          "provenance": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "type": "string",
+                "const": "synthetic_fixture"
+              },
+              "fixtureId": {
+                "type": "string"
+              },
+              "fields": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "method": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "source",
+              "fixtureId",
+              "fields",
+              "method"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "family",
+          "kind",
+          "timestamp",
+          "summary",
+          "facts",
+          "provenance"
+        ],
+        "additionalProperties": {}
+      }
+    },
+    "policyClauses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "route_deviation",
+              "no_show",
+              "general"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "params": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "type": "number"
+            }
+          },
+          "remedyCriteria": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "remedyId": {
+                    "type": "string",
+                    "enum": [
+                      "keep_charge",
+                      "refund_route_excess",
+                      "refund_no_show_fee"
+                    ]
+                  },
+                  "when": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "remedyId",
+                  "when"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "category",
+          "title",
+          "text",
+          "params",
+          "remedyCriteria"
+        ],
+        "additionalProperties": {}
+      }
+    },
+    "cases": {
+      "type": "object",
+      "properties": {
+        "rider": {
+          "type": "object",
+          "properties": {
+            "side": {
+              "type": "string",
+              "enum": [
+                "rider",
+                "driver"
+              ]
+            },
+            "summary": {
+              "type": "string"
+            },
+            "arguments": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "point": {
+                    "type": "string"
+                  },
+                  "evidenceIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "policyIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "point",
+                  "evidenceIds",
+                  "policyIds"
+                ],
+                "additionalProperties": {}
+              }
+            },
+            "counterevidence": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "point": {
+                    "type": "string"
+                  },
+                  "evidenceIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "policyIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "point",
+                  "evidenceIds",
+                  "policyIds"
+                ],
+                "additionalProperties": {}
+              }
+            },
+            "requestedRemedy": {
+              "type": "string",
+              "enum": [
+                "keep_charge",
+                "refund_route_excess",
+                "refund_no_show_fee"
+              ]
+            },
+            "missingFacts": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "side",
+            "summary",
+            "arguments",
+            "counterevidence",
+            "requestedRemedy",
+            "missingFacts"
+          ],
+          "additionalProperties": {}
+        },
+        "driver": {
+          "type": "object",
+          "properties": {
+            "side": {
+              "type": "string",
+              "enum": [
+                "rider",
+                "driver"
+              ]
+            },
+            "summary": {
+              "type": "string"
+            },
+            "arguments": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "point": {
+                    "type": "string"
+                  },
+                  "evidenceIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "policyIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "point",
+                  "evidenceIds",
+                  "policyIds"
+                ],
+                "additionalProperties": {}
+              }
+            },
+            "counterevidence": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "point": {
+                    "type": "string"
+                  },
+                  "evidenceIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "policyIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "point",
+                  "evidenceIds",
+                  "policyIds"
+                ],
+                "additionalProperties": {}
+              }
+            },
+            "requestedRemedy": {
+              "type": "string",
+              "enum": [
+                "keep_charge",
+                "refund_route_excess",
+                "refund_no_show_fee"
+              ]
+            },
+            "missingFacts": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "side",
+            "summary",
+            "arguments",
+            "counterevidence",
+            "requestedRemedy",
+            "missingFacts"
+          ],
+          "additionalProperties": {}
+        }
+      },
+      "additionalProperties": {}
+    },
+    "result": {
+      "type": "object",
+      "properties": {
+        "judge": {
+          "type": "object",
+          "properties": {
+            "ruling": {
+              "type": "string"
+            },
+            "findings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "point": {
+                    "type": "string"
+                  },
+                  "evidenceIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "policyIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "point",
+                  "evidenceIds",
+                  "policyIds"
+                ],
+                "additionalProperties": {}
+              }
+            },
+            "remedyId": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "keep_charge",
+                    "refund_route_excess",
+                    "refund_no_show_fee"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "confidence": {
+              "type": "number"
+            },
+            "reasoning": {
+              "type": "string"
+            },
+            "riderExplanation": {
+              "type": "string"
+            },
+            "driverExplanation": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "ruling",
+            "findings",
+            "remedyId",
+            "confidence",
+            "reasoning",
+            "riderExplanation",
+            "driverExplanation"
+          ],
+          "additionalProperties": {}
+        },
+        "action": {
+          "type": "object",
+          "properties": {
+            "remedyId": {
+              "type": "string",
+              "enum": [
+                "keep_charge",
+                "refund_route_excess",
+                "refund_no_show_fee"
+              ]
+            },
+            "recipient": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "const": "rider"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "currency": {
+              "type": "string",
+              "const": "SGD"
+            },
+            "amountCents": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "text": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "remedyId",
+            "recipient",
+            "currency",
+            "amountCents",
+            "text"
+          ],
+          "additionalProperties": {}
+        }
+      },
+      "required": [
+        "judge",
+        "action"
+      ],
+      "additionalProperties": {}
+    },
+    "error": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "additionalProperties": {}
+    },
+    "missingEvidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "family": {
+            "type": "string",
+            "enum": [
+              "gps",
+              "chat",
+              "payment",
+              "history"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "family",
+          "reason"
+        ],
+        "additionalProperties": {}
+      }
+    },
+    "usage": {
+      "type": "object",
+      "properties": {
+        "modelCalls": {
+          "type": "number"
+        },
+        "inputTokens": {
+          "type": "number"
+        },
+        "outputTokens": {
+          "type": "number"
+        },
+        "latencyMs": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": {}
+    }
+  },
+  "required": [
+    "runId",
+    "status",
+    "events"
+  ],
+  "additionalProperties": {}
+}

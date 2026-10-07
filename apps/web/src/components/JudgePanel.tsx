@@ -2,6 +2,11 @@ import type { RunView } from "../contracts/provisional";
 import type { UiStatus } from "../state/useRun";
 import { Chips } from "./citations";
 
+/** Contract: confidence in [0, 1]. Anything else is shown as given, never silently rescaled. */
+export function formatConfidence(c: number): string {
+  return c >= 0 && c <= 1 ? `${Math.round(c * 100)}%` : `${c} (outside the expected 0–1 scale)`;
+}
+
 export function JudgePanel({ view, status }: { view?: RunView; status: UiStatus }) {
   const judge = view?.result?.judge;
   return (
@@ -19,7 +24,7 @@ export function JudgePanel({ view, status }: { view?: RunView; status: UiStatus 
           <div className="ruling"><span className="mono">{judge.ruling}</span></div>
           <h4>Findings</h4>
           <ul>{judge.findings.map((f, i) => <li key={i}>{f.point} <Chips evidenceIds={f.evidenceIds} policyIds={f.policyIds} /></li>)}</ul>
-          <div className="confidence">Model-assessed confidence: <strong>{Math.round(judge.confidence * 100)}%</strong></div>
+          <div className="confidence">Model-assessed confidence: <strong>{formatConfidence(judge.confidence)}</strong></div>
           <h4>Reasoning</h4>
           <p>{judge.reasoning}</p>
           <div className="explanations">

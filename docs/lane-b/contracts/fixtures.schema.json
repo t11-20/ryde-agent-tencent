@@ -1,0 +1,45 @@
+{
+  "title": "GET /api/fixtures response (PROVISIONAL)",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "fixtureId": {
+        "type": "string"
+      },
+      "disputeId": {
+        "type": "string"
+      },
+      "category": {
+        "type": "string",
+        "enum": [
+          "route_deviation",
+          "no_show"
+        ]
+      },
+      "label": {
+        "type": "string"
+      },
+      "purpose": {
+        "type": "string"
+      },
+      "riderClaim": {
+        "type": "string"
+      },
+      "driverStatement": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "fixtureId",
+      "disputeId",
+      "category",
+      "label",
+      "purpose",
+      "riderClaim",
+      "driverStatement"
+    ],
+    "additionalProperties": {}
+  }
+}
