@@ -1,0 +1,31 @@
+{
+  "name": "@fairtrip/eval",
+  "version": "0.1.0",
+  "private": true,
+  "description": "FairTrip evaluation runner and scorecard. Drives Lane A's API with the SYNTHETIC fixtures and checks outcomes against the expected-outcome matrix.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "ensure-evidence": "node scripts/ensure-evidence.mjs",
+    "preeval": "npm run -s ensure-evidence",
+    "eval": "tsx src/cli.ts",
+    "preeval:demo": "npm run -s ensure-evidence",
+    "eval:demo": "tsx scripts/demo.ts",
+    "pretypecheck": "npm run -s ensure-evidence",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "pretest": "npm run -s ensure-evidence",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@fairtrip/evidence": "file:../evidence",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "tsx": "^4.23.15",
+    "typescript": "~5.9",
+    "vitest": "^5.0.3"
+  }
+}
