@@ -1,0 +1,45 @@
+{
+  "name": "@fairtrip/evidence",
+  "version": "0.1.0",
+  "private": true,
+  "description": "FairTrip evidence layer: schemas, deterministic calculations, evidence adapters and dispute-bound tools. All data is SYNTHETIC; policy is a DEMONSTRATION POLICY.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./node": {
+      "types": "./dist/node.d.ts",
+      "import": "./dist/node.js"
+    },
+    "./data/*": "./data/*"
+  },
+  "files": [
+    "dist",
+    "data"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "fixtures:build": "tsx scripts/build-fixtures.ts",
+    "fixtures:check": "tsx scripts/build-fixtures.ts --check",
+    "examples:build": "tsx scripts/build-examples.ts",
+    "audit": "tsx scripts/audit.ts"
+  },
+  "dependencies": {
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "tsx": "^4.23.15",
+    "typescript": "~5.9",
+    "vitest": "^5.0.3"
+  }
+}
