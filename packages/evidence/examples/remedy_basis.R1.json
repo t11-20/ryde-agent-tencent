@@ -1,0 +1,18 @@
+[
+  {
+    "remedyId": "keep_charge",
+    "eligibleCents": 0,
+    "formula": "0 (charge unchanged)"
+  },
+  {
+    "remedyId": "refund_route_excess",
+    "eligibleCents": 198,
+    "formula": "min(divHalfUp(2642 x 75 x 100, 100000) = 198, divHalfUp(795 x 100, 100) = 795, paid 1473) = 198"
+  },
+  {
+    "remedyId": "refund_no_show_fee",
+    "eligibleCents": null,
+    "formula": "min(sum of no_show_fee items, paidCents)",
+    "unavailableReason": "not applicable to category"
+  }
+]

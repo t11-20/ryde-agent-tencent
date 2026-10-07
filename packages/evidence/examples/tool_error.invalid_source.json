@@ -1,0 +1,22 @@
+{
+  "ok": false,
+  "error": {
+    "code": "invalid_arguments",
+    "message": "get_evidence expects { sources: (\"gps\"|\"chat\"|\"payment\"|\"history\")[] } with 1-4 entries and no other keys.",
+    "issues": {
+      "errors": [],
+      "properties": {
+        "sources": {
+          "errors": [],
+          "items": [
+            {
+              "errors": [
+                "Invalid option: expected one of \"gps\"|\"chat\"|\"payment\"|\"history\""
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+}
