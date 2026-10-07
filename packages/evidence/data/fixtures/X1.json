@@ -1,0 +1,100 @@
+{
+  "fixtureId": "X1",
+  "label": "Missing GPS",
+  "purpose": "robustness",
+  "synthetic": true,
+  "dispute": {
+    "id": "DSP-X1",
+    "category": "route_deviation",
+    "tripId": "TRP-X1",
+    "filedAt": "2026-10-02T17:21:00Z",
+    "riderClaim": "I take this trip every week and it is usually much cheaper. This time I was charged S$16.50. I think the driver took a long way.",
+    "driverStatement": "I followed the navigation."
+  },
+  "parties": {
+    "riderId": "RDR-X1",
+    "driverId": "DRV-X1"
+  },
+  "trip": {
+    "pickup": {
+      "lat": 1.351,
+      "lng": 103.848,
+      "label": "Bishan (synthetic pin)"
+    },
+    "dropoff": {
+      "lat": 1.283,
+      "lng": 103.86,
+      "label": "Marina Bay (synthetic pin)"
+    },
+    "requestedAt": "2026-10-02T14:55:00Z",
+    "outcome": "completed"
+  },
+  "gps": {
+    "status": "unavailable",
+    "reason": "No location data received from the driver app for this trip (synthetic telemetry gap)."
+  },
+  "comms": {
+    "messages": [
+      {
+        "id": "m1",
+        "ts": "2026-10-02T15:21:40Z",
+        "sender": "rider",
+        "text": "Why is the fare so high? I take this trip every week."
+      }
+    ],
+    "calls": []
+  },
+  "payment": {
+    "status": "available",
+    "currency": "SGD",
+    "rateCard": {
+      "baseCents": 300,
+      "perKmCents": 75,
+      "perMinCents": 20,
+      "noShowFeeCents": 500
+    },
+    "surgeMultiplierX100": 100,
+    "lineItems": [
+      {
+        "code": "base",
+        "label": "Base fare",
+        "cents": 300
+      },
+      {
+        "code": "distance",
+        "label": "Distance",
+        "cents": 930,
+        "quantity": 12400,
+        "unit": "m"
+      },
+      {
+        "code": "time",
+        "label": "Time",
+        "cents": 420,
+        "quantity": 1260,
+        "unit": "s"
+      }
+    ],
+    "totalCents": 1650,
+    "paidCents": 1650,
+    "paidAt": "2026-10-02T15:21:30Z"
+  },
+  "history": {
+    "rider": {
+      "partyId": "RDR-X1",
+      "accountAgeDays": 1300,
+      "rating": 4.8,
+      "completedTrips": 400,
+      "disputesFiled90d": 0,
+      "disputesAgainst90d": 0
+    },
+    "driver": {
+      "partyId": "DRV-X1",
+      "accountAgeDays": 700,
+      "rating": 4.75,
+      "completedTrips": 2600,
+      "disputesFiled90d": 0,
+      "disputesAgainst90d": 1
+    }
+  }
+}
