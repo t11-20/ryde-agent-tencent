@@ -41,17 +41,48 @@
   thresholds, so they live in `calc/route.ts`. Every policy threshold comes from `demo-policy.v1.json`.
 - **Data export.** `@fairtrip/evidence/data/*` is exported so the browser can import fixtures for UI mock mode.
 
+- **Provisional contracts.** No Lane A contracts exist on `main`, so two provisional mirrors are used:
+  `apps/web/src/contracts/provisional.ts` (UI) and `packages/eval/src/contracts.ts` (eval, which only needs the
+  fields it checks). Replace both with Lane A's package at integration. The eval's event names live in
+  `packages/eval/src/traceRules.ts`.
+- **Eval `release` preset.** The plan 12.3 gate needs the six golden fixtures plus X1, X2, X3 and N2H, with R1 and N2
+  run three times. `--fixtures release` runs exactly that set. Gate fixtures that were not run fail as "not run".
+- **noReasoningLeak scope.** Strings are scanned in `cases`, `result`, `events[].summary` and `error`. The key
+  `reasoning_content` is rejected anywhere in the run view, because the UI export would carry it.
+
 ## Root changes needed at integration
 
-Lane B never edits root files. At integration, on `main`:
+Lane B never edits root files. At integration, on `main` (human or Lane A):
 
-1. *(optional, once a root `package.json` exists)* npm workspaces `["packages/*", "apps/*"]`.
-2. When the root lockfile exists, delete the nested `package-lock.json` files under Lane B packages and regenerate the root lockfile **on `main` after each merge**.
-3. Until then, each Lane B package installs standalone; cross-package dependencies use `file:` specifiers.
+1. Add a root `package.json` with npm workspaces `["packages/*", "apps/*"]` and `"engines": { "node": ">=22" }`.
+2. Once the root lockfile exists, delete the nested lockfiles:
+   - `packages/evidence/package-lock.json`
+   - `packages/eval/package-lock.json`
+   - `apps/web/package-lock.json`
+3. Regenerate the root lockfile **on `main` after each merge** (`npm install` at the root, then commit). Lane B never
+   commits the root lockfile. `docs/lane-b/scripts/verify.sh` restores it with `git checkout -- package-lock.json`
+   if an install touches it.
+4. The `file:` specifiers (`"@fairtrip/evidence": "file:../../packages/evidence"` in `apps/web`, `file:../evidence`
+   in `packages/eval`) can stay as they are, or become `"*"` under workspaces.
+5. Optional: a root `.nvmrc` with `22`.
+6. Optional: root scripts that delegate to the packages, e.g. `"verify:lane-b": "docs/lane-b/scripts/verify.sh"`.
+
+## Dev proxy and API
+
+| Item | Value |
+|---|---|
+| Lane A API | `http://localhost:3001`, routes under `/api` (**to confirm with Lane A**, see CONTRACT_REQUESTS #7) |
+| Web dev server | `http://localhost:5173` |
+| Web proxy | `/api` → `VITE_API_PROXY_TARGET` (default `http://localhost:3001`) |
+| Eval default | `--base-url http://localhost:3001` |
 
 ## Merge procedure
 
 1. On `lane-b`: `git fetch origin && git merge origin/main` (never rebase).
 2. `docs/lane-b/scripts/check-ownership.sh origin/main`
-3. `git merge-tree --write-tree origin/main HEAD` and, if it exists, `git merge-tree --write-tree origin/lane-a HEAD` — both must be clean.
-4. Human merges `lane-b` into `main` (Lane B never merges or opens PRs itself).
+3. `git merge-tree --write-tree origin/main HEAD` and, once it exists,
+   `git merge-tree --write-tree origin/lane-a HEAD`. Both must be clean.
+4. `docs/lane-b/scripts/verify.sh` (installs, typechecks, tests and builds every Lane B package in dependency order,
+   checks generated artefacts for drift, then restores the root lockfile if needed).
+5. The human merges `lane-b` into `main`. Lane B never opens or merges PRs itself.
+6. After the merge, regenerate the root lockfile on `main` (if workspaces exist).
