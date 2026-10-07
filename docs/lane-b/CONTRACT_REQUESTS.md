@@ -13,3 +13,8 @@ Status legend: OPEN / AGREED / CHANGED. All are OPEN until Edward confirms.
 | 7 | **Port and prefix.** `http://localhost:3001`, routes under `/api`. | OPEN |
 | 8 | **Ruling vocabulary.** `rider_upheld` / `driver_upheld` / `incomplete`, plus `favours` and the remedy. | OPEN |
 | 9 | **Zod 4 and Node >= 22** on Lane A packages (version alignment). | OPEN |
+| 10 | **Confidence scale.** `judge.confidence` is a number in `[0, 1]`. The UI shows other values as given, flagged as off-scale. | OPEN |
+| 11 | **Policy clauses in the run view.** Return `policyClauses` (the clauses accessed). Without it, the UI marks every policy citation chip as unresolved. | OPEN |
+| 12 | **Schemas and examples.** `docs/lane-b/contracts/` has JSON Schemas and example responses of what the UI and eval expect. Confirm them or send diffs. | OPEN |
+
+See `LANE_A_GUIDE.md` for the integration summary.
