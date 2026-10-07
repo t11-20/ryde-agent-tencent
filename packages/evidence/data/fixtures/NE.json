@@ -1,0 +1,254 @@
+{
+  "fixtureId": "NE",
+  "label": "Exact NS-1 thresholds",
+  "purpose": "edge",
+  "synthetic": true,
+  "dispute": {
+    "id": "DSP-NE",
+    "category": "no_show",
+    "tripId": "TRP-NE",
+    "filedAt": "2026-10-03T05:37:34Z",
+    "riderClaim": "The driver cancelled and I was charged a no-show fee, but I couldn't find the car.",
+    "driverStatement": "I waited five minutes at the pickup and messaged the rider."
+  },
+  "parties": {
+    "riderId": "RDR-NE",
+    "driverId": "DRV-NE"
+  },
+  "trip": {
+    "pickup": {
+      "lat": 1.3526,
+      "lng": 103.9447,
+      "label": "Tampines main entrance (synthetic pin)"
+    },
+    "dropoff": null,
+    "requestedAt": "2026-10-03T03:29:00Z",
+    "outcome": "cancelled_no_show"
+  },
+  "gps": {
+    "status": "available",
+    "driverTrace": [
+      {
+        "ts": "2026-10-03T03:30:00Z",
+        "lat": 1.362,
+        "lng": 103.953
+      },
+      {
+        "ts": "2026-10-03T03:30:14Z",
+        "lat": 1.361268,
+        "lng": 103.952245
+      },
+      {
+        "ts": "2026-10-03T03:30:28Z",
+        "lat": 1.360536,
+        "lng": 103.951491
+      },
+      {
+        "ts": "2026-10-03T03:30:42Z",
+        "lat": 1.359804,
+        "lng": 103.950736
+      },
+      {
+        "ts": "2026-10-03T03:30:56Z",
+        "lat": 1.359072,
+        "lng": 103.949982
+      },
+      {
+        "ts": "2026-10-03T03:31:10Z",
+        "lat": 1.35834,
+        "lng": 103.949227
+      },
+      {
+        "ts": "2026-10-03T03:31:24Z",
+        "lat": 1.357609,
+        "lng": 103.948473
+      },
+      {
+        "ts": "2026-10-03T03:31:38Z",
+        "lat": 1.356877,
+        "lng": 103.947718
+      },
+      {
+        "ts": "2026-10-03T03:31:52Z",
+        "lat": 1.356145,
+        "lng": 103.946964
+      },
+      {
+        "ts": "2026-10-03T03:32:06Z",
+        "lat": 1.355413,
+        "lng": 103.946209
+      },
+      {
+        "ts": "2026-10-03T03:32:20Z",
+        "lat": 1.354681,
+        "lng": 103.945455
+      },
+      {
+        "ts": "2026-10-03T03:32:34Z",
+        "lat": 1.353949,
+        "lng": 103.9447
+      },
+      {
+        "ts": "2026-10-03T03:32:49Z",
+        "lat": 1.353949,
+        "lng": 103.9447
+      },
+      {
+        "ts": "2026-10-03T03:33:04Z",
+        "lat": 1.353949,
+        "lng": 103.9447
+      },
+      {
+        "ts": "2026-10-03T03:33:19Z",
+        "lat": 1.353949,
+        "lng": 103.9447
+      },
+      {
+        "ts": "2026-10-03T03:33:34Z",
+        "lat": 1.353949,
+        "lng": 103.9447
+      },
+      {
+        "ts": "2026-10-03T03:33:49Z",
+        "lat": 1.353949,
+        "lng": 103.9447
+      },
+      {
+        "ts": "2026-10-03T03:34:04Z",
+        "lat": 1.353949,
+        "lng": 103.9447
+      },
+      {
+        "ts": "2026-10-03T03:34:19Z",
+        "lat": 1.353949,
+        "lng": 103.9447
+      },
+      {
+        "ts": "2026-10-03T03:34:34Z",
+        "lat": 1.353949,
+        "lng": 103.9447
+      },
+      {
+        "ts": "2026-10-03T03:34:49Z",
+        "lat": 1.353949,
+        "lng": 103.9447
+      },
+      {
+        "ts": "2026-10-03T03:35:04Z",
+        "lat": 1.353949,
+        "lng": 103.9447
+      },
+      {
+        "ts": "2026-10-03T03:35:19Z",
+        "lat": 1.353949,
+        "lng": 103.9447
+      },
+      {
+        "ts": "2026-10-03T03:35:34Z",
+        "lat": 1.353949,
+        "lng": 103.9447
+      },
+      {
+        "ts": "2026-10-03T03:35:49Z",
+        "lat": 1.353949,
+        "lng": 103.9447
+      },
+      {
+        "ts": "2026-10-03T03:36:04Z",
+        "lat": 1.353949,
+        "lng": 103.9447
+      },
+      {
+        "ts": "2026-10-03T03:36:19Z",
+        "lat": 1.353949,
+        "lng": 103.9447
+      },
+      {
+        "ts": "2026-10-03T03:36:34Z",
+        "lat": 1.353949,
+        "lng": 103.9447
+      },
+      {
+        "ts": "2026-10-03T03:36:49Z",
+        "lat": 1.353949,
+        "lng": 103.9447
+      },
+      {
+        "ts": "2026-10-03T03:37:04Z",
+        "lat": 1.353949,
+        "lng": 103.9447
+      },
+      {
+        "ts": "2026-10-03T03:37:19Z",
+        "lat": 1.353949,
+        "lng": 103.9447
+      },
+      {
+        "ts": "2026-10-03T03:37:34Z",
+        "lat": 1.353949,
+        "lng": 103.9447
+      }
+    ],
+    "events": [
+      {
+        "ts": "2026-10-03T03:32:34Z",
+        "type": "driver_marked_arrived"
+      },
+      {
+        "ts": "2026-10-03T03:37:34Z",
+        "type": "driver_cancelled_no_show"
+      }
+    ],
+    "trafficAdvisories": []
+  },
+  "comms": {
+    "messages": [
+      {
+        "id": "m1",
+        "ts": "2026-10-03T03:33:19Z",
+        "sender": "driver",
+        "text": "I'm at the pickup point."
+      }
+    ],
+    "calls": []
+  },
+  "payment": {
+    "status": "available",
+    "currency": "SGD",
+    "rateCard": {
+      "baseCents": 300,
+      "perKmCents": 75,
+      "perMinCents": 20,
+      "noShowFeeCents": 500
+    },
+    "surgeMultiplierX100": 100,
+    "lineItems": [
+      {
+        "code": "no_show_fee",
+        "label": "No-show fee",
+        "cents": 500
+      }
+    ],
+    "totalCents": 500,
+    "paidCents": 500,
+    "paidAt": "2026-10-03T03:37:39Z"
+  },
+  "history": {
+    "rider": {
+      "partyId": "RDR-NE",
+      "accountAgeDays": 700,
+      "rating": 4.75,
+      "completedTrips": 150,
+      "disputesFiled90d": 0,
+      "disputesAgainst90d": 0
+    },
+    "driver": {
+      "partyId": "DRV-NE",
+      "accountAgeDays": 1000,
+      "rating": 4.8,
+      "completedTrips": 4000,
+      "disputesFiled90d": 0,
+      "disputesAgainst90d": 0
+    }
+  }
+}

@@ -1,0 +1,463 @@
+{
+  "fixtureId": "R3",
+  "label": "Documented road closure",
+  "purpose": "golden",
+  "synthetic": true,
+  "dispute": {
+    "id": "DSP-R3",
+    "category": "route_deviation",
+    "tripId": "TRP-R3",
+    "filedAt": "2026-10-02T16:14:30Z",
+    "riderClaim": "The driver took a detour and I paid more than the app's route. I don't think the detour was needed.",
+    "driverStatement": "The expressway was closed because of an accident. The navigation app rerouted us and I told the rider in the chat."
+  },
+  "parties": {
+    "riderId": "RDR-R3",
+    "driverId": "DRV-R3"
+  },
+  "trip": {
+    "pickup": {
+      "lat": 1.351,
+      "lng": 103.848,
+      "label": "Bishan (synthetic pin)"
+    },
+    "dropoff": {
+      "lat": 1.283,
+      "lng": 103.86,
+      "label": "Marina Bay (synthetic pin)"
+    },
+    "requestedAt": "2026-10-02T13:55:00Z",
+    "outcome": "completed"
+  },
+  "gps": {
+    "status": "available",
+    "referenceRoute": {
+      "points": [
+        [
+          1.351,
+          103.848
+        ],
+        [
+          1.33,
+          103.845
+        ],
+        [
+          1.305,
+          103.848
+        ],
+        [
+          1.29,
+          103.855
+        ],
+        [
+          1.283,
+          103.86
+        ]
+      ],
+      "estDurationSec": 716,
+      "source": "Synthetic reference route (not a routing-service result)"
+    },
+    "driverTrace": [
+      {
+        "ts": "2026-10-02T14:00:00Z",
+        "lat": 1.351,
+        "lng": 103.848
+      },
+      {
+        "ts": "2026-10-02T14:00:14Z",
+        "lat": 1.3496,
+        "lng": 103.8478
+      },
+      {
+        "ts": "2026-10-02T14:00:28Z",
+        "lat": 1.3482,
+        "lng": 103.8476
+      },
+      {
+        "ts": "2026-10-02T14:00:42Z",
+        "lat": 1.3468,
+        "lng": 103.8474
+      },
+      {
+        "ts": "2026-10-02T14:00:57Z",
+        "lat": 1.3454,
+        "lng": 103.8472
+      },
+      {
+        "ts": "2026-10-02T14:01:11Z",
+        "lat": 1.344,
+        "lng": 103.847
+      },
+      {
+        "ts": "2026-10-02T14:01:25Z",
+        "lat": 1.3426,
+        "lng": 103.8468
+      },
+      {
+        "ts": "2026-10-02T14:01:39Z",
+        "lat": 1.3412,
+        "lng": 103.8466
+      },
+      {
+        "ts": "2026-10-02T14:01:53Z",
+        "lat": 1.3398,
+        "lng": 103.8464
+      },
+      {
+        "ts": "2026-10-02T14:02:07Z",
+        "lat": 1.3384,
+        "lng": 103.8462
+      },
+      {
+        "ts": "2026-10-02T14:02:21Z",
+        "lat": 1.337,
+        "lng": 103.846
+      },
+      {
+        "ts": "2026-10-02T14:02:35Z",
+        "lat": 1.3356,
+        "lng": 103.8458
+      },
+      {
+        "ts": "2026-10-02T14:02:50Z",
+        "lat": 1.3342,
+        "lng": 103.8456
+      },
+      {
+        "ts": "2026-10-02T14:03:04Z",
+        "lat": 1.3328,
+        "lng": 103.8454
+      },
+      {
+        "ts": "2026-10-02T14:03:18Z",
+        "lat": 1.3314,
+        "lng": 103.8452
+      },
+      {
+        "ts": "2026-10-02T14:03:32Z",
+        "lat": 1.33,
+        "lng": 103.845
+      },
+      {
+        "ts": "2026-10-02T14:03:47Z",
+        "lat": 1.329643,
+        "lng": 103.846429
+      },
+      {
+        "ts": "2026-10-02T14:04:01Z",
+        "lat": 1.329286,
+        "lng": 103.847857
+      },
+      {
+        "ts": "2026-10-02T14:04:16Z",
+        "lat": 1.328929,
+        "lng": 103.849286
+      },
+      {
+        "ts": "2026-10-02T14:04:31Z",
+        "lat": 1.328571,
+        "lng": 103.850714
+      },
+      {
+        "ts": "2026-10-02T14:04:46Z",
+        "lat": 1.328214,
+        "lng": 103.852143
+      },
+      {
+        "ts": "2026-10-02T14:05:00Z",
+        "lat": 1.327857,
+        "lng": 103.853571
+      },
+      {
+        "ts": "2026-10-02T14:05:15Z",
+        "lat": 1.3275,
+        "lng": 103.855
+      },
+      {
+        "ts": "2026-10-02T14:05:30Z",
+        "lat": 1.327143,
+        "lng": 103.856429
+      },
+      {
+        "ts": "2026-10-02T14:05:44Z",
+        "lat": 1.326786,
+        "lng": 103.857857
+      },
+      {
+        "ts": "2026-10-02T14:05:59Z",
+        "lat": 1.326429,
+        "lng": 103.859286
+      },
+      {
+        "ts": "2026-10-02T14:06:14Z",
+        "lat": 1.326071,
+        "lng": 103.860714
+      },
+      {
+        "ts": "2026-10-02T14:06:29Z",
+        "lat": 1.325714,
+        "lng": 103.862143
+      },
+      {
+        "ts": "2026-10-02T14:06:43Z",
+        "lat": 1.325357,
+        "lng": 103.863571
+      },
+      {
+        "ts": "2026-10-02T14:06:58Z",
+        "lat": 1.325,
+        "lng": 103.865
+      },
+      {
+        "ts": "2026-10-02T14:07:13Z",
+        "lat": 1.323529,
+        "lng": 103.865294
+      },
+      {
+        "ts": "2026-10-02T14:07:28Z",
+        "lat": 1.322059,
+        "lng": 103.865588
+      },
+      {
+        "ts": "2026-10-02T14:07:43Z",
+        "lat": 1.320588,
+        "lng": 103.865882
+      },
+      {
+        "ts": "2026-10-02T14:07:58Z",
+        "lat": 1.319118,
+        "lng": 103.866176
+      },
+      {
+        "ts": "2026-10-02T14:08:13Z",
+        "lat": 1.317647,
+        "lng": 103.866471
+      },
+      {
+        "ts": "2026-10-02T14:08:28Z",
+        "lat": 1.316176,
+        "lng": 103.866765
+      },
+      {
+        "ts": "2026-10-02T14:08:43Z",
+        "lat": 1.314706,
+        "lng": 103.867059
+      },
+      {
+        "ts": "2026-10-02T14:08:58Z",
+        "lat": 1.313235,
+        "lng": 103.867353
+      },
+      {
+        "ts": "2026-10-02T14:09:13Z",
+        "lat": 1.311765,
+        "lng": 103.867647
+      },
+      {
+        "ts": "2026-10-02T14:09:28Z",
+        "lat": 1.310294,
+        "lng": 103.867941
+      },
+      {
+        "ts": "2026-10-02T14:09:43Z",
+        "lat": 1.308824,
+        "lng": 103.868235
+      },
+      {
+        "ts": "2026-10-02T14:09:58Z",
+        "lat": 1.307353,
+        "lng": 103.868529
+      },
+      {
+        "ts": "2026-10-02T14:10:13Z",
+        "lat": 1.305882,
+        "lng": 103.868824
+      },
+      {
+        "ts": "2026-10-02T14:10:28Z",
+        "lat": 1.304412,
+        "lng": 103.869118
+      },
+      {
+        "ts": "2026-10-02T14:10:43Z",
+        "lat": 1.302941,
+        "lng": 103.869412
+      },
+      {
+        "ts": "2026-10-02T14:10:58Z",
+        "lat": 1.301471,
+        "lng": 103.869706
+      },
+      {
+        "ts": "2026-10-02T14:11:13Z",
+        "lat": 1.3,
+        "lng": 103.87
+      },
+      {
+        "ts": "2026-10-02T14:11:27Z",
+        "lat": 1.298786,
+        "lng": 103.869286
+      },
+      {
+        "ts": "2026-10-02T14:11:41Z",
+        "lat": 1.297571,
+        "lng": 103.868571
+      },
+      {
+        "ts": "2026-10-02T14:11:55Z",
+        "lat": 1.296357,
+        "lng": 103.867857
+      },
+      {
+        "ts": "2026-10-02T14:12:09Z",
+        "lat": 1.295143,
+        "lng": 103.867143
+      },
+      {
+        "ts": "2026-10-02T14:12:23Z",
+        "lat": 1.293929,
+        "lng": 103.866429
+      },
+      {
+        "ts": "2026-10-02T14:12:37Z",
+        "lat": 1.292714,
+        "lng": 103.865714
+      },
+      {
+        "ts": "2026-10-02T14:12:52Z",
+        "lat": 1.2915,
+        "lng": 103.865
+      },
+      {
+        "ts": "2026-10-02T14:13:06Z",
+        "lat": 1.290286,
+        "lng": 103.864286
+      },
+      {
+        "ts": "2026-10-02T14:13:20Z",
+        "lat": 1.289071,
+        "lng": 103.863571
+      },
+      {
+        "ts": "2026-10-02T14:13:34Z",
+        "lat": 1.287857,
+        "lng": 103.862857
+      },
+      {
+        "ts": "2026-10-02T14:13:48Z",
+        "lat": 1.286643,
+        "lng": 103.862143
+      },
+      {
+        "ts": "2026-10-02T14:14:02Z",
+        "lat": 1.285429,
+        "lng": 103.861429
+      },
+      {
+        "ts": "2026-10-02T14:14:16Z",
+        "lat": 1.284214,
+        "lng": 103.860714
+      },
+      {
+        "ts": "2026-10-02T14:14:30Z",
+        "lat": 1.283,
+        "lng": 103.86
+      }
+    ],
+    "events": [
+      {
+        "ts": "2026-10-02T14:00:00Z",
+        "type": "trip_start"
+      },
+      {
+        "ts": "2026-10-02T14:03:32Z",
+        "type": "reroute",
+        "reason": "road_closure",
+        "detail": "Navigation rerouted: road closed ahead on the reference route (synthetic)"
+      },
+      {
+        "ts": "2026-10-02T14:14:30Z",
+        "type": "trip_end"
+      }
+    ],
+    "trafficAdvisories": [
+      {
+        "id": "ADV-SYN-0412",
+        "ts": "2026-10-02T13:50:00Z",
+        "type": "road_closure",
+        "description": "Synthetic advisory: road closed southbound on the reference route between its second and third waypoints due to an accident.",
+        "source": "Synthetic traffic advisory feed (demo)"
+      }
+    ]
+  },
+  "comms": {
+    "messages": [
+      {
+        "id": "m1",
+        "ts": "2026-10-02T14:03:47Z",
+        "sender": "driver",
+        "text": "Sorry, road ahead closed due to an accident. App is rerouting us."
+      },
+      {
+        "id": "m2",
+        "ts": "2026-10-02T14:04:12Z",
+        "sender": "rider",
+        "text": "Oh ok."
+      }
+    ],
+    "calls": []
+  },
+  "payment": {
+    "status": "available",
+    "currency": "SGD",
+    "rateCard": {
+      "baseCents": 300,
+      "perKmCents": 75,
+      "perMinCents": 20,
+      "noShowFeeCents": 500
+    },
+    "surgeMultiplierX100": 100,
+    "lineItems": [
+      {
+        "code": "base",
+        "label": "Base fare",
+        "cents": 300
+      },
+      {
+        "code": "distance",
+        "label": "Distance",
+        "cents": 726,
+        "quantity": 9678,
+        "unit": "m"
+      },
+      {
+        "code": "time",
+        "label": "Time",
+        "cents": 290,
+        "quantity": 870,
+        "unit": "s"
+      }
+    ],
+    "totalCents": 1316,
+    "paidCents": 1316,
+    "paidAt": "2026-10-02T14:15:00Z"
+  },
+  "history": {
+    "rider": {
+      "partyId": "RDR-R3",
+      "accountAgeDays": 650,
+      "rating": 4.8,
+      "completedTrips": 140,
+      "disputesFiled90d": 0,
+      "disputesAgainst90d": 0
+    },
+    "driver": {
+      "partyId": "DRV-R3",
+      "accountAgeDays": 1200,
+      "rating": 4.85,
+      "completedTrips": 5100,
+      "disputesFiled90d": 0,
+      "disputesAgainst90d": 1
+    }
+  }
+}

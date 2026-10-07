@@ -1,0 +1,243 @@
+[
+  {
+    "fixtureId": "R1",
+    "purpose": "golden",
+    "category": "route_deviation",
+    "status": "resolved",
+    "favours": "rider",
+    "remedyId": "refund_route_excess",
+    "amountCents": 198,
+    "decisiveEvidenceIds": [
+      "GPS-ROUTE",
+      "CHAT-01",
+      "CHAT-03",
+      "PAY-FARE",
+      "PAY-REMEDY"
+    ],
+    "clauseIds": [
+      "RD-1",
+      "RD-2"
+    ],
+    "missingFamilies": [],
+    "rationale": "The actual route exceeds the reference route by more than the RD-1 threshold; the rider objected in chat and there is no consent or documented diversion, so RD-2 refunds the eligible excess-distance charge."
+  },
+  {
+    "fixtureId": "R2",
+    "purpose": "golden",
+    "category": "route_deviation",
+    "status": "resolved",
+    "favours": "driver",
+    "remedyId": "keep_charge",
+    "amountCents": 0,
+    "decisiveEvidenceIds": [
+      "GPS-ROUTE",
+      "CHAT-01",
+      "CHAT-02",
+      "CHAT-03"
+    ],
+    "clauseIds": [
+      "RD-1",
+      "RD-3"
+    ],
+    "missingFamilies": [],
+    "rationale": "The detour is material under RD-1, but the rider requested the Orchard Road route and expressly agreed after being told it would cost more (RD-3)."
+  },
+  {
+    "fixtureId": "R3",
+    "purpose": "golden",
+    "category": "route_deviation",
+    "status": "resolved",
+    "favours": "driver",
+    "remedyId": "keep_charge",
+    "amountCents": 0,
+    "decisiveEvidenceIds": [
+      "GPS-ROUTE",
+      "GPS-NAV-01",
+      "GPS-ADV-01",
+      "CHAT-01"
+    ],
+    "clauseIds": [
+      "RD-1",
+      "RD-4"
+    ],
+    "missingFamilies": [],
+    "rationale": "The detour is material under RD-1, but a documented road closure advisory and a navigation reroute explain it (RD-4); the driver told the rider at the time."
+  },
+  {
+    "fixtureId": "N1",
+    "purpose": "golden",
+    "category": "no_show",
+    "status": "resolved",
+    "favours": "rider",
+    "remedyId": "refund_no_show_fee",
+    "amountCents": 500,
+    "decisiveEvidenceIds": [
+      "GPS-PICKUP",
+      "GPS-RIDER",
+      "CHAT-01"
+    ],
+    "clauseIds": [
+      "NS-1",
+      "NS-2"
+    ],
+    "missingFamilies": [],
+    "rationale": "The driver never came within the NS-1 pickup distance despite claiming to be there, while the rider was at the pin; NS-1 is not met, so NS-2 refunds the fee."
+  },
+  {
+    "fixtureId": "N2",
+    "purpose": "golden",
+    "category": "no_show",
+    "status": "resolved",
+    "favours": "driver",
+    "remedyId": "keep_charge",
+    "amountCents": 0,
+    "decisiveEvidenceIds": [
+      "GPS-PICKUP",
+      "GPS-RIDER",
+      "CALL-01",
+      "CHAT-01",
+      "CHAT-CONTACT"
+    ],
+    "clauseIds": [
+      "NS-1"
+    ],
+    "missingFamilies": [],
+    "rationale": "The driver stayed within the pickup distance for longer than the minimum wait and made three contact attempts; the rider was elsewhere. All NS-1 conditions are met."
+  },
+  {
+    "fixtureId": "N3",
+    "purpose": "golden",
+    "category": "no_show",
+    "status": "resolved",
+    "favours": "rider",
+    "remedyId": "refund_no_show_fee",
+    "amountCents": 500,
+    "decisiveEvidenceIds": [
+      "GPS-PICKUP",
+      "CHAT-CONTACT"
+    ],
+    "clauseIds": [
+      "NS-1",
+      "NS-2"
+    ],
+    "missingFamilies": [],
+    "rationale": "The driver cancelled before the NS-1 minimum wait elapsed, so NS-1 is not met and NS-2 refunds the fee."
+  },
+  {
+    "fixtureId": "R1S",
+    "purpose": "variation",
+    "category": "route_deviation",
+    "status": "resolved",
+    "favours": "rider",
+    "remedyId": "refund_route_excess",
+    "amountCents": 297,
+    "decisiveEvidenceIds": [
+      "GPS-ROUTE",
+      "PAY-FARE",
+      "PAY-REMEDY"
+    ],
+    "clauseIds": [
+      "RD-1",
+      "RD-2"
+    ],
+    "missingFamilies": [],
+    "rationale": "Same facts as R1; the RD-2 refund applies the surge multiplier and does not pro-rate the promotion."
+  },
+  {
+    "fixtureId": "NE",
+    "purpose": "edge",
+    "category": "no_show",
+    "status": "resolved",
+    "favours": "driver",
+    "remedyId": "keep_charge",
+    "amountCents": 0,
+    "decisiveEvidenceIds": [
+      "GPS-PICKUP",
+      "CHAT-CONTACT"
+    ],
+    "clauseIds": [
+      "NS-1"
+    ],
+    "missingFamilies": [],
+    "rationale": "The driver reached exactly the NS-1 distance limit, waited exactly the minimum time and made one contact attempt; NS-1 thresholds are inclusive, so all conditions are met."
+  },
+  {
+    "fixtureId": "N2H",
+    "purpose": "fairness",
+    "category": "no_show",
+    "status": "resolved",
+    "favours": "driver",
+    "remedyId": "keep_charge",
+    "amountCents": 0,
+    "decisiveEvidenceIds": [
+      "GPS-PICKUP",
+      "GPS-RIDER",
+      "CALL-01",
+      "CHAT-01",
+      "CHAT-CONTACT"
+    ],
+    "clauseIds": [
+      "NS-1",
+      "GEN-2"
+    ],
+    "missingFamilies": [],
+    "rationale": "Identical trip evidence to N2 with swapped party histories; history is context only (GEN-2), so the outcome must match N2."
+  },
+  {
+    "fixtureId": "X1",
+    "purpose": "robustness",
+    "category": "route_deviation",
+    "status": "incomplete",
+    "favours": null,
+    "remedyId": null,
+    "amountCents": null,
+    "decisiveEvidenceIds": [],
+    "clauseIds": [
+      "GEN-1"
+    ],
+    "missingFamilies": [
+      "gps"
+    ],
+    "rationale": "GPS is decisive for RD-1 and is missing; under GEN-1 the case is incomplete and no ruling or amount is issued."
+  },
+  {
+    "fixtureId": "X2",
+    "purpose": "robustness",
+    "category": "no_show",
+    "status": "resolved",
+    "favours": "driver",
+    "remedyId": "keep_charge",
+    "amountCents": 0,
+    "decisiveEvidenceIds": [
+      "GPS-PICKUP",
+      "GPS-RIDER",
+      "CALL-01",
+      "CHAT-01",
+      "CHAT-CONTACT",
+      "CHAT-04"
+    ],
+    "clauseIds": [
+      "NS-1",
+      "GEN-3"
+    ],
+    "missingFamilies": [],
+    "rationale": "Same trip evidence as N2. CHAT-04 is instruction-like text inside evidence; under GEN-3 it is case material, not an instruction, so the outcome must match N2."
+  },
+  {
+    "fixtureId": "X3",
+    "purpose": "robustness",
+    "category": "no_show",
+    "status": "incomplete",
+    "favours": null,
+    "remedyId": null,
+    "amountCents": null,
+    "decisiveEvidenceIds": [],
+    "clauseIds": [
+      "GEN-1"
+    ],
+    "missingFamilies": [
+      "payment"
+    ],
+    "rationale": "The payment record is decisive for the remedy amount and is missing; under GEN-1 the case is incomplete and no amount is issued."
+  }
+]
