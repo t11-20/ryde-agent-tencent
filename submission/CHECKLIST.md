@@ -8,13 +8,13 @@ correct the rows below if they differ.
 
 | Item | Description | Owner | Status | Evidence | Blocker |
 |---|---|---|---|---|---|
-| E1 | Project built using CodeBuddy or WorkBuddy | Partner + Edward | TODO | — | Must be done in CodeBuddy by a human; Claude Code work does not count |
+| E1 | Project built using CodeBuddy or WorkBuddy | Partner + Edward | TODO | — | Must be genuine development done in CodeBuddy or WorkBuddy; work done in other tools does not count |
 | E2 | At least 3 genuine CodeBuddy development-chat screenshots | Partner | TODO | `submission/screenshots/README.md` lists what to capture | Needs E1 work |
 | E3 | Title and case-study line | Partner | DRAFTED | `submission/identity.md` | Human sign-off |
 | E4 | Blurb (9 words or fewer) and cover-image exports (1920×1080, 384×216) | Partner | DRAFTED (text) / TODO (image) | `submission/identity.md` | Cover image not made |
 | E5 | Project description | Partner + Edward | DRAFTED | `submission/description.md` | Metrics need a real scorecard; Lane A sections (architecture, prompting) to fill |
 | E6 | Screenshots and submission checklist | Partner | DRAFTED | this file; `submission/screenshots/README.md` | Product screenshots need the live system |
-| E7 | *Not described in the handoff; fill from the execution plan* | ? | TODO | — | Plan not available to Claude Code |
+| E7 | *Not described in the handoff; fill from the execution plan* | ? | TODO | — | Execution plan wording to be checked |
 
 ## Deliverables
 

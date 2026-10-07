@@ -1,6 +1,6 @@
 # FairTrip: project description (DRAFT)
 
-> Draft by Claude Code for the human to finalise. Every metric is a placeholder of the form `[[FROM SCORECARD: …]]`.
+> Draft for the team to finalise. Every metric is a placeholder of the form `[[FROM SCORECARD: …]]`.
 > Fill each one from a **real** `packages/eval` scorecard run against the live system, never from the fake-server
 > demo. If a number was not measured, delete the sentence instead of estimating it.
 >
