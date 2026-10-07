@@ -10,14 +10,19 @@
     "ensure-evidence": "node scripts/ensure-evidence.mjs",
     "predev": "npm run -s ensure-evidence",
     "dev": "vite",
-    "dev:mock": "VITE_API_MODE=mock vite",
+    "predev:mock": "npm run -s ensure-evidence",
+    "dev:mock": "vite --mode mock",
     "pretypecheck": "npm run -s ensure-evidence",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "pretest": "npm run -s ensure-evidence",
     "test": "vitest run",
     "prebuild": "npm run -s ensure-evidence",
     "build": "tsc -p tsconfig.json --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "precontracts:build": "npm run -s ensure-evidence",
+    "contracts:build": "tsx scripts/build-contract-artifacts.ts",
+    "precontracts:check": "npm run -s ensure-evidence",
+    "contracts:check": "tsx scripts/build-contract-artifacts.ts --check"
   },
   "dependencies": {
     "@fairtrip/evidence": "file:../../packages/evidence",
@@ -34,6 +39,7 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
     "jsdom": "^29.1.1",
+    "tsx": "^4.23.15",
     "typescript": "~5.9",
     "vite": "^8.3.3",
     "vitest": "^5.0.3"

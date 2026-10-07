@@ -1,0 +1,15 @@
+{
+  "title": "POST /api/runs response (PROVISIONAL)",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "runId": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "runId"
+  ],
+  "additionalProperties": {}
+}
