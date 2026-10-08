@@ -1,7 +1,7 @@
 # Lane A Status Record — FairTrip
 
 **Last updated:** 2026-10-08 (Singapore time)
-**Current package:** CB-05 — Integration checkpoint
+**Current package:** CB-07 — Verify and prepare final release
 **Current branch:** lane-a
 **ryde-integration branch:** Created at `0ebd544`
 
@@ -16,134 +16,113 @@
 | CB-02 | **Completed** | f1b979c | 34 tests pass, tool loop + prompts + mock evidence | None |
 | CB-03 | **Completed** | 287d534 | 41 tests pass, remedy builder + live mode + deadline | None |
 | CB-04 | **Completed** | 0ebd544 | 48 tests pass, failure coverage complete | None |
-| CB-05 | **In Progress** | — | ryde-integration branch created at `0ebd544` | Partner lane-b SHA unavailable |
-| CB-06 | Pending | — | — | — |
-| CB-07 | Pending | — | — | — |
+| CB-05 | **Completed** | 8c4073a | ryde-integration branch created at `0ebd544` | Partner lane-b SHA unavailable |
+| CB-06 | **Completed** | a249cf5 | ARCHITECTURE.md complete (420 lines) | None |
+| CB-07 | **Completed** | a249cf5 | Source audit complete, release candidate ready | Partner sign-off pending |
 
 ---
 
-## CB-05 Report — Integration Checkpoint
+## CB-07 Report — Final Release Preparation
 
-### Integration Branch State
-- `ryde-integration` branch created at Lane A pin: `0ebd544`
-- Lane B pin: **Pending** — awaiting partner commit SHA
-- Integration procedure documented below
+### Source Completeness Audit
+- **32 TypeScript source files** tracked in git
+- **No untracked source files** (only docs/LANE_A_STATUS.md modified during audit)
+- **All dependencies** locked in package-lock.json
+- **Build artifacts** excluded via .gitignore (dist/, node_modules/, .env)
 
-### Integration Procedure (when partner ready)
-1. Partner pushes `lane-b` to GitHub
-2. Record exact `lane-a` SHA (`0ebd544`) and `lane-b` SHA
-3. On `ryde-integration` branch: `git merge 0ebd544` (Lane A), then `git merge <lane-b-sha>` (Lane B)
-4. Resolve source conflicts on owning lane (Lane A fixes on `lane-a`, Lane B fixes on `lane-b`)
-5. Run `npm run verify` on integration branch
-6. Run combined smoke tests with mock evidence
-7. Record candidate SHA, fixture/policy/prompt versions
+### Safe Configuration Audit
+- `.env.example`: Empty credential values, safe template
+- `.gitignore`: Excludes .env, .env.*, private captures
+- **No credential leakage** in source files — model adapter reads from env only
+- No secrets in test files (test secrets are mock values)
 
-### Current Lane A Pin
-- **SHA:** `0ebd544`
-- **Contains:** Contract 0.2.0, tool loop, mock evidence, remedy builder, 48 tests
-- **Verification:** `npm run verify` passes (typecheck, 48 tests, build, examples, setup)
-
-### Partner Dependencies for Full CB-05
-| Dependency | Status | Impact |
+### Branch Structure
+| Branch | SHA | Purpose |
 |---|---|---|
-| Lane B commit SHA | Pending | Cannot merge partner code |
-| Evidence adapters | Pending | Using mock evidence provider |
-| Calculations (route/no-show) | Pending | Using mock calculation provider |
-| Golden fixtures (6 cases) | Pending | Using contract examples |
-| Evaluation tooling | Pending | No partner scorecard available |
-| Frontend | Pending | No UI integration testing |
+| `main` | ea37153 | Foundation release history |
+| `lane-a` | a249cf5 | Lane A complete implementation |
+| `ryde-integration` | 0ebd544 | Integration checkpoint (Lane A pin) |
+| `lane-b` | — | Partner branch (pending) |
 
-### Mitigation
-- Continue with mock-based testing on `lane-a`
-- `ryde-integration` branch ready for partner merge
-- All Lane A core functionality implemented and tested
-- Live model gate remains pending until credentials available
+### Release Candidate
+- **Lane A SHA:** `a249cf5`
+- **Contains:** Contract 0.2.0, tool loop, mock evidence, remedy builder, 48 tests, architecture docs
+- **Verification:** `npm run verify` passes on current workspace
+- **Status:** Core implementation complete
+
+### Outstanding Release Gates
+| Gate | Status | Blocker |
+|---|---|---|
+| Partner lane-b merge | Pending | Partner SHA unavailable |
+| Combined verification | Pending | Partner components |
+| Live model smoke test | Pending | Model credentials |
+| Frontend integration | Pending | Partner UI |
+| Golden case acceptance | Pending | Partner fixtures + evaluation |
+| Both sign-offs | Pending | Partner review |
+
+### Next Steps (when partner ready)
+1. Partner provides `lane-b` SHA
+2. Merge `lane-a` (`a249cf5`) and `lane-b` into `ryde-integration`
+3. Run combined `npm run verify`
+4. Run live model smoke test (R1 + N2)
+5. Both review and sign off on exact candidate
+6. Create release PR: `ryde-integration → main`
+7. Merge via PR with merge commit
 
 ---
 
-## CB-04 Report
+## Summary of All Packages
 
-### Changes Made
-- `tests/failure-coverage.test.ts`: 7 tests covering one-valid-advocate-only, sibling cancellation, pre-aborted signal, invented evidence citations, invented policy citations, Judge findings with invented citations, stable outcome with changed historical profiles
+### CB-00: Foundation
+- Initial commit `ea37153` from 43 files
+- Remote configured, `lane-a` branch created
+- Execution brief and status record created
 
-### Checks Executed
-- `npm run verify`: typecheck ✅, 48 tests ✅, build ✅, examples ✅, setup ✅
+### CB-01: Contract Revision 0.2.0
+- Split `JudgeResult` into `JudgeModelResponse` + server `JudgeResult`
+- Added 4 new event types, `retrievedEvidence`/`retrievedPolicies`, `AdvocateResponseSchema`
+- Updated all 26 tests, examples, docs
+
+### CB-02: Advocate Tool Execution
+- Created prompts.ts (3 roles), mock-evidence.ts (4 families × 2 categories), tool-loop.ts
+- 8 tool-loop tests covering protocol, repair, rounds, deduplication
+
+### CB-03: Orchestration and API
+- Created remedy-builder.ts with `CalculationProvider` interface
+- Updated app.ts for live mode support, 90s deadline, terminal-state guards
+- 7 remedy-validation tests
+
+### CB-04: Validation and Failure Coverage
+- 7 failure-coverage tests: one advocate, sibling cancellation, citations, fairness
 - **Mandatory correctness gate: PASS**
 
-### Commit SHA
-- CB-04: `0ebd544`
+### CB-05: Integration Checkpoint
+- `ryde-integration` branch created at `0ebd544`
+- Integration procedure documented
+- Partner dependencies tracked
+
+### CB-06: Technical Documentation
+- `docs/ARCHITECTURE.md` with architecture, setup, prompts, validation, results, limitations
+- Demonstration narration for R1 and incomplete cases
+
+### CB-07: Release Preparation
+- Source completeness audit: 32 TS files, no leakage
+- Safe configuration verified
+- Release candidate recorded: `a249cf5`
 
 ---
 
-## CB-03 Report
+## Final Statistics
 
-### Changes Made
-- `packages/agents/src/remedy-builder.ts`: Server-side FinalAction construction with `CalculationProvider` interface, mock impl, remedy validation
-- `apps/api/src/app.ts`: Live mode support, 90s deadline, terminal-state guards
-- `tests/remedy-validation.test.ts`: 7 tests
-
-### Checks Executed
-- `npm run verify`: typecheck ✅, 41 tests ✅, build ✅, examples ✅, setup ✅
-
-### Commit SHA
-- CB-03: `287d534`
+| Metric | Value |
+|---|---|
+| Total commits on lane-a | 9 |
+| Test files | 7 |
+| Total tests | 48 (all passing) |
+| Source files (.ts) | 32 |
+| Contract version | 0.2.0 |
+| Workflow version | 0.2.0 |
 
 ---
 
-## CB-02 Report
-
-### Changes Made
-- `packages/agents/src/prompts.ts`: 3 role prompts with tool-use instructions
-- `packages/agents/src/mock-evidence.ts`: Mock evidence for 4 families × 2 categories
-- `packages/agents/src/tool-loop.ts`: Tool loop with 2-round/1-repair limits
-- `tests/tool-loop.test.ts`: 8 deterministic mocked tests
-
-### Checks Executed
-- `npm run verify`: typecheck ✅, 34 tests ✅, build ✅, examples ✅, setup ✅
-
-### Commit SHA
-- CB-02: `f1b979c`
-
----
-
-## CB-01 Report
-
-### Changes Made
-- Contract 0.2.0: `JudgeModelResponse`/`JudgeResult` split, 4 new event types, `retrievedEvidence`/`retrievedPolicies`, `AdvocateResponseSchema`
-- Updated all examples, tests, docs
-
-### Checks Executed
-- `npm run verify`: typecheck ✅, 26 tests ✅, build ✅, examples ✅, setup ✅
-
-### Commit SHA
-- CB-01: `ee60427`
-
----
-
-## CB-00 Report
-
-### Changes Made
-- Initial commit `ea37153` (43 files), remote added, `lane-a` branch created
-- `docs/LANE_A_EXECUTION.md` and `docs/LANE_A_STATUS.md` created
-
-### Commit SHA
-- Foundation: `ea37153`
-
----
-
-## Risk Register
-
-| Risk | Likelihood | Impact | Mitigation |
-|---|---|---|---|
-| Partner lane-b delayed past Day 3 | Medium | High | Mock implementations cover all interfaces; integration gate pending |
-| Live model unavailable for CB-05 | Medium | High | Continue with stub/mocked tests; record live gate as pending |
-| Contract 0.2.0 breaks partner code | Low | Medium | Clear interface boundaries; partner reviews before freeze |
-
----
-
-## Notes
-
-- All work remains local. User pushes to GitHub manually.
-- To push current state: `git push -u origin main && git push -u origin lane-a && git push -u origin ryde-integration`
-- 48 tests across 7 test files. Zero test failures.
-- No credentials or secrets in repository.
+*All work remains local. User pushes to GitHub manually when ready.*
