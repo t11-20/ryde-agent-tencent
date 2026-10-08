@@ -29,6 +29,11 @@ export interface WorkflowEventEmitter {
   emit(event: WorkflowEvent): void;
 }
 
+// Re-export tool-loop and prompts for consumers
+export { runAdvocateToolLoop, type ToolLoopResult, type ToolLoopConfig } from './tool-loop.js';
+export { riderAdvocatePrompt, driverAdvocatePrompt, judgePrompt } from './prompts.js';
+export { createMockEvidenceTools, mockEvidenceStore, mockPolicyStore } from './mock-evidence.js';
+
 // Foundation: production prompts/tool loops are a later Lane A workstream (CB-02).
 // This version supports event emission for immediate persistence (CB-03).
 export async function runWorkflow(
