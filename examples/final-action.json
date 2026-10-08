@@ -1,0 +1,7 @@
+{
+  "remedyId": "keep_charge",
+  "recipient": "none",
+  "currency": "SGD",
+  "amountCents": 0,
+  "recommendation": "Development stub only. Do not execute any payment action."
+}

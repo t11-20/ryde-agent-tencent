@@ -1,0 +1,21 @@
+{
+  "notice": "Development contract examples only. Not real evidence, demonstration policy, golden cases, or live rulings.",
+  "disputes": [
+    {"id":"dispute-route-example","category":"route_deviation","tripId":"trip-example","riderClaim":"Placeholder route claim for API integration.","driverStatement":"Placeholder response."},
+    {"id":"dispute-no-show-example","category":"no_show","tripId":"trip-example","riderClaim":"Placeholder no-show claim for API integration.","driverStatement":"Placeholder response."}
+  ],
+  "evidence": [
+    {"id":"e-gps","source":"gps","timestamp":"2026-10-08T00:00:00Z","facts":{"placeholder":true},"provenance":{"kind":"contract_example","description":"Envelope example; detailed GPS facts supplied by partner."}},
+    {"id":"e-chat","source":"chat","timestamp":"2026-10-08T00:00:00Z","facts":{"placeholder":true},"provenance":{"kind":"contract_example","description":"Envelope example; detailed chat facts supplied by partner."}},
+    {"id":"e-payment","source":"payment","timestamp":"2026-10-08T00:00:00Z","facts":{"placeholder":true},"provenance":{"kind":"contract_example","description":"Envelope example; detailed payment facts supplied by partner."}},
+    {"id":"e-history","source":"history","timestamp":"2026-10-08T00:00:00Z","facts":{"placeholder":true},"provenance":{"kind":"contract_example","description":"Envelope example; detailed historical facts supplied by partner."}}
+  ],
+  "policies": [
+    {"id":"p-route-placeholder","version":"contract-example-0.1.0","category":"route_deviation","ruleText":"Placeholder clause for contract validation only.","remedyCriteria":"No operational policy is defined by this example."},
+    {"id":"p-no-show-placeholder","version":"contract-example-0.1.0","category":"no_show","ruleText":"Placeholder clause for contract validation only.","remedyCriteria":"No operational policy is defined by this example."}
+  ],
+  "riderCase": {"side":"rider","summary":"Development stub rider case.","arguments":[{"claim":"Placeholder claim referencing example records.","evidenceIds":["e-gps"],"policyClauseIds":["p-route-placeholder"]}],"counterevidence":[],"requestedRemedyId":"keep_charge","missingFacts":["Partner-owned fixture and policy are not supplied."]},
+  "driverCase": {"side":"driver","summary":"Development stub driver case.","arguments":[{"claim":"Placeholder response referencing example records.","evidenceIds":["e-chat"],"policyClauseIds":["p-route-placeholder"]}],"counterevidence":[],"requestedRemedyId":"keep_charge","missingFacts":["Partner-owned fixture and policy are not supplied."]},
+  "judgeResult": {"ruling":"incomplete","findings":[{"claim":"Only development placeholders are available.","evidenceIds":["e-gps","e-chat"],"policyClauseIds":["p-route-placeholder"]}],"remedyId":"keep_charge","confidence":0,"reasoning":"Fixed development stub; no real adjudication or model invocation occurred.","riderExplanation":"No real decision has been made.","driverExplanation":"No real decision has been made.","action":{"remedyId":"keep_charge","recipient":"none","currency":"SGD","amountCents":0,"recommendation":"Development stub only. Do not execute any payment action."}},
+  "event": {"runId":"run-example","sequence":1,"timestamp":"2026-10-08T00:00:00Z","mode":"stub","actor":"system","type":"run.started","summary":"Development stub started; no model call.","evidenceIds":[],"policyClauseIds":[]}
+}
