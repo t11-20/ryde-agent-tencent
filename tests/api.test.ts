@@ -15,7 +15,9 @@ async function finished(api: ReturnType<typeof app>, id: string) {
 describe('prerequisite API', () => {
   it('runs offline, labels examples, and completes both categories without real retrieval events', async () => {
     const api = app();
-    expect((await request(api).get('/api/health')).body.mode).toBe('stub');
+    const health = await request(api).get('/api/health');
+    expect(health.body.mode).toBe('stub');
+    expect(health.body.contractVersion).toBe('0.2.0');
     const list = await request(api).get('/api/fixtures');
     expect(list.status).toBe(200); expect(list.body.fixtures).toHaveLength(2);
     for (const fixture of list.body.fixtures) {
@@ -26,10 +28,18 @@ describe('prerequisite API', () => {
       const run = RunSchema.parse(response.body);
       expect(run.status).toBe('completed'); expect(run.mode).toBe('stub');
       expect(run.dispute.riderClaim).toBe('Edited placeholder claim');
-      expect(run.events.map(e => e.type)).toEqual(['run.started', 'case.completed', 'case.completed', 'judge.started', 'run.completed']);
+      expect(run.retrievedEvidence).toEqual([]);
+      expect(run.retrievedPolicies).toEqual([]);
+      const eventTypes = run.events.map(e => e.type);
+      expect(eventTypes[0]).toBe('run.started');
+      expect(eventTypes[eventTypes.length - 1]).toBe('run.completed');
+      expect(eventTypes.filter(t => t === 'model.start')).toHaveLength(3);
+      expect(eventTypes.filter(t => t === 'model.finish')).toHaveLength(3);
+      expect(eventTypes.filter(t => t === 'case.completed')).toHaveLength(2);
+      expect(eventTypes).toContain('judge.started');
       const polled = await request(api).get(`/api/runs/${run.id}?after=2`);
-      expect(polled.body.events.map((e: {sequence: number}) => e.sequence)).toEqual([3, 4, 5]);
-      expect((await request(api).get(`/api/runs/${run.id}?after=5`)).body.events).toEqual([]);
+      expect(polled.body.events.map((e: {sequence: number}) => e.sequence)).toEqual([3, 4, 5, 6, 7, 8, 9, 10, 11]);
+      expect((await request(api).get(`/api/runs/${run.id}?after=11`)).body.events).toEqual([]);
     }
   });
   it('isolates concurrent runs', async () => {

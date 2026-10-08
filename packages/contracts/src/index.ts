@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const CONTRACT_VERSION = '0.1.0';
+export const CONTRACT_VERSION = '0.2.0';
 const Id = z.string().trim().min(1);
 const Timestamp = z.iso.datetime();
 export const CategorySchema = z.enum(['route_deviation', 'no_show']);
@@ -32,21 +32,43 @@ export const FinalActionSchema = z.strictObject({
   if (action.remedyId === 'keep_charge' && (action.amountCents !== 0 || action.recipient !== 'none'))
     ctx.addIssue({code: 'custom', message: 'keep_charge requires zero cents and no recipient'});
 });
+
+// Model-facing: what the Judge agent returns (NO money/recipient)
+export const JudgeModelResponseSchema = z.strictObject({
+  ruling: z.enum(['rider_favored', 'driver_favored', 'incomplete']),
+  findings: z.array(ArgumentSchema),
+  remedyId: RemedySchema,
+  confidence: z.number().min(0).max(1),
+  reasoning: z.string().min(1),
+  riderExplanation: z.string().min(1),
+  driverExplanation: z.string().min(1)
+});
+
+// Server-constructed: validated model response + server-built action
 export const JudgeResultSchema = z.strictObject({
-  ruling: z.enum(['rider_favored', 'driver_favored', 'incomplete']), findings: z.array(ArgumentSchema),
-  remedyId: RemedySchema, confidence: z.number().min(0).max(1), reasoning: z.string().min(1),
-  riderExplanation: z.string().min(1), driverExplanation: z.string().min(1), action: FinalActionSchema
-}).refine(result => result.remedyId === result.action.remedyId, {message: 'Result and action remedies must match'});
+  ...JudgeModelResponseSchema.shape,
+  action: FinalActionSchema
+}).refine(result => result.remedyId === result.action.remedyId,
+  {message: 'Result and action remedies must match'});
+
 export const ActivityEventSchema = z.strictObject({
   runId: Id, sequence: z.number().int().positive(), timestamp: Timestamp, mode: ModeSchema,
   actor: z.enum(['system', 'rider', 'driver', 'judge']),
-  type: z.enum(['run.started', 'tool.requested', 'evidence.retrieved', 'policy.retrieved', 'case.completed', 'judge.started', 'run.completed', 'run.failed']),
+  type: z.enum([
+    'run.started', 'model.start', 'model.finish', 'tool.requested', 'evidence.retrieved',
+    'policy.retrieved', 'case.completed', 'output.repair', 'judge.started', 'run.completed',
+    'run.incomplete', 'run.failed'
+  ]),
   summary: z.string().min(1), evidenceIds: z.array(Id), policyClauseIds: z.array(Id)
 });
+
 const RunFields = {
   id: Id, fixtureId: Id, mode: ModeSchema, dispute: DisputeSchema,
-  cases: z.array(AdvocateCaseSchema), events: z.array(ActivityEventSchema)
+  cases: z.array(AdvocateCaseSchema), events: z.array(ActivityEventSchema),
+  retrievedEvidence: z.array(EvidenceSchema),
+  retrievedPolicies: z.array(PolicyClauseSchema)
 };
+
 export const RunSchema = z.discriminatedUnion('status', [
   z.strictObject({...RunFields, status: z.enum(['queued', 'running'])}),
   z.strictObject({...RunFields, status: z.literal('completed'), result: JudgeResultSchema}),
@@ -65,20 +87,39 @@ export const RunSchema = z.discriminatedUnion('status', [
   if (run.status === 'completed' && (!sides.includes('rider') || !sides.includes('driver')))
     ctx.addIssue({code: 'custom', message: 'Completed runs require both advocate cases'});
 });
+
 export const StartRunSchema = z.strictObject({fixtureId: Id, riderClaim: z.string().trim().min(1).max(10000).optional()});
 export const FixtureSummarySchema = z.strictObject({
   id: Id, category: CategorySchema, label: z.string().min(1), kind: z.literal('contract_example')
 });
+
+// Advocate tool-response protocol: either requests tools or produces a final case
+export const AdvocateResponseSchema = z.discriminatedUnion('type', [
+  z.strictObject({
+    type: z.literal('tool_request'),
+    tools: z.array(z.discriminatedUnion('name', [
+      z.strictObject({name: z.literal('get_evidence'), input: z.strictObject({sources: z.array(SourceSchema).min(1)})}),
+      z.strictObject({name: z.literal('get_policy'), input: z.strictObject({category: CategorySchema})})
+    ])).min(1)
+  }),
+  z.strictObject({
+    type: z.literal('final_case'),
+    case: AdvocateCaseSchema
+  })
+]);
+
 export type Dispute = z.infer<typeof DisputeSchema>;
 export type Evidence = z.infer<typeof EvidenceSchema>;
 export type PolicyClause = z.infer<typeof PolicyClauseSchema>;
 export type AdvocateCase = z.infer<typeof AdvocateCaseSchema>;
+export type JudgeModelResponse = z.infer<typeof JudgeModelResponseSchema>;
 export type JudgeResult = z.infer<typeof JudgeResultSchema>;
 export type FinalAction = z.infer<typeof FinalActionSchema>;
 export type ActivityEvent = z.infer<typeof ActivityEventSchema>;
 export type Run = z.infer<typeof RunSchema>;
+export type AdvocateResponse = z.infer<typeof AdvocateResponseSchema>;
 
-export function validateCitations(cases: AdvocateCase[], result: JudgeResult | undefined, evidence: Evidence[], policies: PolicyClause[]): void {
+export function validateCitations(cases: AdvocateCase[], result: JudgeModelResponse | undefined, evidence: Evidence[], policies: PolicyClause[]): void {
   const evidenceIds = new Set(evidence.map(e => e.id));
   const policyIds = new Set(policies.map(p => p.id));
   if (evidenceIds.size !== evidence.length || policyIds.size !== policies.length) throw new Error('Duplicate source identifier');

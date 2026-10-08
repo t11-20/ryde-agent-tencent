@@ -1,6 +1,6 @@
 import express from 'express';
 import { randomUUID } from 'node:crypto';
-import { RunSchema, ActivityEventSchema, StartRunSchema, type Run, type ActivityEvent } from '@fairtrip/contracts';
+import { RunSchema, ActivityEventSchema, StartRunSchema, type Run, type ActivityEvent, type FinalAction } from '@fairtrip/contracts';
 import { runWorkflow } from '@fairtrip/agents';
 import { catalog, fixtures, examplesFor } from './catalog.js';
 import { readConfig, type Config } from './config.js';
@@ -12,7 +12,7 @@ export function createApp(config: Config = readConfig()) {
   const runs = new Map<string, Run>();
   app.disable('x-powered-by');
   app.use(express.json({limit: '64kb'}));
-  app.get('/api/health', (_req, res) => res.json({status: 'ok', mode: 'stub', contractVersion: '0.1.0', modelAccess: 'pending_partner_configuration'}));
+  app.get('/api/health', (_req, res) => res.json({status: 'ok', mode: 'stub', contractVersion: '0.2.0', modelAccess: 'pending_partner_configuration'}));
   app.get('/api/fixtures', (_req, res) => res.json({mode: 'stub', notice: catalog.notice, fixtures}));
   app.post('/api/runs', (req, res) => {
     const input = StartRunSchema.safeParse(req.body);
@@ -23,32 +23,45 @@ export function createApp(config: Config = readConfig()) {
     const dispute = {...fixture, riderClaim: input.data.riderClaim ?? fixture.riderClaim};
     const events: ActivityEvent[] = [];
     const cases: Run['cases'] = [];
-    const emit = (actor: ActivityEvent['actor'], type: ActivityEvent['type'], summary: string) => {
-      events.push(ActivityEventSchema.parse({runId: id, sequence: events.length + 1, timestamp: new Date().toISOString(), mode: 'stub', actor, type, summary, evidenceIds: [], policyClauseIds: []}));
+    const retrievedEvidence: Run['retrievedEvidence'] = [];
+    const retrievedPolicies: Run['retrievedPolicies'] = [];
+    const emit = (actor: ActivityEvent['actor'], type: ActivityEvent['type'], summary: string, evidenceIds: string[] = [], policyClauseIds: string[] = []) => {
+      events.push(ActivityEventSchema.parse({runId: id, sequence: events.length + 1, timestamp: new Date().toISOString(), mode: 'stub', actor, type, summary, evidenceIds, policyClauseIds}));
     };
     emit('system', 'run.started', 'Development stub started; no model invocation or evidence retrieval.');
-    const base = {id, fixtureId: fixture.id, mode: 'stub' as const, dispute, cases, events};
+    const base = {id, fixtureId: fixture.id, mode: 'stub' as const, dispute, cases, events, retrievedEvidence, retrievedPolicies};
     runs.set(id, RunSchema.parse({...base, status: 'queued'}));
     setImmediate(() => {
       runs.set(id, RunSchema.parse({...base, status: 'running'}));
       const examples = examplesFor(dispute);
       const controller = new AbortController();
       void runWorkflow(dispute, {
-        async advocate(side) { return examples.cases.find(c => c.side === side); },
-        async judge() { return examples.result; }
-      }, catalog.evidence, examples.policies, controller.signal, {
-        onCase(value) {
-          cases.push(value);
-          emit(value.side, 'case.completed', `Development stub ${value.side} case available.`);
-          runs.set(id, RunSchema.parse({...base, status: 'running'}));
+        async advocate(side) {
+          const c = examples.cases.find(c => c.side === side);
+          if (c) cases.push(c);
+          return c;
         },
-        onJudge() {emit('judge', 'judge.started', 'Both example cases validated; fixed stub Judge response follows.');}
-      }).then(({result}) => {
+        async judge() { return examples.modelResponse; }
+      }, catalog.evidence, examples.policies, controller.signal, {
+        emit(event) {
+          emit(event.actor, event.type, event.summary, event.evidenceIds ?? [], event.policyClauseIds ?? []);
+          runs.set(id, RunSchema.parse({...base, cases, events, retrievedEvidence, retrievedPolicies, status: 'running'}));
+        }
+      }).then(({modelResponse}) => {
+        // Server constructs FinalAction from the model's remedyId selection
+        const action: FinalAction = {
+          remedyId: modelResponse.remedyId,
+          recipient: modelResponse.remedyId === 'keep_charge' ? 'none' : 'rider',
+          currency: 'SGD',
+          amountCents: 0,
+          recommendation: 'Development stub only. Do not execute any payment action.'
+        };
+        const result = {...modelResponse, action};
         emit('system', 'run.completed', 'Stub response ready; this is not a real dispute decision.');
-        runs.set(id, RunSchema.parse({...base, status: 'completed', result}));
-      }).catch(() => {
-        emit('system', 'run.failed', 'Stub workflow validation failed.');
-        runs.set(id, RunSchema.parse({...base, status: 'failed', error: {code: 'STUB_FAILED', message: 'Stub workflow validation failed'}}));
+        runs.set(id, RunSchema.parse({...base, cases, events, retrievedEvidence, retrievedPolicies, status: 'completed', result}));
+      }).catch((err) => {
+        emit('system', 'run.failed', `Workflow failed: ${err instanceof Error ? err.message : String(err)}`);
+        runs.set(id, RunSchema.parse({...base, cases, events, retrievedEvidence, retrievedPolicies, status: 'failed', error: {code: 'WORKFLOW_FAILED', message: err instanceof Error ? err.message : 'Workflow execution failed'}}));
       });
     });
     res.status(202).json({id, mode: 'stub', status: 'queued'});

@@ -36,4 +36,19 @@ describe('fixed workflow foundation', () => {
     await expect(runWorkflow(catalog.disputes[0]!, {advocate, judge: adjudicate}, catalog.evidence, catalog.policies, controller.signal)).rejects.toThrow();
     expect(advocate).not.toHaveBeenCalled(); expect(adjudicate).not.toHaveBeenCalled();
   });
+  it('emits events through the WorkflowEventEmitter', async () => {
+    const events: {actor: string; type: string}[] = [];
+    const emitter = {emit: (e: {actor: string; type: string}) => events.push(e)};
+    await runWorkflow(catalog.disputes[0]!, {
+      async advocate(side) { return side === 'rider' ? catalog.riderCase : catalog.driverCase; },
+      judge: judge()
+    }, catalog.evidence, catalog.policies, signal(), emitter);
+    expect(events.some(e => e.type === 'model.start' && e.actor === 'rider')).toBe(true);
+    expect(events.some(e => e.type === 'model.start' && e.actor === 'driver')).toBe(true);
+    expect(events.some(e => e.type === 'case.completed' && e.actor === 'rider')).toBe(true);
+    expect(events.some(e => e.type === 'case.completed' && e.actor === 'driver')).toBe(true);
+    expect(events.some(e => e.type === 'judge.started' && e.actor === 'judge')).toBe(true);
+    expect(events.some(e => e.type === 'model.start' && e.actor === 'judge')).toBe(true);
+    expect(events.some(e => e.type === 'model.finish' && e.actor === 'judge')).toBe(true);
+  });
 });
