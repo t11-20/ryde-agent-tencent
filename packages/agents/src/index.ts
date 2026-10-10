@@ -35,8 +35,7 @@ export { riderAdvocatePrompt, driverAdvocatePrompt, judgePrompt } from './prompt
 export { createMockEvidenceTools, mockEvidenceStore, mockPolicyStore } from './mock-evidence.js';
 export { buildFinalAction, createMockCalculationProvider, type CalculationProvider, type CalculationResult, type RemedyValidationError } from './remedy-builder.js';
 
-// Foundation: production prompts/tool loops are a later Lane A workstream (CB-02).
-// This version supports event emission for immediate persistence (CB-03).
+// Orchestrates validated advocates and Judge with cancellation and immediate events.
 export async function runWorkflow(
   dispute: Dispute,
   roles: WorkflowRoles,
@@ -49,15 +48,23 @@ export async function runWorkflow(
   const sources = evidence.map(value => EvidenceSchema.parse(value));
   const clauses = policies.map(value => PolicyClauseSchema.parse(value));
   signal.throwIfAborted();
+  const advocatesController = new AbortController();
+  const advocateSignal = AbortSignal.any([signal, advocatesController.signal]);
   const cases = await Promise.all((['rider', 'driver'] as const).map(async side => {
-    emitter?.emit({actor: side, type: 'model.start', summary: `${side} advocate model invocation started`});
-    const parsed = AdvocateCaseSchema.parse(await roles.advocate(side, input, signal));
-    emitter?.emit({actor: side, type: 'model.finish', summary: `${side} advocate model invocation finished`});
-    signal.throwIfAborted();
-    if (parsed.side !== side) throw new Error('Advocate returned the wrong side');
-    validateCitations([parsed], undefined, sources, clauses);
-    emitter?.emit({actor: side, type: 'case.completed', summary: `${side} case validated and completed`, evidenceIds: parsed.arguments.flatMap(a => a.evidenceIds), policyClauseIds: parsed.arguments.flatMap(a => a.policyClauseIds)});
-    return parsed;
+    try {
+      advocateSignal.throwIfAborted();
+      emitter?.emit({actor: side, type: 'model.start', summary: `${side} advocate model invocation started`});
+      const parsed = AdvocateCaseSchema.parse(await roles.advocate(side, input, advocateSignal));
+      emitter?.emit({actor: side, type: 'model.finish', summary: `${side} advocate model invocation finished`});
+      advocateSignal.throwIfAborted();
+      if (parsed.side !== side) throw new Error('Advocate returned the wrong side');
+      validateCitations([parsed], undefined, sources, clauses);
+      emitter?.emit({actor: side, type: 'case.completed', summary: `${side} case validated and completed`, evidenceIds: parsed.arguments.flatMap(a => a.evidenceIds), policyClauseIds: parsed.arguments.flatMap(a => a.policyClauseIds)});
+      return parsed;
+    } catch (error) {
+      advocatesController.abort(error);
+      throw error;
+    }
   }));
   signal.throwIfAborted();
   emitter?.emit({actor: 'judge', type: 'judge.started', summary: 'Both cases validated; Judge handoff'});

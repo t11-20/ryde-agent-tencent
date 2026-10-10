@@ -1,9 +1,9 @@
 # FairTrip Architecture and Technical Documentation
 
-**Project:** FairTrip — Ryde Multi-Agent Dispute Resolution Prototype  
-**Version:** 0.2.0  
-**Date:** 2026-10-08  
-**Lane A Commit:** `0ebd544`
+**Project:** FairTrip — Ryde Multi-Agent Dispute Resolution Prototype
+**Version:** 0.2.0
+**Date:** 2026-10-11 (Asia/Kuala_Lumpur)
+**Published Lane A baseline:** `37c7506`; local audit source is described in [LANE_A_STATUS.md](LANE_A_STATUS.md)
 
 ---
 
@@ -17,7 +17,7 @@ FairTrip resolves ride-hailing disputes through three distinct LLM agents:
 2. **Driver Advocate** — Gathers evidence and builds the driver's defense
 3. **Judge** — Reviews both cases, applies policy, and selects a remedy
 
-The server constructs the final monetary action from the Judge's remedy selection using validated partner calculations.
+The server constructs the final monetary action from the Judge's remedy selection. Current Lane A uses labeled mock calculations; partner calculation integration remains pending.
 
 ### 1.2 Component Diagram
 
@@ -255,7 +255,7 @@ All provenance is marked `kind: 'contract_example'` with description noting mock
 
 ### 5.2 Remedy Validation
 
-`buildFinalAction(modelResponse, evidence, calculationProvider)` checks:
+`buildFinalAction(modelResponse, evidence, calculationProvider, disputeCategory)` checks:
 - Remedy ID is appropriate for dispute category
 - Amount is integer, non-negative, finite SGD cents
 - Refund does not exceed paid charge cap
@@ -272,8 +272,8 @@ All provenance is marked `kind: 'contract_example'` with description noting mock
 | Model timeout | Abort signal triggers | `run.failed` |
 | Run deadline exceeded | Abort controller triggers | `run.failed` |
 | Missing decisive evidence | `incomplete` ruling, no invented amount | `run.incomplete` |
-| Wrong-category remedy | Server returns `keep_charge` + error | `run.incomplete` |
-| Excessive refund | Capped at paid charge | `run.incomplete` |
+| Wrong-category remedy | Run is incomplete with a validation error and no result/action | `run.incomplete` |
+| Excessive refund | Capped at paid charge when the calculation is otherwise valid | `run.completed` |
 
 ---
 
@@ -287,28 +287,30 @@ All provenance is marked `kind: 'contract_example'` with description noting mock
 | `workflow.test.ts` | 6 | Parallel advocates, Judge ordering, cancellation, event emission |
 | `api.test.ts` | 4 | End-to-end stub flow, concurrent isolation, input validation |
 | `config-model.test.ts` | 4 | Config parsing, model adapter, error sanitization |
-| `tool-loop.test.ts` | 8 | Tool protocol, repair, rounds, deduplication |
-| `remedy-validation.test.ts` | 7 | Remedy construction, category validation, caps |
-| `failure-coverage.test.ts` | 7 | One advocate, sibling cancellation, citations, fairness |
-| **Total** | **48** | |
+| `tool-loop.test.ts` | 11 | Tool protocol, repair, rounds, deduplication, sanitized errors |
+| `remedy-validation.test.ts` | 9 | Remedy construction, authoritative category validation, caps |
+| `failure-coverage.test.ts` | 7 | Advocate failure, sibling cancellation, citations; changed-history acceptance remains pending |
+| `live-wiring.test.ts` | 9 | Live callbacks with scripted responses, retrieval, Judge context/repair, incomplete outcomes, outages, deadline |
+| `codebuddy-env.test.ts` | 5 | Configuration fallback, explicit precedence, matching-provider checks |
+| **Total** | **67** | |
 
 ### 6.2 Build and Verification
 
 | Check | Status |
 |---|---|
 | TypeScript typecheck | Pass (strict mode) |
-| Test suite | 48/48 pass |
+| Test suite | 67/67 pass across 9 files |
 | Build (contracts → agents → api) | Pass |
 | Example validation | Pass |
 | Setup verification | Pass |
 
 ### 6.3 Limitations
 
-- **Live model:** Not yet tested with real model credentials
-- **Partner calculations:** Using mock `CalculationProvider`; real GPS/fare calculations pending
+- **Live model:** Real three-agent adjudication remains unverified; further credential and provider checks are deferred at the user's request. The earlier connectivity attempt returned HTTP 401
+- **Partner calculations:** Lane B source is available on its own branch; the current Lane A API still uses mock `CalculationProvider` until shared integration
 - **Partner fixtures:** Using synthetic contract examples; golden cases pending
 - **Frontend:** Partner-owned; no UI integration tested
-- **Evaluation:** No partner evaluation runner or scorecard
+- **Evaluation:** Lane B runner and historical fake-server scorecards exist in the separated integration work; no current real-model golden scorecard is accepted
 - **Persistence:** In-memory only; no database
 - **Authentication:** Not implemented
 - **Hosting:** Local development only
@@ -317,9 +319,9 @@ All provenance is marked `kind: 'contract_example'` with description noting mock
 
 ## 7. Demonstration Narration
 
-### 7.1 R1 — Route Deviation with Unjustified Detour
+### 7.1 Lane A route example — illustrative mock calculation
 
-**Setup:** Rider claims driver took a longer route without justification.
+**Setup:** Rider claims driver took a longer route without justification. This narration illustrates the mock protocol; it is not an observed real-model run or an accepted Lane B R1 golden outcome.
 
 **Flow:**
 1. Rider Advocate requests GPS and payment evidence
@@ -351,7 +353,7 @@ Genuine CodeBuddy development screenshots to capture:
 
 1. **CB-01 implementation** — Contract revision with `JudgeModelResponse` split
 2. **CB-02 implementation** — Tool loop execution with mock model responses
-3. **CB-04 verification** — Test suite showing 48 passing tests
+3. **CB-04 verification** — Genuine CodeBuddy view of the current test suite; this audit passes 67 tests
 
 Current screenshot archive: `docs/evidence/00-project-open.png`
 
@@ -368,6 +370,7 @@ fairtrip/
 │   │   │   ├── catalog.ts # Fixture loader
 │   │   │   ├── config.ts  # Environment validation
 │   │   │   ├── model.ts   # OpenAI-compatible adapter
+│   │   │   ├── live-roles.ts # Live callbacks using Lane A examples
 │   │   │   └── server.ts  # Entry point
 │   │   └── package.json
 │   └── web/              # React frontend (Lane B)
@@ -388,7 +391,9 @@ fairtrip/
 │   ├── config-model.test.ts
 │   ├── tool-loop.test.ts
 │   ├── remedy-validation.test.ts
-│   └── failure-coverage.test.ts
+│   ├── failure-coverage.test.ts
+│   ├── live-wiring.test.ts
+│   └── codebuddy-env.test.ts
 ├── examples/
 │   ├── catalog.json      # Contract examples
 │   ├── run.json          # Complete run example
@@ -400,6 +405,8 @@ fairtrip/
 │   └── LANE_A_STATUS.md
 └── scripts/
     ├── check-examples.ts
+    ├── codebuddy-env.ts
+    ├── codebuddy-model-config.ts
     ├── check-model.ts
     └── check-setup.ts
 ```
@@ -411,10 +418,10 @@ fairtrip/
 | Branch | Purpose | Current SHA |
 |---|---|---|
 | `main` | Release history | `ea37153` |
-| `lane-a` | Lane A development | `8c4073a` |
-| `lane-b` | Partner development | Pending |
+| `lane-a` | Lane A development | Published baseline `37c7506`; local audit follows |
+| `lane-b` | Partner development (separate) | `origin/lane-b`: `e2ad1e3` |
 | `ryde-integration` | Combined testing | `0ebd544` (Lane A pin) |
 
 ---
 
-*This document reflects the implemented system as of Lane A commit `0ebd544`. All claims are based on passing tests and verified behavior, not projected performance.*
+*Current acceptance results and pending work are recorded in [LANE_A_STATUS.md](LANE_A_STATUS.md). Mocked protocol results do not establish real model quality, partner agreement, or release readiness.*

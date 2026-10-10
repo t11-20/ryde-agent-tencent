@@ -1,12 +1,14 @@
 import express from 'express';
 import { randomUUID } from 'node:crypto';
 import { RunSchema, ActivityEventSchema, StartRunSchema, type Run, type ActivityEvent } from '@fairtrip/contracts';
-import { runWorkflow, type WorkflowEventEmitter } from '@fairtrip/agents';
+import { runWorkflow, EXECUTION_LIMITS, mockEvidenceStore, mockPolicyStore, type ModelAdapter, type WorkflowEventEmitter, type WorkflowRoles } from '@fairtrip/agents';
 import { buildFinalAction, createMockCalculationProvider } from '@fairtrip/agents';
 import { catalog, fixtures, examplesFor } from './catalog.js';
 import { readConfig, type Config } from './config.js';
+import { createModelAdapter } from './model.js';
+import { createLiveRoles } from './live-roles.js';
 
-export function createApp(config: Config = readConfig()) {
+export function createApp(config: Config = readConfig(), modelAdapter?: ModelAdapter) {
   const app = express();
   const runs = new Map<string, Run>();
   app.disable('x-powered-by');
@@ -43,16 +45,27 @@ export function createApp(config: Config = readConfig()) {
     runs.set(id, RunSchema.parse({...base, status: 'queued'}));
 
     setImmediate(() => {
-      // Run-level 90-second deadline
+      let terminal = false;
       const deadlineController = new AbortController();
-      const deadlineTimeout = setTimeout(() => deadlineController.abort(new Error('Run deadline exceeded (90s)')), 90000);
+      const fail = (message: string) => {
+        if (terminal) return;
+        emit('system', 'run.failed', `Workflow failed: ${message}`);
+        terminal = true;
+        runs.set(id, RunSchema.parse({...base, cases, events, retrievedEvidence, retrievedPolicies, status: 'failed', error: {code: 'WORKFLOW_FAILED', message}}));
+      };
+      const deadlineTimeout = setTimeout(() => {
+        const error = new Error('Run deadline exceeded (90s)');
+        deadlineController.abort(error);
+        fail(error.message);
+      }, EXECUTION_LIMITS.runDeadlineMs);
 
       runs.set(id, RunSchema.parse({...base, status: 'running'}));
 
       const examples = examplesFor(dispute);
+      const evidence = mode === 'live' ? mockEvidenceStore[dispute.id] ?? [] : catalog.evidence;
+      const policies = mode === 'live' ? mockPolicyStore[dispute.category] ?? [] : examples.policies;
 
       // Create event emitter that also prevents late writes after terminal state
-      let terminal = false;
       const emitter: WorkflowEventEmitter = {
         emit(event) {
           if (terminal) return; // Prevent late writes after terminal transition
@@ -65,19 +78,30 @@ export function createApp(config: Config = readConfig()) {
         }
       };
 
-      void runWorkflow(dispute, {
+      const roles: WorkflowRoles = mode === 'live'
+        ? createLiveRoles(modelAdapter ?? createModelAdapter(config), emitter, retrievedEvidence, retrievedPolicies, cases)
+        : {
         async advocate(side) {
           const c = examples.cases.find(c => c.side === side);
           if (c) cases.push(c);
           return c;
         },
         async judge() { return examples.modelResponse; }
-      }, catalog.evidence, examples.policies, deadlineController.signal, emitter).then(({modelResponse}) => {
+      };
+      void runWorkflow(dispute, roles, evidence, policies, deadlineController.signal, emitter).then(({modelResponse}) => {
         clearTimeout(deadlineTimeout);
+        if (terminal) return;
+        if (mode === 'live' && modelResponse.ruling === 'incomplete') {
+          emit('system', 'run.incomplete', 'Judge requires additional decisive evidence; no monetary action issued.');
+          terminal = true;
+          const missingEvidence = cases.flatMap(value => value.missingFacts);
+          runs.set(id, RunSchema.parse({...base, cases, events, retrievedEvidence, retrievedPolicies, status: 'incomplete', missingEvidence: missingEvidence.length ? [...new Set(missingEvidence)] : ['Additional decisive evidence is required by the Judge.']}));
+          return;
+        }
 
         // Server constructs FinalAction from the model's remedyId selection
         const calculationProvider = createMockCalculationProvider();
-        const {action, error} = buildFinalAction(modelResponse, catalog.evidence, calculationProvider);
+        const {action, error} = buildFinalAction(modelResponse, evidence, calculationProvider, dispute.category);
 
         if (error) {
           emit('system', 'run.incomplete', `Remedy validation failed: ${error.message}`);
@@ -87,15 +111,12 @@ export function createApp(config: Config = readConfig()) {
         }
 
         const result = {...modelResponse, action};
-        emit('system', 'run.completed', mode === 'stub' ? 'Stub response ready; this is not a real dispute decision.' : 'Live run completed with validated result.');
+        emit('system', 'run.completed', mode === 'stub' ? 'Stub response ready; this is not a real dispute decision.' : 'Live model run completed using synthetic contract examples and mock calculations; this is not a real dispute decision.');
         terminal = true;
         runs.set(id, RunSchema.parse({...base, cases, events, retrievedEvidence, retrievedPolicies, status: 'completed', result}));
       }).catch((err) => {
         clearTimeout(deadlineTimeout);
-        if (terminal) return; // Already in terminal state
-        emit('system', 'run.failed', `Workflow failed: ${err instanceof Error ? err.message : String(err)}`);
-        terminal = true;
-        runs.set(id, RunSchema.parse({...base, cases, events, retrievedEvidence, retrievedPolicies, status: 'failed', error: {code: 'WORKFLOW_FAILED', message: err instanceof Error ? err.message : 'Workflow execution failed'}}));
+        fail(err instanceof Error ? err.message : 'Workflow execution failed');
       });
     });
     res.status(202).json({id, mode, status: 'queued'});

@@ -21,21 +21,26 @@ describe('failure coverage and edge cases', () => {
 
   it('cancels sibling work when one advocate fails', async () => {
     const adjudicate = judge();
-    let driverStarted = false;
+    let driverSignal: AbortSignal | undefined;
+    let driverCancelled = false;
     await expect(runWorkflow(catalog.disputes[0]!, {
-      async advocate(side) {
+      async advocate(side, _input, roleSignal) {
         if (side === 'rider') {
+          await new Promise(resolve => setImmediate(resolve));
           throw new Error('Rider advocate failed');
         }
-        driverStarted = true;
-        await new Promise(resolve => setTimeout(resolve, 100));
+        driverSignal = roleSignal;
+        await new Promise<void>((_resolve, reject) => roleSignal.addEventListener('abort', () => {
+          driverCancelled = true;
+          reject(roleSignal.reason);
+        }, {once: true}));
         return catalog.driverCase;
       },
       judge: adjudicate
     }, catalog.evidence, catalog.policies, signal())).rejects.toThrow();
     expect(adjudicate).not.toHaveBeenCalled();
-    // The driver advocate may or may not have started before the rider failed
-    // due to Promise.all behavior; the key is Judge was never called
+    expect(driverSignal?.aborted).toBe(true);
+    expect(driverCancelled).toBe(true);
   });
 
   it('honors pre-aborted signal and prevents all execution', async () => {

@@ -17,6 +17,29 @@ const emitter = { emit: vi.fn() };
 const signal = () => new AbortController().signal;
 
 describe('advocate tool loop', () => {
+  it('allows two tool request rounds followed by a final case', async () => {
+    const model = mockModel([
+      JSON.stringify({type: 'tool_request', tools: [{name: 'get_evidence', input: {sources: ['gps']}}]}),
+      JSON.stringify({type: 'tool_request', tools: [{name: 'get_policy', input: {category: 'route_deviation'}}]}),
+      JSON.stringify({type: 'final_case', case: {...catalog.riderCase, side: 'rider'}})
+    ]);
+    const output = await runAdvocateToolLoop('rider', dispute, model, evidenceTools, emitter, signal(), 'test prompt');
+    expect(output.retrievedEvidence).toHaveLength(1);
+    expect(output.retrievedPolicies).toHaveLength(1);
+  });
+
+  it('does not spend a tool round on the single directed output repair', async () => {
+    const model = mockModel([
+      JSON.stringify({type: 'tool_request', tools: [{name: 'get_evidence', input: {sources: ['gps']}}]}),
+      JSON.stringify({type: 'tool_request', tools: [{name: 'get_policy', input: {category: 'route_deviation'}}]}),
+      'malformed final case',
+      JSON.stringify({type: 'final_case', case: {...catalog.riderCase, side: 'rider'}})
+    ]);
+    const output = await runAdvocateToolLoop('rider', dispute, model, evidenceTools, emitter, signal(), 'test prompt');
+    expect(output.case.side).toBe('rider');
+    expect(output.retrievedPolicies).toHaveLength(1);
+  });
+
   it('completes in one round when model returns final_case immediately', async () => {
     const model = mockModel([JSON.stringify({
       type: 'final_case',
@@ -87,8 +110,17 @@ describe('advocate tool loop', () => {
     await expect(runAdvocateToolLoop('rider', dispute, model, evidenceTools, emitter, signal(), 'test prompt')).rejects.toThrow('unparseable');
   });
 
+  it('keeps raw model reasoning out of public parse-failure diagnostics', async () => {
+    const model = mockModel(['<think>synthetic private reasoning</think>', '<think>synthetic private reasoning</think>']);
+    const failure = runAdvocateToolLoop('rider', dispute, model, evidenceTools, emitter, signal(), 'test prompt');
+    await expect(failure).rejects.toThrow('unparseable output');
+    await expect(failure).rejects.not.toThrow('synthetic private reasoning');
+    await expect(failure).rejects.not.toThrow('<think>');
+  });
+
   it('fails after exceeding max tool rounds', async () => {
     const model = mockModel([
+      JSON.stringify({type: 'tool_request', tools: [{name: 'get_evidence', input: {sources: ['gps']}}]}),
       JSON.stringify({ type: 'tool_request', tools: [{ name: 'get_evidence', input: { sources: ['gps'] } }] }),
       JSON.stringify({ type: 'tool_request', tools: [{ name: 'get_evidence', input: { sources: ['chat'] } }] })
     ]);

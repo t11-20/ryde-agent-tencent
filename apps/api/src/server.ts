@@ -3,7 +3,7 @@ import { readConfig } from './config.js';
 try {
   const config = readConfig();
   const server = createApp(config).listen(config.API_PORT, config.API_HOST, () => {
-    console.log(`FairTrip STUB API listening on ${config.API_HOST}:${config.API_PORT}. Live model access pending.`);
+    console.log(`FairTrip ${config.RUN_MODE.toUpperCase()} API listening on ${config.API_HOST}:${config.API_PORT}. ${config.RUN_MODE === 'stub' ? 'Development stubs; no model requests.' : 'Synthetic contract examples; model authentication is checked on invocation.'}`);
   });
   server.on('error', () => {console.error('API startup failed; check host/port availability.'); process.exitCode = 1;});
   process.on('SIGTERM', () => server.close());

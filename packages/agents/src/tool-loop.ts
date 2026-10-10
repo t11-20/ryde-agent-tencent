@@ -32,8 +32,9 @@ export async function runAdvocateToolLoop(
   ];
 
   let repairAttempts = 0;
+  let toolRounds = 0;
 
-  for (let round = 0; round < config.maxRounds; round++) {
+  while (true) {
     signal.throwIfAborted();
 
     // Call the model
@@ -63,7 +64,7 @@ export async function runAdvocateToolLoop(
         });
         continue;
       }
-      throw new Error(`Advocate ${side} produced unparseable output after ${repairAttempts} repair attempts: ${parseError instanceof Error ? parseError.message : String(parseError)}`);
+      throw new Error(`Advocate ${side} produced unparseable output after ${repairAttempts} repair attempts`);
     }
 
     if (response.type === 'final_case') {
@@ -76,6 +77,8 @@ export async function runAdvocateToolLoop(
 
     // Tool request: execute tools and feed results back
     if (response.type === 'tool_request') {
+      if (toolRounds >= config.maxRounds) throw new Error(`Advocate ${side} exceeded maximum tool rounds (${config.maxRounds}) without producing a final case`);
+      toolRounds++;
       for (const tool of response.tools) {
         signal.throwIfAborted();
         if (tool.name === 'get_evidence') {
@@ -133,5 +136,4 @@ export async function runAdvocateToolLoop(
     }
   }
 
-  throw new Error(`Advocate ${side} exceeded maximum tool rounds (${config.maxRounds}) without producing a final case`);
 }

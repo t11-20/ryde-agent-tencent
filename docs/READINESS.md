@@ -1,17 +1,26 @@
 # Setup readiness
 
-Statuses record verified facts, not assumed completion. The permanent project folder is `/Users/edward/Documents/ChatGPT/Tencent`; the previous empty repository was deleted and the working project was renamed. No real provider credentials or authentic case data have been supplied. The project-open screenshot is recorded, while genuine development-chat evidence remains pending.
+Statuses record verified facts, not assumed completion. The permanent project folder is `/Users/edward/Documents/ChatGPT/Tencent`; the previous empty repository was deleted and the working project was renamed. Private runtime configuration is present, but the latest MiniMax connectivity check failed with HTTP 401; authenticated operation remains unverified. No authentic case data are used. The project-open screenshot is recorded, while genuine development-chat evidence remains pending.
 
 | Prerequisite | Owner | Status | Evidence / remaining gate |
 |---|---|---|---|
 | Matching Node/npm | Both | Local runtime verified; partner pending | Node 22.23.3 and npm 10.9.9 are pinned. Both lanes must run check:setup. |
 | Repository structure | Both | Local scaffold prepared | npm workspaces for API/web/contracts/agents; examples, fixture and evaluation slots. A cloud repository is optional. |
-| Environment handling | Lane A | Templates prepared; live key pending | .env.example, exclusions, validation, and sanitized check:model command. Successful real model request required. |
-| Agent framework | Lane A | Locally verified | Internal version 0.1.0; advocate/Judge ordering and validation tested; production role/tool loops deferred. |
+| Environment handling | Lane A | Local handling tested; real-provider checks deferred | Private runtime fields and matching CodeBuddy model settings exist; the earlier check:model returned HTTP 401. Further credential checks are deferred at the user's request. |
+| Agent framework | Lane A | Locally verified with mocked model responses | Workflow 0.2.0; live callbacks, independent tools, Judge context, cancellation and incomplete/deadline handling tested. Authenticated acceptance remains pending. |
 | Shared Zod contracts | Lane A + partner | Implemented; paired review pending | Eight contracts and inferred types; partner-owned detailed evidence payloads remain open. |
 | Example payloads | Both | Local examples prepared; partner review pending | Both categories, four evidence envelopes, both advocates, Judge, action, event, full run validation. |
 | Stub API | Lane A | Locally verified | Both categories, run creation/polling, error responses and concurrent run isolation tested; explicit stub labels and offline operation. |
 | Buddy access/evidence | Both | Project open verified; agent access and development captures pending | CodeBuddy desktop 4.12.1 has the renamed Tencent project open. Native window inspection and 00-project-open.png verify the Explorer contents. Keyboard automation was blocked by macOS, so no successful agent response or three development captures are claimed. |
+
+## Current verification — 11 October 2026 (Kuala Lumpur)
+
+- Updated local Lane A: 67 tests across nine files, typechecks, builds, contract examples and setup checks passed.
+- A clean source copy passed the locked dependency install and full verification with all 67 tests; results are recorded in [Lane A status](LANE_A_STATUS.md).
+- The actual development server started in stub mode on an isolated local port. Health, fixture listing, both category runs, and sequence polling passed.
+- `check:model` reached the configured MiniMax provider and returned HTTP 401. Further credential investigation and real-model execution are deferred at the user's request.
+- Lane B remains separate. The old combined history and post-merge edits are preserved in the local backup branch and stash.
+- The detailed current package status and outstanding Lane A/shared gates are in [LANE_A_STATUS.md](LANE_A_STATUS.md). Historical foundation notes below do not supersede that record.
 
 ## Folder status
 
@@ -25,7 +34,7 @@ Statuses record verified facts, not assumed completion. The permanent project fo
 1. Verify CodeBuddy signed-in agent access with a successful review of project files. Installation, running state and the open Tencent project are verified; an agent response is still pending.
 2. Perform real development/debugging in CodeBuddy desktop and collect readable screenshots with captions. At least three are required across project development checkpoints by the existing execution plan; none are claimed so far.
 3. Both people confirm runtime versions and Buddy access. Partner contract review is necessary before a shared freeze.
-4. Receive the partner's runtime API configuration, configure it privately, and run check:model successfully.
+4. Real-provider checks are deferred at the user's request. When resumed, validate the private configuration and run check:model successfully; the earlier result was HTTP 401.
 
 ## Partner verification and contract review
 
@@ -39,7 +48,7 @@ These are shared-team checks, separate from live API credentials and from partne
 - [ ] Use `/api/fixtures`, create a stub run with `/api/runs`, then poll `/api/runs/:id` with the event sequence cursor. Confirm the UI/data work can consume the responses and explicit stub labels.
 - [ ] Record the actual commands/results, date and project revision or shared archive used. Partner evidence is pending until supplied.
 
-**Contract review** means Edward (Lane A) and the partner jointly agree on the shared interfaces before treating version 0.1.0 as frozen:
+**Contract review** means Edward (Lane A) and the partner jointly agree on the shared interfaces before treating contract version 0.2.0 as frozen:
 
 - [ ] Review `packages/contracts/src/index.ts`, `docs/CONTRACTS.md`, and the valid payloads in `examples` together.
 - [ ] Agree field names, required/optional fields, IDs, category/status enums, ISO timestamps, and money as integer SGD cents.

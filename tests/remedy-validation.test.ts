@@ -28,6 +28,18 @@ const noShowEvidence: Evidence[] = [
 ];
 
 describe('remedy validation and FinalAction construction', () => {
+  it('uses the dispute category for partner evidence IDs without example prefixes', () => {
+    const evidence = noShowEvidence.map((record, index) => ({...record, id: `partner-evidence-${index}`}));
+    const {action, error} = buildFinalAction(modelResponse('refund_no_show_fee'), evidence, calculationProvider, 'no_show');
+    expect(error).toBeUndefined();
+    expect(action.amountCents).toBe(500);
+  });
+
+  it('rejects the wrong remedy using the authoritative category even with misleading IDs', () => {
+    const {error} = buildFinalAction(modelResponse('refund_no_show_fee'), noShowEvidence, calculationProvider, 'route_deviation');
+    expect(error?.code).toBe('WRONG_CATEGORY_REMEDY');
+  });
+
   it('constructs keep_charge with zero amount and no recipient', () => {
     const {action, error} = buildFinalAction(modelResponse('keep_charge'), routeEvidence, calculationProvider);
     expect(error).toBeUndefined();

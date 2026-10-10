@@ -1,6 +1,6 @@
 # FairTrip — setup foundation
 
-Lane A and shared prerequisites for the Ryde dispute-resolution prototype. The current API runs **development stubs only**. Live model access is pending the partner's update; real dispute policies, fixtures, evidence payloads, UI, and golden evaluations remain partner-owned.
+Lane A backend for the Ryde dispute-resolution prototype. Stub mode runs offline. Live mode invokes the two advocates and Judge using Lane A's labeled synthetic evidence and mock calculations. Lane B remains separate; shared contract alignment, real evidence/calculation adapters, UI integration, and golden acceptance are pending.
 
 ## Run locally
 
@@ -12,10 +12,10 @@ Use Node **22.23.3** and npm **10.9.9**. Node 22 remains supported until April 2
 cd /Users/edward/Documents/ChatGPT/Tencent
 npm ci
 npm run verify
-npm run dev
+RUN_MODE=stub npm run dev
 ```
 
-The API listens at `http://127.0.0.1:3001`. No `.env` is required for stub mode. Copy `.env.example` to `.env` when configuration is needed. Do not commit populated environment files.
+The API listens at `http://127.0.0.1:3001`. No `.env` is required for stub mode. The explicit `RUN_MODE=stub` command also keeps an existing live `.env` from making model requests. Copy `.env.example` to `.env` when configuration is needed. Do not commit populated environment files.
 
 ```sh
 curl http://127.0.0.1:3001/api/fixtures
@@ -36,10 +36,10 @@ The desktop workflow does not require CNB or a separate CodeBuddy CLI installati
 
 | Location | Purpose |
 |---|---|
-| `apps/api` | Lane A Express stub API and model connectivity adapter |
+| `apps/api` | Lane A Express API, live role callbacks, and model adapter |
 | `apps/web` | Partner's reserved React/Vite package; no UI implementation |
-| `packages/contracts` | Shared Zod schemas and TypeScript types, version 0.1.0 |
-| `packages/agents` | Lane A fixed workflow foundation, version 0.1.0 |
+| `packages/contracts` | Shared Zod schemas and TypeScript types, contract version 0.2.0 |
+| `packages/agents` | Advocates, tool loops, Judge orchestration, cancellation and action validation, workflow version 0.2.0 |
 | `examples` | Development contract payloads; not golden fixtures |
 | `fixtures` | Reserved for partner-supplied complete fixtures |
 | `tests/evaluation` | Reserved for partner's expected outcomes/evaluation |
@@ -47,16 +47,21 @@ The desktop workflow does not require CNB or a separate CodeBuddy CLI installati
 
 See [API and workflow contracts](docs/CONTRACTS.md), [readiness checklist](docs/READINESS.md), and the existing [two-lane execution plan](Ryde_Two_Lane_Execution_Plan.md).
 
-## Model configuration — pending
+## Current verification and pending work
 
-The partner must confirm provider, region/account site, HTTPS API base URL (including the provider's `/v1` path), model name, and credential access. Configure `MODEL_API_KEY`, `MODEL_BASE_URL`, and `MODEL_NAME` privately in `.env` or backend environment variables, then run:
+The 11 October 2026 audit passed 67 tests across nine files, package builds, strict TypeScript checks, contract examples, setup checks, and an actual development-server smoke test for both offline categories. A clean source copy also passed a fresh locked dependency install and verification.
+
+See [Lane A status](docs/LANE_A_STATUS.md) for the measured results and pending gates. CodeBuddy's saved live wiring and model bootstrap were restored to the local Lane A source without merging Lane B.
+
+## Model configuration
+
+Keep `MODEL_API_KEY`, `MODEL_BASE_URL`, and `MODEL_NAME` private in `.env` or backend environment variables. The restored bootstrap can fill missing values from a matching private `~/.codebuddy/models.json` entry. Explicit runtime settings win; a fallback key is not combined with an unrelated endpoint.
 
 ```sh
 npm run check:model
+RUN_MODE=live npm run dev
 ```
 
-This makes one real chat-completions request and logs only success or sanitized diagnostics. CodeBuddy/WorkBuddy product access is separate from runtime API access. Do not place keys in frontend environment variables.
+The current private settings select MiniMax-M2.5. The live connectivity check returned **HTTP 401**; configured values do not establish successful API authentication. Further credential checks are deferred at the user's request; this audit does not claim authenticated live operation. CodeBuddy product access is separate from runtime API access.
 
-Tencent Hunyuan was selected provisionally. New service onboarding goes through TokenHub; use the endpoint for the actual account region and a model listed as available to that account. Do not reuse retired model IDs from old tutorials. [TokenHub migration](https://cloud.tencent.com/document/product/1823/131382), [current API guide](https://cloud.tencent.com/document/product/1823/130078).
-
-Successful connectivity does not implement the three live agents. The setup API intentionally refuses `RUN_MODE=live` until the production role/tool runner is implemented. Never silently fall back from a live run to stub output.
+Live callbacks and tool execution are exercised by mocked model responses in the tests. The real three-agent smoke tests, shared golden cases and Lane B integration remain pending. Current evidence and calculations are labeled examples; no actual payments are executed.

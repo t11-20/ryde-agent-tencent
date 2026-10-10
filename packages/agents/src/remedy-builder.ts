@@ -1,4 +1,4 @@
-import type { JudgeModelResponse, FinalAction, Evidence } from '@fairtrip/contracts';
+import type { JudgeModelResponse, FinalAction, Evidence, Dispute } from '@fairtrip/contracts';
 
 export interface CalculationResult {
   amountCents: number;
@@ -50,12 +50,13 @@ export interface RemedyValidationError {
 export function buildFinalAction(
   modelResponse: JudgeModelResponse,
   evidence: Evidence[],
-  calculationProvider: CalculationProvider
+  calculationProvider: CalculationProvider,
+  disputeCategory?: Dispute['category']
 ): {action: FinalAction; error?: RemedyValidationError} {
   const remedyId = modelResponse.remedyId;
-  const category = evidence.some(e => e.id.startsWith('e-route')) ? 'route_deviation' :
+  const category = disputeCategory ?? (evidence.some(e => e.id.startsWith('e-route')) ? 'route_deviation' :
                    evidence.some(e => e.id.startsWith('e-noshow')) ? 'no_show' :
-                   'route_deviation'; // fallback
+                   'route_deviation'); // Legacy callers use synthetic example ID prefixes.
 
   // Validate remedy is appropriate for category
   if (category === 'route_deviation' && remedyId === 'refund_no_show_fee') {
