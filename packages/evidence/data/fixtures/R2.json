@@ -1,0 +1,232 @@
+{
+  "fixtureId": "R2",
+  "label": "Longer route requested and approved by the rider",
+  "purpose": "golden",
+  "dispute": {
+    "id": "DSP-R2",
+    "category": "route_deviation",
+    "tripId": "TRP-R2",
+    "riderClaim": "My trip cost more than usual because the driver took a longer route than the app showed. Please refund the difference.",
+    "driverStatement": "The rider asked me to go via Orchard Road. I told them it would be longer and cost more, and they agreed in the chat."
+  },
+  "filedAt": "2026-10-02T15:24:15Z",
+  "trip": {
+    "pickup": {
+      "lat": 1.351,
+      "lng": 103.848,
+      "label": "Bishan (synthetic pin)"
+    },
+    "dropoff": {
+      "lat": 1.283,
+      "lng": 103.86,
+      "label": "Marina Bay (synthetic pin)"
+    },
+    "startedAt": "2026-10-02T13:10:00Z",
+    "endedAt": "2026-10-02T13:24:15Z",
+    "driverMarkedArrivedAt": null,
+    "cancelledAt": null
+  },
+  "gps": {
+    "status": "available",
+    "referenceRoute": {
+      "points": [
+        [
+          1.351,
+          103.848
+        ],
+        [
+          1.33,
+          103.845
+        ],
+        [
+          1.305,
+          103.848
+        ],
+        [
+          1.29,
+          103.855
+        ],
+        [
+          1.283,
+          103.86
+        ]
+      ],
+      "estDurationSec": 716,
+      "source": "Synthetic reference route (not a routing-service result)"
+    },
+    "driverTrace": [
+      {
+        "ts": "2026-10-02T13:10:00Z",
+        "lat": 1.351,
+        "lng": 103.848
+      },
+      {
+        "ts": "2026-10-02T13:10:49Z",
+        "lat": 1.3468,
+        "lng": 103.8454
+      },
+      {
+        "ts": "2026-10-02T13:11:39Z",
+        "lat": 1.3426,
+        "lng": 103.8428
+      },
+      {
+        "ts": "2026-10-02T13:12:28Z",
+        "lat": 1.3384,
+        "lng": 103.8402
+      },
+      {
+        "ts": "2026-10-02T13:13:18Z",
+        "lat": 1.3342,
+        "lng": 103.8376
+      },
+      {
+        "ts": "2026-10-02T13:14:07Z",
+        "lat": 1.33,
+        "lng": 103.835
+      },
+      {
+        "ts": "2026-10-02T13:14:57Z",
+        "lat": 1.325,
+        "lng": 103.8344
+      },
+      {
+        "ts": "2026-10-02T13:15:48Z",
+        "lat": 1.32,
+        "lng": 103.8338
+      },
+      {
+        "ts": "2026-10-02T13:16:38Z",
+        "lat": 1.315,
+        "lng": 103.8332
+      },
+      {
+        "ts": "2026-10-02T13:17:29Z",
+        "lat": 1.31,
+        "lng": 103.8326
+      },
+      {
+        "ts": "2026-10-02T13:18:19Z",
+        "lat": 1.305,
+        "lng": 103.832
+      },
+      {
+        "ts": "2026-10-02T13:19:14Z",
+        "lat": 1.301667,
+        "lng": 103.836333
+      },
+      {
+        "ts": "2026-10-02T13:20:08Z",
+        "lat": 1.298333,
+        "lng": 103.840667
+      },
+      {
+        "ts": "2026-10-02T13:21:03Z",
+        "lat": 1.295,
+        "lng": 103.845
+      },
+      {
+        "ts": "2026-10-02T13:21:51Z",
+        "lat": 1.292,
+        "lng": 103.84875
+      },
+      {
+        "ts": "2026-10-02T13:22:39Z",
+        "lat": 1.289,
+        "lng": 103.8525
+      },
+      {
+        "ts": "2026-10-02T13:23:27Z",
+        "lat": 1.286,
+        "lng": 103.85625
+      },
+      {
+        "ts": "2026-10-02T13:24:15Z",
+        "lat": 1.283,
+        "lng": 103.86
+      }
+    ],
+    "reroutes": [],
+    "advisories": []
+  },
+  "chat": {
+    "messages": [
+      {
+        "id": "m1",
+        "ts": "2026-10-02T13:11:00Z",
+        "sender": "rider",
+        "text": "Hi, can we go via Orchard Road instead? I need to pass by there."
+      },
+      {
+        "id": "m2",
+        "ts": "2026-10-02T13:11:30Z",
+        "sender": "driver",
+        "text": "Can, but it will be longer and the fare will be a bit more. Is that alright?"
+      },
+      {
+        "id": "m3",
+        "ts": "2026-10-02T13:12:00Z",
+        "sender": "rider",
+        "text": "Yes ok, no problem."
+      },
+      {
+        "id": "m4",
+        "ts": "2026-10-02T13:12:10Z",
+        "sender": "driver",
+        "text": "Noted, going via Orchard Road."
+      }
+    ],
+    "calls": []
+  },
+  "payment": {
+    "status": "available",
+    "currency": "SGD",
+    "rateCard": {
+      "baseCents": 300,
+      "perKmCents": 75,
+      "perMinCents": 20,
+      "noShowFeeCents": 500
+    },
+    "surgeMultiplierX100": 100,
+    "lineItems": [
+      {
+        "code": "base",
+        "label": "Base fare",
+        "cents": 300
+      },
+      {
+        "code": "distance",
+        "label": "Distance",
+        "cents": 713,
+        "quantity": 9505
+      },
+      {
+        "code": "time",
+        "label": "Time",
+        "cents": 285,
+        "quantity": 855
+      }
+    ],
+    "totalCents": 1298,
+    "paidCents": 1298,
+    "paidAt": "2026-10-02T13:24:45Z"
+  },
+  "history": {
+    "rider": {
+      "partyId": "RDR-R2",
+      "accountAgeDays": 400,
+      "rating": 4.6,
+      "completedTrips": 95,
+      "disputesFiled90d": 3,
+      "disputesAgainst90d": 0
+    },
+    "driver": {
+      "partyId": "DRV-R2",
+      "accountAgeDays": 1900,
+      "rating": 4.9,
+      "completedTrips": 8200,
+      "disputesFiled90d": 0,
+      "disputesAgainst90d": 0
+    }
+  }
+}
