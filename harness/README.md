@@ -8,7 +8,7 @@ This folder lets a CodeBuddy agent (any model, including small ones) rebuild Lan
 |---|---|
 | Lane A on `main` (contracts, three agents, Judge, API, 67 tests) | Done and passing |
 | Lane B evidence layer, integration, UI, evaluation | Not started (the old `lane-b` branch is not used) |
-| Real model runs | Not yet; your OpenAI-compatible key is first tested in LB-11 |
+| Real model runs | Not yet; your MiniMax Token Plan key (MiniMax-M3) is first tested in LB-11 |
 | CodeBuddy screenshots (3 required) | None yet; capture at the 📸 tasks |
 | Cover, description, presentation, updated architecture diagram | Not started (LB-16) |
 
@@ -19,7 +19,7 @@ The deadline used in this plan is **16 October 2026**, taken from your earlier h
 1. Install Node **22.23.3** and npm **10.9.9** exactly (LB-00 shows the commands). The repository rejects other versions.
 2. Create the branch `lane-b-codebuddy` from `origin/main` and unzip this harness into the repository root (LB-00).
 3. Open the repository folder in CodeBuddy.
-4. Your model key goes only into `.env` (LB-11). Never paste it into a chat.
+4. Your model key goes only into `.env` (LB-11) and, if CodeBuddy uses it too, your user-level `~/.codebuddy/models.json`. Never put it in the project's `.codebuddy/` folder, which is committed, and never paste it into a chat.
 
 ## Running a task
 
@@ -31,12 +31,25 @@ The deadline used in this plan is **16 October 2026**, taken from your earlier h
 
 **Choosing between your two coding models:** run LB-02 with one and LB-03 with the other. Keep whichever passes **Verify** with fewer interventions. Use the stronger one for LB-09, LB-13 and LB-14, the three riskiest tasks.
 
+## Checking a task's work yourself
+
+Green tests only prove the agent's own tests pass; a weak model can write tests that check its own wrong numbers. After LB-02 to LB-08, run the independent audit, which calls the agent's functions on the original data and compares the answers with the spec's numbers:
+
+```
+npm run build
+node harness/audit/check-golden.mjs
+```
+
+The audit also changes fixture inputs (a different rate, fee or route) to prove results are computed rather than hardcoded, and scans the source for golden numbers or fixture IDs. To see what the code computes for a fixture, run `node harness/audit/show-fixture.mjs R1`.
+
+`[PASS]` = matches the spec. `[FAIL]` = wrong result, shown as expected vs got; give that line to `/lb-fix` or rerun the task with a stronger model. `[SKIP]` = task not done yet. `[WARN]` = the agent's own tests never mention the spec's numbers (weak tests; a point against that model). A model that reports DONE while the audit shows FAIL for its task should be dropped. From LB-09 on, the evaluation runner (LB-14, LB-15) is the independent check.
+
 ## Task map and schedule
 
 | Day | Tasks | Gate at the end of the day |
 |---|---|---|
 | Sun 11 Oct (evening) | LB-00 setup · LB-01 workspace · LB-02 data | Baseline green; dataset loads |
-| Mon 12 Oct | LB-03 helpers · LB-04 GPS · LB-05 chat · LB-06 payment · LB-07 evidence | All golden numbers reproduced |
+| Mon 12 Oct | LB-03 helpers · LB-04 GPS · LB-05 chat · LB-06 payment · LB-06A formula functions · LB-07 evidence | All golden numbers reproduced; audit shows no hand calculations |
 | Tue 13 Oct | LB-08 source · LB-09 API wiring · LB-10 golden flow · LB-11 real model | R1 runs through the API with your model |
 | Wed 14 Oct | LB-12 web foundation · LB-13 UI · LB-14 evaluation | UI shows a live R1 run; release gate passes with the scripted model |
 | Thu 15 Oct | LB-15 live acceptance · LB-16 drafts | Release gate passes with the real model; assets drafted |
@@ -88,8 +101,10 @@ Cut in this order: LB-10 (LB-14 covers it) → timeline styling and chip highlig
 | `../.codebuddy/rules/`, `../.codebuddy/commands/` | Always-on guardrails and the `/lb-task`, `/lb-fix`, `/lb-check` commands |
 | `SPEC.md`, `spec/` | Specification index and the 13 section files, including golden numbers |
 | `reference/` | Your original challenge and submission requirement documents |
-| `tasks/LB-00.md` … `LB-16.md` | One card per task |
+| `tasks/LB-00.md` … `LB-16.md` | One card per task (plus `LB-06A`) |
+| `audit/show-fixture.mjs` | Prints what the code computes for one fixture |
 | `STATUS.md` | Progress tracker the agent updates |
 | `PROMPTS.md` | Copy-paste prompts if slash commands are unavailable |
 | `TROUBLESHOOTING.md` | Common errors and fixes |
+| `audit/check-golden.mjs` | Independent check of the evidence layer against the spec's numbers |
 | `data/` | The synthetic dataset (copied into the package in LB-02) |

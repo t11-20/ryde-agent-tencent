@@ -22,7 +22,6 @@ You are implementing **Lane B** of FairTrip, a Ryde multi-agent dispute-resoluti
 - Do not start long-running processes (`npm run dev`, `npm run dev:web`, `vite`). When a card needs a running server, ask the human to start it in a separate terminal and wait for them to reply "server is running".
 - Do not invent APIs or file contents. When unsure, read the existing file the card points to and follow its pattern.
 - Lane A files (`packages/contracts/src/*`, `packages/agents/src/*`, `apps/api/src/*`, `scripts/*`, root `package.json`, root `tsconfig.json`, files in `tests/` that you did not create) may be changed only when the card lists them, and only in the way the card describes.
-- Only converse in English.
 
 ## Project facts
 
@@ -32,6 +31,14 @@ You are implementing **Lane B** of FairTrip, a Ryde multi-agent dispute-resoluti
 - Packages other code imports (`contracts`, `agents`, `evidence`) are consumed through their built `dist/` folders. Run `npm run build` after changing them, before running anything that imports them.
 - API: `http://127.0.0.1:3001`, routes under `/api`. Web dev server: `http://127.0.0.1:5173`, which proxies `/api` to the API.
 - All data is SYNTHETIC. The policy is a DEMONSTRATION POLICY, never "Ryde policy". The comparison path is a "reference route", never an "optimal route".
+
+## Calculations: code only, never by hand
+
+- Never work out a number yourself, in your reasoning, in code or in tests. Every computed value must come from calling a function on the input data: geo (`distanceMeters`, `pathLengthMeters`), money (`divHalfUp`), the named formula functions in `packages/evidence/src/formulas.ts` (`calculateDistanceChargeCents`, `calculateRouteExcessRefundCents`, …) or the metric functions (`routeMetrics`, `pickupMetrics`, `checkFare`, `remedyBasis`).
+- Never write a computed result, a fixture ID (R1, N2…), a dispute or party ID, or a fixture timestamp into `packages/evidence/src/`. The code must give the right answer for any fixture, including ones it has never seen.
+- Expected values in tests come only from the spec (§5.2, §5.10 and §7) or the task card, copied exactly. Never derive an expected value by your own arithmetic.
+- To see what the code computes, run `npm run build`, then `node harness/audit/show-fixture.mjs <FIXTURE_ID>`, and read the output.
+- `node harness/audit/check-golden.mjs` fails the task if the source contains golden numbers or fixture IDs, if results do not change when the inputs change, or if the formula functions are bypassed.
 
 ## TypeScript rules (the compiler is strict)
 

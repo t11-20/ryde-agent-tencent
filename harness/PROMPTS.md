@@ -60,3 +60,14 @@ Summarise task LB-XX for another engineer in under 25 lines: the goal, what you 
 Using submission/metrics/scorecard.md, harness/spec/13-labelling-and-honesty-rules.md and the hackathon requirements in harness/reference/submissions.md and harness/reference/requirements.md, draft submission/description.md with the headings listed in harness/tasks/LB-16.md.
 Use only numbers that appear in the scorecard; write "not measured" otherwise; describe impact as projected.
 ```
+
+## P8 — Stop the agent calculating by hand
+
+```
+Stop working out numbers yourself. Follow the "Calculations: code only" rules in CODEBUDDY.md:
+every value must come from calling the functions in packages/evidence/src (formulas.ts, geo.ts, money.ts, routeMetrics, checkFare, remedyBasis).
+To see a value, run `npm run build` and `node harness/audit/show-fixture.mjs <FIXTURE_ID>`.
+Expected values in tests come only from harness/spec/07-golden-values.md and harness/spec/05-calculations.md §5.10, copied exactly.
+Remove any number you calculated yourself from src/ and tests, then run `node harness/audit/check-golden.mjs` and fix every FAIL.
+```
+

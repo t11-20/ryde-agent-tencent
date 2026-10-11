@@ -1,7 +1,7 @@
 # Tencent Cloud AI Singapore Hackathon 2026
 ## Ryde — Digital Native Track
 
-# 1. CASE STUDY
+# 1. CASE STUDY — WORD-FOR-WORD EXTRACTION
 
 ## 5. The Digital Native Track - Ryde
 

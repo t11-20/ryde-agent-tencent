@@ -4,6 +4,8 @@ Part of the FairTrip Lane B specification. Index: `harness/SPEC.md`.
 
 All functions are pure (no I/O). Distances are rounded with `Math.round` **only where stated**.
 
+**Code-only rule.** Every number is produced by a function call on input data. The money and threshold formulas live in the named functions of §5.10, and §5.4, §5.8 and §5.9 must call them rather than repeat the arithmetic inline. No computed result, fixture ID or fixture timestamp may appear in `packages/evidence/src/`.
+
 ### 5.1 Geo (`geo.ts`) — use this code exactly
 
 ```ts
@@ -168,3 +170,54 @@ When a `distance` or `time` item has no `quantity`, or a value is not a safe int
 3. `refund_no_show_fee`: category is not `no_show` → `"not applicable to category"`; fare invalid → `"fare arithmetic invalid"`; no-show fee items sum to 0 → `"no no-show fee charged"`; otherwise `eligibleCents = Math.min(feeSum, paidCents)`.
 
 Formula text is free-form (for display), for example `min(divHalfUp(2642 x 75 x 100, 100000) = 198, divHalfUp(795 x 100, 100) = 795, paid 1473) = 198`.
+
+### 5.10 Formula functions (`formulas.ts`) — use this code exactly
+
+```ts
+// Every money and threshold formula in one place. Inputs are integers; every division uses divHalfUp.
+import { divHalfUp } from './money.js';
+
+/** Distance charge: billed metres x per-km rate / 1000, rounded half up. */
+export function calculateDistanceChargeCents(meters: number, perKmCents: number): number {
+  return divHalfUp(meters * perKmCents, 1000);
+}
+/** Time charge: billed seconds x per-minute rate / 60, rounded half up. */
+export function calculateTimeChargeCents(seconds: number, perMinCents: number): number {
+  return divHalfUp(seconds * perMinCents, 60);
+}
+/** Surge charge on the pre-surge subtotal (base + distance + time): subtotal x (surgeX100 - 100) / 100. */
+export function calculateSurgeChargeCents(preSurgeCents: number, surgeMultiplierX100: number): number {
+  return divHalfUp(preSurgeCents * (surgeMultiplierX100 - 100), 100);
+}
+/** RD-2 refund for excess distance: excess metres x per-km rate x surgeX100 / 100000. */
+export function calculateRouteExcessRefundCents(excessMeters: number, perKmCents: number, surgeMultiplierX100: number): number {
+  return divHalfUp(excessMeters * perKmCents * surgeMultiplierX100, 100000);
+}
+/** Cap for the RD-2 refund: the surged distance charge. */
+export function calculateSurgedDistanceCapCents(distanceChargeCents: number, surgeMultiplierX100: number): number {
+  return divHalfUp(distanceChargeCents * surgeMultiplierX100, 100);
+}
+/** RD-1 threshold: the greater of the minimum metres or the percentage of the reference distance. */
+export function calculateMaterialityThresholdMeters(referenceMeters: number, minExcessMeters: number, minExcessPercent: number): number {
+  return Math.max(minExcessMeters, divHalfUp(referenceMeters * minExcessPercent, 100));
+}
+/** Excess as a percentage of the reference distance, one decimal place. */
+export function calculateExcessPercent(excessMeters: number, referenceMeters: number): number {
+  return Math.round((excessMeters * 1000) / referenceMeters) / 10;
+}
+```
+
+Where they are used: `route.ts` uses `calculateMaterialityThresholdMeters` (with `params.minExcessMeters` and `params.minExcessPercent`) and `calculateExcessPercent`; `fare.ts` uses `calculateDistanceChargeCents`, `calculateTimeChargeCents` and `calculateSurgeChargeCents` for the expected cents; `remedy.ts` computes `Math.min(calculateRouteExcessRefundCents(excessMeters, perKmCents, x), calculateSurgedDistanceCapCents(distanceCents, x), paidCents)`.
+
+Test vectors (produced by running these functions in code, not by hand):
+
+| Call | Result |
+|---|---|
+| `calculateDistanceChargeCents(10598, 75)` / `(9505, 75)` / `(12400, 75)` | 795 / 713 / 930 |
+| `calculateTimeChargeCents(1134, 20)` / `(855, 20)` / `(1260, 20)` | 378 / 285 / 420 |
+| `calculateSurgeChargeCents(1473, 150)` / `(1473, 100)` | 737 / 0 |
+| `calculateRouteExcessRefundCents(2642, 75, 100)` / `(2642, 75, 150)` / `(1549, 75, 100)` / `(1722, 75, 100)` | 198 / 297 / 116 / 129 |
+| `calculateSurgedDistanceCapCents(795, 100)` / `(795, 150)` | 795 / 1193 |
+| `calculateMaterialityThresholdMeters(7956, 500, 10)` / `(4000, 500, 10)` / `(8000, 500, 10)` | 796 / 500 / 800 |
+| `calculateExcessPercent(2642, 7956)` / `(1549, 7956)` / `(1722, 7956)` / `(0, 7956)` | 33.2 / 19.5 / 21.6 / 0 |
+
