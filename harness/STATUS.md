@@ -12,7 +12,7 @@ Status values: `TODO`, `IN PROGRESS`, `DONE`, `BLOCKED`. The agent updates its o
 | LB-05 | Chat and call analysis | LB-04 | DONE | 5ea6805 | 34 new tests (chat tags, sentiment, contact attempts) pass; 140 total; typecheck clean |
 | LB-06 | Fare check and remedy basis | LB-05 | DONE | | 32 new tests (fare anomalies + remedy basis) pass; 172 total; typecheck clean |
 | LB-06A | Formula functions, no hand calculations | LB-06 | DONE | | `formulas.ts` copied from SPEC §5.10; route/fare/remedy call the named formulas (no inline copies); 7 new tests, 179 total; audit RESULT: OK (68 passed, 2 skips = LB-07/LB-08) |
-| LB-07 | Evidence builder and policy clauses | LB-06 | TODO | | |
+| LB-07 | Evidence builder and policy clauses | LB-06 | DONE | | facts/policy/build-evidence added; 49 new tests pass, 228 total; typecheck clean; audit RESULT: OK (87 passed, 1 skip = LB-08) |
 | LB-08 | Dispute source (integration seam) | LB-07 | TODO | | Lane A file touched: agents index |
 | LB-09 | Connect the fixture source to the live API | LB-08 | TODO | | Lane A files touched: app, live-roles, server |
 | LB-10 | Golden flow for all 11 fixtures | LB-09 | TODO | | |
@@ -27,7 +27,7 @@ Status values: `TODO`, `IN PROGRESS`, `DONE`, `BLOCKED`. The agent updates its o
 
 | Gate | Condition | Status |
 |---|---|---|
-| G1 | Golden numbers reproduced (LB-04 to LB-07) | |
+| G1 | Golden numbers reproduced (LB-04 to LB-07) | MET (check-golden: 87 passed, 0 failed, 1 skip = LB-08) |
 | G2 | Live API serves Lane B data; Lane A tests still pass (LB-09) | |
 | G3 | Real model completes R1 (LB-11) | |
 | G4 | Release gate passes with the real model (LB-15) | |

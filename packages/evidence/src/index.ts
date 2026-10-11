@@ -10,3 +10,6 @@ export * from './pickup.js';
 export * from './chat.js';
 export * from './fare.js';
 export * from './remedy.js';
+export * from './facts.js';
+export * from './policy.js';
+export * from './build-evidence.js';
