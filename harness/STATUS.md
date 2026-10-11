@@ -6,7 +6,7 @@ Status values: `TODO`, `IN PROGRESS`, `DONE`, `BLOCKED`. The agent updates its o
 |---|---|---|---|---|---|
 | LB-00 | Setup and baseline | — | DONE | 1c9b130, d31805e | Node v22.23.3 / npm 10.9.9; baseline `npm run verify` passes with 67 tests, examples validated, foundation verified |
 | LB-01 | Evidence workspace and root wiring | LB-00 | DONE | | 10 test files / 68 tests pass (67 Lane A + smoke); typecheck, build, check:examples pass |
-| LB-02 | Data files, schemas and dataset loader | LB-01 | TODO | | |
+| LB-02 | Data files, schemas and dataset loader | LB-01 | DONE | | 13 data files copied byte-identical; 11 fixtures + 11 policy clauses validate; 11 test files / 74 tests pass |
 | LB-03 | Geo, money and time helpers | LB-02 | TODO | | |
 | LB-04 | GPS metrics: route and pickup | LB-03 | TODO | | |
 | LB-05 | Chat and call analysis | LB-04 | TODO | | |
