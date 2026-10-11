@@ -22,6 +22,7 @@ You are implementing **Lane B** of FairTrip, a Ryde multi-agent dispute-resoluti
 - Do not start long-running processes (`npm run dev`, `npm run dev:web`, `vite`). When a card needs a running server, ask the human to start it in a separate terminal and wait for them to reply "server is running".
 - Do not invent APIs or file contents. When unsure, read the existing file the card points to and follow its pattern.
 - Lane A files (`packages/contracts/src/*`, `packages/agents/src/*`, `apps/api/src/*`, `scripts/*`, root `package.json`, root `tsconfig.json`, files in `tests/` that you did not create) may be changed only when the card lists them, and only in the way the card describes.
+- Only converse in English.
 
 ## Project facts
 
