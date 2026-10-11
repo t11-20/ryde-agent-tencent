@@ -4,8 +4,8 @@ Status values: `TODO`, `IN PROGRESS`, `DONE`, `BLOCKED`. The agent updates its o
 
 | ID | Task | Requires | Status | Commit | Notes |
 |---|---|---|---|---|---|
-| LB-00 | Setup and baseline | — | DONE | | Node v22.23.3 / npm 10.9.9; baseline `npm run verify` passes with 67 tests, examples validated, foundation verified. Earlier blockers (version mismatch, then host-wide NTFS mount-point traversal breaking workspace resolution) are both fixed — see Blockers for the environment note |
-| LB-01 | Evidence workspace and root wiring | LB-00 | TODO | | |
+| LB-00 | Setup and baseline | — | DONE | 1c9b130, d31805e | Node v22.23.3 / npm 10.9.9; baseline `npm run verify` passes with 67 tests, examples validated, foundation verified |
+| LB-01 | Evidence workspace and root wiring | LB-00 | DONE | | 10 test files / 68 tests pass (67 Lane A + smoke); typecheck, build, check:examples pass |
 | LB-02 | Data files, schemas and dataset loader | LB-01 | TODO | | |
 | LB-03 | Geo, money and time helpers | LB-02 | TODO | | |
 | LB-04 | GPS metrics: route and pickup | LB-03 | TODO | | |
@@ -35,5 +35,3 @@ Status values: `TODO`, `IN PROGRESS`, `DONE`, `BLOCKED`. The agent updates its o
 ## Blockers
 
 None. Format: `LB-xx — first error line — what was tried — what is needed`.
-
-Resolved while doing LB-00, kept here as environment context for later cards: this Windows host initially refused to traverse NTFS mount points ("The path cannot be traversed because it contains an untrusted mount point"), so the npm workspace junctions under `node_modules/@fairtrip/*` could not be resolved and every `@fairtrip/*` import failed with TS2307 / `ERR_MODULE_NOT_FOUND`. The junctions themselves were always valid (fsutil tag `0xa0000003`, correct targets), a junction created outside the repo failed identically, no ancestor folder was a reparse point, and Defender controlled folder access was off — the block was machine-wide and pointed at **Trend Micro Maximum Security**. Allowing reparse/mount-point traversal there fixed it; `npm run verify` then passed with 67 tests. If workspace imports ever break again, suspect that policy first, not the repo.
