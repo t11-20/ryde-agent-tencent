@@ -1,6 +1,6 @@
 import type { Fixture, PolicyParams } from './schemas.js';
 import { distanceMeters, pathLengthMeters, toLatLng, type LatLng } from './geo.js';
-import { divHalfUp } from './money.js';
+import { calculateExcessPercent, calculateMaterialityThresholdMeters } from './formulas.js';
 import { secondsBetween } from './time.js';
 
 export interface UnexpectedStop {
@@ -26,9 +26,9 @@ export interface RouteMetrics {
   referenceRouteSource: string;
 }
 
-/** §5.4 threshold rule: max(minExcessMeters, divHalfUp(referenceMeters * minExcessPercent, 100)). */
+/** §5.4 threshold rule (RD-1), computed by the named formula function of SPEC §5.10. */
 export function thresholdMetersFor(referenceMeters: number, params: PolicyParams): number {
-  return Math.max(params.minExcessMeters, divHalfUp(referenceMeters * params.minExcessPercent, 100));
+  return calculateMaterialityThresholdMeters(referenceMeters, params.minExcessMeters, params.minExcessPercent);
 }
 
 /** Strict >: a detour is material only when excess exceeds the threshold. */
@@ -90,7 +90,7 @@ export function routeMetrics(fixture: Fixture, params: PolicyParams): RouteMetri
   const referenceMeters = pathLengthMeters(referenceRoute.points.map(toLatLng));
   const actualMeters = pathLengthMeters(fixture.gps.driverTrace.map(p => ({ lat: p.lat, lng: p.lng })));
   const excessMeters = Math.max(0, actualMeters - referenceMeters);
-  const excessPct = Math.round((excessMeters * 1000) / referenceMeters) / 10;
+  const excessPct = calculateExcessPercent(excessMeters, referenceMeters);
   const thresholdMeters = thresholdMetersFor(referenceMeters, params);
   const exceedsThreshold = isMaterialDetour(excessMeters, thresholdMeters);
   const referenceDurationSec = referenceRoute.estDurationSec;

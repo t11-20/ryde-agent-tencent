@@ -1,5 +1,5 @@
 import type { Fixture } from './schemas.js';
-import { divHalfUp } from './money.js';
+import { calculateDistanceChargeCents, calculateSurgeChargeCents, calculateTimeChargeCents } from './formulas.js';
 
 export type AvailablePayment = Extract<Fixture['payment'], { status: 'available' }>;
 
@@ -8,17 +8,12 @@ export interface FareCheck {
   anomalies: string[];
 }
 
-const isSafeNonNegInt = (n: number): boolean => Number.isSafeInteger(n) && n >= 0;
-
-/** Guarded divHalfUp: returns null instead of throwing when inputs are not non-negative safe integers. */
-function safeDiv(n: number, d: number): number | null {
-  if (!isSafeNonNegInt(n) || !Number.isSafeInteger(d) || d <= 0) return null;
-  return divHalfUp(n, d);
-}
+const isSafeNonNegInt = (n: number | undefined): n is number => n !== undefined && Number.isSafeInteger(n) && n >= 0;
 
 /**
  * SPEC §5.8. Validates fare arithmetic in integer cents. Codes are pushed in the
- * table's order. Every divHalfUp call is guarded: a missing quantity or a
+ * table's order. The expected distance, time and surge cents come from the named
+ * formula functions (SPEC §5.10). Every call is guarded: a missing quantity or a
  * non-integer input records the matching anomaly instead of throwing.
  */
 export function checkFare(payment: AvailablePayment): FareCheck {
@@ -43,28 +38,33 @@ export function checkFare(payment: AvailablePayment): FareCheck {
     anomalies.push('base_mismatch');
   }
 
-  // 4. distance_mismatch: cents = divHalfUp(quantity * perKmCents, 1000)
+  // 4. distance_mismatch: expected cents from calculateDistanceChargeCents(quantity, perKmCents)
   const distanceItem = lineItems.find(li => li.code === 'distance');
   if (distanceItem !== undefined) {
-    const q = distanceItem.quantity;
-    const expected = q === undefined ? null : safeDiv(q * rateCard.perKmCents, 1000);
+    const quantity = distanceItem.quantity;
+    const perKmCents = rateCard.perKmCents;
+    const expected =
+      isSafeNonNegInt(quantity) && isSafeNonNegInt(perKmCents) ? calculateDistanceChargeCents(quantity, perKmCents) : null;
     if (expected === null || distanceItem.cents !== expected) anomalies.push('distance_mismatch');
   }
 
-  // 5. time_mismatch: cents = divHalfUp(quantity * perMinCents, 60)
+  // 5. time_mismatch: expected cents from calculateTimeChargeCents(quantity, perMinCents)
   const timeItem = lineItems.find(li => li.code === 'time');
   if (timeItem !== undefined) {
-    const q = timeItem.quantity;
-    const expected = q === undefined ? null : safeDiv(q * rateCard.perMinCents, 60);
+    const quantity = timeItem.quantity;
+    const perMinCents = rateCard.perMinCents;
+    const expected =
+      isSafeNonNegInt(quantity) && isSafeNonNegInt(perMinCents) ? calculateTimeChargeCents(quantity, perMinCents) : null;
     if (expected === null || timeItem.cents !== expected) anomalies.push('time_mismatch');
   }
 
-  // 6. surge_mismatch
+  // 6. surge_mismatch: expected cents from calculateSurgeChargeCents(base + distance + time, surgeMultiplierX100)
   const x = payment.surgeMultiplierX100;
   if (x > 100) {
     const surgeItem = lineItems.find(li => li.code === 'surge');
-    const bdt = sumByCode('base') + sumByCode('distance') + sumByCode('time');
-    const expected = safeDiv(bdt * (x - 100), 100);
+    const preSurgeCents = sumByCode('base') + sumByCode('distance') + sumByCode('time');
+    const expected =
+      isSafeNonNegInt(preSurgeCents) && isSafeNonNegInt(x) ? calculateSurgeChargeCents(preSurgeCents, x) : null;
     if (surgeItem === undefined || expected === null || surgeItem.cents !== expected) {
       anomalies.push('surge_mismatch');
     }

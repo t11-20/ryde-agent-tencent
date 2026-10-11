@@ -3,6 +3,7 @@ export * from './schemas.js';
 export * from './dataset.js';
 export * from './geo.js';
 export * from './money.js';
+export * from './formulas.js';
 export * from './time.js';
 export * from './route.js';
 export * from './pickup.js';

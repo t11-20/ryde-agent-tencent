@@ -1,7 +1,7 @@
 import type { Fixture } from './schemas.js';
 import type { RouteMetrics } from './route.js';
 import type { FareCheck } from './fare.js';
-import { divHalfUp } from './money.js';
+import { calculateRouteExcessRefundCents, calculateSurgedDistanceCapCents } from './formulas.js';
 
 export interface RemedyBasisEntry {
   remedyId: 'keep_charge' | 'refund_route_excess' | 'refund_no_show_fee';
@@ -56,12 +56,12 @@ function routeExcessEntry(fixture: Fixture, route: RouteMetrics | null, fare: Fa
 
   const x = payment.surgeMultiplierX100;
   const per = payment.rateCard.perKmCents;
-  const byDistance = divHalfUp(route.excessMeters * per * x, 100000);
-  const byCharged = divHalfUp(distanceCents * x, 100);
-  const eligibleCents = Math.min(byDistance, byCharged, payment.paidCents);
+  const byExcessDistance = calculateRouteExcessRefundCents(route.excessMeters, per, x);
+  const bySurgedCap = calculateSurgedDistanceCapCents(distanceCents, x);
+  const eligibleCents = Math.min(byExcessDistance, bySurgedCap, payment.paidCents);
   const formula =
-    `min(divHalfUp(${route.excessMeters} x ${per} x ${x}, 100000) = ${byDistance}, ` +
-    `divHalfUp(${distanceCents} x ${x}, 100) = ${byCharged}, paid ${payment.paidCents}) = ${eligibleCents}`;
+    `min(calculateRouteExcessRefundCents(${route.excessMeters}, ${per}, ${x}) = ${byExcessDistance}, ` +
+    `calculateSurgedDistanceCapCents(${distanceCents}, ${x}) = ${bySurgedCap}, paid ${payment.paidCents}) = ${eligibleCents}`;
   return { remedyId: id, eligibleCents, formula, unavailableReason: null };
 }
 
