@@ -2,15 +2,17 @@
 
 **Last updated:** 2026-10-11 (Asia/Kuala_Lumpur)
 **Current branch:** `lane-a`
-**Published baseline:** `37c7506` on `origin/lane-a`
-**Current audit:** restored Lane A portions of the saved CodeBuddy work and corrected defects found during verification. See `git log -1` for the local audit commit.
+**Original published baseline:** `37c7506`
+**Verified code revision:** `c163321`; subsequent publication documentation commits do not change the tested code.
+**Publication target:** [collaboration repository, branch `lane-a`](https://github.com/t11-20/ryde-agent-tencent/tree/lane-a)
+**Current audit:** restored Lane A portions of the saved CodeBuddy work and corrected defects found during verification.
 **Release status:** Local verification passes; real-model verification is deferred at the user's request; shared release acceptance remains pending.
 
 ## Scope and preserved work
 
 Lane A stays separate from Lane B. The ten original Lane A commits are retained. CodeBuddy's later live-mode callbacks, model bootstrap, and live-wiring tests were recovered from stash `742bf388fd1b38e77a8c976c022a66ff1169386a` and adapted to Lane A's synthetic examples without importing Lane B packages.
 
-The integrated history remains on local branch `codex/lane-a-b-integration-backup-20261010` at `8e942b0`; the original stash and generated integration reports remain available. Integration-only adapters and fixtures are not part of the current Lane A branch. This audit updates the local repository; the last published branch remains at the baseline above.
+The integrated history remains on local branch `codex/lane-a-b-integration-backup-20261010` at `8e942b0`; the original stash and generated integration reports remain available. Integration-only adapters and fixtures are not part of the current Lane A branch. Lane A publication uses the collaboration repository's `lane-a` branch. See that branch's history for the latest documentation revision.
 
 ## Package status
 

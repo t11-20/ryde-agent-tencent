@@ -418,7 +418,7 @@ fairtrip/
 | Branch | Purpose | Current SHA |
 |---|---|---|
 | `main` | Release history | `ea37153` |
-| `lane-a` | Lane A development | Published baseline `37c7506`; local audit follows |
+| `lane-a` | Lane A development | Verified code audit `c163321`; publication documentation follows |
 | `lane-b` | Partner development (separate) | `origin/lane-b`: `e2ad1e3` |
 | `ryde-integration` | Combined testing | `0ebd544` (Lane A pin) |
 
