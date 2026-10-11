@@ -11,6 +11,7 @@ Status values: `TODO`, `IN PROGRESS`, `DONE`, `BLOCKED`. The agent updates its o
 | LB-04 | GPS metrics: route and pickup | LB-03 | DONE | 5a878ee | 23 new tests (route+pickup) pass; 106 total; typecheck clean |
 | LB-05 | Chat and call analysis | LB-04 | DONE | 5ea6805 | 34 new tests (chat tags, sentiment, contact attempts) pass; 140 total; typecheck clean |
 | LB-06 | Fare check and remedy basis | LB-05 | DONE | | 32 new tests (fare anomalies + remedy basis) pass; 172 total; typecheck clean |
+| LB-06A | Formula functions, no hand calculations | LB-06 | DONE | | `formulas.ts` copied from SPEC §5.10; route/fare/remedy call the named formulas (no inline copies); 7 new tests, 179 total; audit RESULT: OK (68 passed, 2 skips = LB-07/LB-08) |
 | LB-07 | Evidence builder and policy clauses | LB-06 | TODO | | |
 | LB-08 | Dispute source (integration seam) | LB-07 | TODO | | Lane A file touched: agents index |
 | LB-09 | Connect the fixture source to the live API | LB-08 | TODO | | Lane A files touched: app, live-roles, server |
