@@ -1,0 +1,129 @@
+{
+  "fixtureId": "N3",
+  "label": "Driver cancelled after 210 s, before the 300 s minimum",
+  "purpose": "golden",
+  "dispute": {
+    "id": "DSP-N3",
+    "category": "no_show",
+    "tripId": "TRP-N3",
+    "riderClaim": "The driver cancelled after only a few minutes while I was on my way down, and I was charged a no-show fee.",
+    "driverStatement": "I waited at the pickup and the rider did not show up, so I cancelled."
+  },
+  "filedAt": "2026-10-03T12:26:14Z",
+  "trip": {
+    "pickup": {
+      "lat": 1.3526,
+      "lng": 103.9447,
+      "label": "Tampines main entrance (synthetic pin)"
+    },
+    "dropoff": null,
+    "startedAt": null,
+    "endedAt": null,
+    "driverMarkedArrivedAt": "2026-10-03T10:22:44Z",
+    "cancelledAt": "2026-10-03T10:26:14Z"
+  },
+  "gps": {
+    "status": "available",
+    "referenceRoute": null,
+    "driverTrace": [
+      {
+        "ts": "2026-10-03T10:20:00Z",
+        "lat": 1.362,
+        "lng": 103.953
+      },
+      {
+        "ts": "2026-10-03T10:20:55Z",
+        "lat": 1.358917,
+        "lng": 103.950283
+      },
+      {
+        "ts": "2026-10-03T10:21:49Z",
+        "lat": 1.355833,
+        "lng": 103.947567
+      },
+      {
+        "ts": "2026-10-03T10:22:44Z",
+        "lat": 1.35275,
+        "lng": 103.94485
+      },
+      {
+        "ts": "2026-10-03T10:23:44Z",
+        "lat": 1.35275,
+        "lng": 103.94485
+      },
+      {
+        "ts": "2026-10-03T10:24:44Z",
+        "lat": 1.35275,
+        "lng": 103.94485
+      },
+      {
+        "ts": "2026-10-03T10:25:44Z",
+        "lat": 1.35275,
+        "lng": 103.94485
+      },
+      {
+        "ts": "2026-10-03T10:26:14Z",
+        "lat": 1.35275,
+        "lng": 103.94485
+      }
+    ],
+    "reroutes": [],
+    "advisories": []
+  },
+  "chat": {
+    "messages": [
+      {
+        "id": "m1",
+        "ts": "2026-10-03T10:23:14Z",
+        "sender": "driver",
+        "text": "I'm here at the main entrance."
+      },
+      {
+        "id": "m2",
+        "ts": "2026-10-03T10:25:14Z",
+        "sender": "rider",
+        "text": "Coming down now, 2 minutes!"
+      }
+    ],
+    "calls": []
+  },
+  "payment": {
+    "status": "available",
+    "currency": "SGD",
+    "rateCard": {
+      "baseCents": 300,
+      "perKmCents": 75,
+      "perMinCents": 20,
+      "noShowFeeCents": 500
+    },
+    "surgeMultiplierX100": 100,
+    "lineItems": [
+      {
+        "code": "no_show_fee",
+        "label": "No-show fee",
+        "cents": 500
+      }
+    ],
+    "totalCents": 500,
+    "paidCents": 500,
+    "paidAt": "2026-10-03T10:26:19Z"
+  },
+  "history": {
+    "rider": {
+      "partyId": "RDR-N3",
+      "accountAgeDays": 900,
+      "rating": 4.8,
+      "completedTrips": 320,
+      "disputesFiled90d": 0,
+      "disputesAgainst90d": 0
+    },
+    "driver": {
+      "partyId": "DRV-N3",
+      "accountAgeDays": 1500,
+      "rating": 4.7,
+      "completedTrips": 4000,
+      "disputesFiled90d": 1,
+      "disputesAgainst90d": 1
+    }
+  }
+}

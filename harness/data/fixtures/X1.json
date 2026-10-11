@@ -1,0 +1,101 @@
+{
+  "fixtureId": "X1",
+  "label": "Route dispute with GPS telemetry missing",
+  "purpose": "robustness",
+  "dispute": {
+    "id": "DSP-X1",
+    "category": "route_deviation",
+    "tripId": "TRP-X1",
+    "riderClaim": "The driver took a much longer route and I was overcharged. Please refund the extra.",
+    "driverStatement": "I followed the traffic. The route was reasonable."
+  },
+  "filedAt": "2026-10-02T17:51:00Z",
+  "trip": {
+    "pickup": {
+      "lat": 1.351,
+      "lng": 103.848,
+      "label": "Bishan (synthetic pin)"
+    },
+    "dropoff": {
+      "lat": 1.283,
+      "lng": 103.86,
+      "label": "Marina Bay (synthetic pin)"
+    },
+    "startedAt": "2026-10-02T15:30:00Z",
+    "endedAt": "2026-10-02T15:51:00Z",
+    "driverMarkedArrivedAt": null,
+    "cancelledAt": null
+  },
+  "gps": {
+    "status": "unavailable",
+    "reason": "No location data received from the driver app for this trip (synthetic telemetry gap)."
+  },
+  "chat": {
+    "messages": [
+      {
+        "id": "m1",
+        "ts": "2026-10-02T15:35:00Z",
+        "sender": "rider",
+        "text": "Why are we going this way? This is longer than usual."
+      },
+      {
+        "id": "m2",
+        "ts": "2026-10-02T15:35:30Z",
+        "sender": "driver",
+        "text": "Traffic is bad on the usual road."
+      }
+    ],
+    "calls": []
+  },
+  "payment": {
+    "status": "available",
+    "currency": "SGD",
+    "rateCard": {
+      "baseCents": 300,
+      "perKmCents": 75,
+      "perMinCents": 20,
+      "noShowFeeCents": 500
+    },
+    "surgeMultiplierX100": 100,
+    "lineItems": [
+      {
+        "code": "base",
+        "label": "Base fare",
+        "cents": 300
+      },
+      {
+        "code": "distance",
+        "label": "Distance",
+        "cents": 930,
+        "quantity": 12400
+      },
+      {
+        "code": "time",
+        "label": "Time",
+        "cents": 420,
+        "quantity": 1260
+      }
+    ],
+    "totalCents": 1650,
+    "paidCents": 1650,
+    "paidAt": "2026-10-02T15:51:30Z"
+  },
+  "history": {
+    "rider": {
+      "partyId": "RDR-X1",
+      "accountAgeDays": 300,
+      "rating": 4.7,
+      "completedTrips": 60,
+      "disputesFiled90d": 0,
+      "disputesAgainst90d": 0
+    },
+    "driver": {
+      "partyId": "DRV-X1",
+      "accountAgeDays": 900,
+      "rating": 4.6,
+      "completedTrips": 2500,
+      "disputesFiled90d": 0,
+      "disputesAgainst90d": 1
+    }
+  }
+}
