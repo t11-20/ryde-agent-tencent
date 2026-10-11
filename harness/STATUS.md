@@ -9,7 +9,7 @@ Status values: `TODO`, `IN PROGRESS`, `DONE`, `BLOCKED`. The agent updates its o
 | LB-02 | Data files, schemas and dataset loader | LB-01 | DONE | | 13 data files copied byte-identical; 11 fixtures + 11 policy clauses validate; 11 test files / 74 tests pass |
 | LB-03 | Geo, money and time helpers | LB-02 | DONE | | |
 | LB-04 | GPS metrics: route and pickup | LB-03 | DONE | 5a878ee | 23 new tests (route+pickup) pass; 106 total; typecheck clean |
-| LB-05 | Chat and call analysis | LB-04 | TODO | | |
+| LB-05 | Chat and call analysis | LB-04 | DONE | | 34 new tests (chat tags, sentiment, contact attempts) pass; 140 total; typecheck clean |
 | LB-06 | Fare check and remedy basis | LB-05 | TODO | | |
 | LB-07 | Evidence builder and policy clauses | LB-06 | TODO | | |
 | LB-08 | Dispute source (integration seam) | LB-07 | TODO | | Lane A file touched: agents index |
