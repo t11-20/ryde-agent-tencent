@@ -1,0 +1,13 @@
+$:
+  vscode:
+    - docker:
+        build: .ide/Dockerfile
+      services:
+        - vscode
+      stages:
+        - name: Install locked dependencies
+          script: npm ci
+        - name: Build shared packages and API
+          script: npm run build
+        - name: Verify local prerequisites
+          script: npm run check:setup

@@ -1,0 +1,15 @@
+{
+  "name": "@fairtrip/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "@fairtrip/agents": "0.1.0",
+    "@fairtrip/contracts": "0.1.0",
+    "express": "5.2.1",
+    "zod": "4.6.5"
+  }
+}
