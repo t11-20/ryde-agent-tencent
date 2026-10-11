@@ -62,6 +62,6 @@ npm run check:model
 RUN_MODE=live npm run dev
 ```
 
-The current private settings select MiniMax-M2.5. The live connectivity check returned **HTTP 401**; configured values do not establish successful API authentication. Further credential checks are deferred at the user's request; this audit does not claim authenticated live operation. CodeBuddy product access is separate from runtime API access.
+The current runtime model is `MiniMax-M3` through MiniMax's OpenAI-compatible endpoint (`MODEL_BASE_URL=https://api.minimax.io/v1`, `MODEL_NAME=MiniMax-M3`). An earlier connectivity check with the previous MiniMax Configuration returned HTTP 401. The MiniMax-M3 connection is verified in Lane B task LB-011 with `npm run check:model`.
 
 Live callbacks and tool execution are exercised by mocked model responses in the tests. The real three-agent smoke tests, shared golden cases and Lane B integration remain pending. Current evidence and calculations are labeled examples; no actual payments are executed.

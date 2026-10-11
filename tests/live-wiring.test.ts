@@ -27,7 +27,7 @@ function buildStubLiveModel(queues: {rider: string[]; driver: string[]; judge: s
   return adapter;
 }
 
-const liveConfig = readConfig({RUN_MODE: 'live', MODEL_API_KEY: 'test-secret', MODEL_BASE_URL: 'https://example.com/v1', MODEL_NAME: 'MiniMax-M2.5'});
+const liveConfig = readConfig({RUN_MODE: 'live', MODEL_API_KEY: 'test-secret', MODEL_BASE_URL: 'https://example.com/v1', MODEL_NAME: 'MiniMax-M3'});
 
 // Lane A tests use its synthetic examples; no Lane B package is required.
 const r1EvidenceIds = mockEvidenceStore['dispute-route-example']!.map(record => record.id);

@@ -21,7 +21,7 @@ export function resolveCodeBuddyEnvironment(env: NodeJS.ProcessEnv, models: Code
     ? candidates.find(value => value.id === nameHint || value.name === nameHint)
     : urlHint
       ? candidates.find(value => modelHost(value.url) === modelHost(urlHint))
-      : candidates.find(value => value.id === 'MiniMax-M2.5') ?? (candidates.length === 1 ? candidates[0] : undefined);
+      : candidates.find(value => value.id === 'MiniMax-M3') ?? (candidates.length === 1 ? candidates[0] : undefined);
   if (!model || (urlHint && modelHost(urlHint) !== modelHost(model.url))) return resolved;
   if (env.MODEL_API_KEY && env.MODEL_API_KEY !== PLACEHOLDER && env.MODEL_API_KEY !== model.apiKey) return resolved;
   if (!resolved.MODEL_NAME && model.id) resolved.MODEL_NAME = model.id;
