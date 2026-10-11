@@ -6,12 +6,10 @@ The collaboration repository's `main` branch combines the original repository hi
 
 ## Run locally
 
-The permanent project folder is `/Users/edward/Documents/ChatGPT/Tencent`. Open this folder in CodeBuddy and run commands from it. Only this project folder remains under `/Users/edward/Documents/ChatGPT`.
-
 Use Node **22.23.3** and npm **10.9.9**. Node 22 remains supported until April 2027: [official release schedule](https://github.com/nodejs/Release).
 
 ```sh
-cd /Users/edward/Documents/ChatGPT/Tencent
+cd <Project-Folder>
 npm ci
 npm run verify
 RUN_MODE=stub npm run dev
@@ -28,7 +26,7 @@ Use the returned ID with `GET /api/runs/ID?after=0`. Runs are stored in memory a
 
 ## CodeBuddy desktop development
 
-Use CodeBuddy desktop's **Open Folder** command to open `/Users/edward/Documents/ChatGPT/Tencent`. Run the local commands above in its integrated terminal.
+Use CodeBuddy desktop's **Open Folder** command to open <Project-Folder>. Run the local commands above in its integrated terminal.
 
 CodeBuddy 4.12.1 installation, running state, and the open Tencent project were verified on 8 October 2026. The [project-open screenshot](docs/evidence/00-project-open.png) records folder access. A successful signed-in agent response and the three genuine development-chat captures remain pending; follow the [capture tasks](docs/evidence/README.md).
 
