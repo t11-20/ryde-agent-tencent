@@ -39,13 +39,13 @@ Find the first error line, then the matching row. Fix only files your current ca
 
 | Symptom | Fix |
 |---|---|
-| `Model request failed (HTTP 401)` | Wrong or expired key in `.env`. |
-| `HTTP 404` | Wrong `MODEL_NAME` or `MODEL_BASE_URL` (use `https://api.openai.com/v1` for OpenAI). |
-| `HTTP 400` | An option in `MODEL_EXTRA_BODY` is not supported by your model; remove it. JSON mode also needs the word "JSON" in the request (handled by LB-11). |
-| `HTTP 429` | Rate limit; wait a minute and retry. Runs are sequential on purpose. |
-| `Advocate … produced unparseable output` / `output.repair` events | Set `MODEL_EXTRA_BODY='{"response_format":{"type":"json_object"}}'` in `.env` and restart the server. |
+| `Model request failed (HTTP 401)` | Wrong or expired key, or key and endpoint from different MiniMax regions. A Token Plan key (`sk-cp-…`) from platform.minimax.io works with `https://api.minimax.io/v1`; a China-platform key needs the China endpoint. |
+| `HTTP 404` | `MODEL_NAME` must be exactly `MiniMax-M3` (case-sensitive); `MODEL_BASE_URL` must be `https://api.minimax.io/v1`. |
+| `HTTP 400` | An option in `MODEL_EXTRA_BODY` is not accepted; go back to `'{"reasoning_split":true}'`. |
+| `HTTP 429` | The Token Plan quota window is used up. The plan is shared by both of you, so coordinate: avoid evaluation runs while someone is coding with it, then retry later. |
+| `Advocate … produced unparseable output` / `output.repair` events | Make sure `.env` has `MODEL_EXTRA_BODY='{"reasoning_split":true}'` and restart the server. |
 | `Each live advocate must independently request evidence and policy` | The model skipped a tool; apply LB-15 step 4. |
-| `Run deadline exceeded (90s)` or aborted model calls | The model is too slow for the 20 s per-call limit; choose a faster model or lower reasoning effort. |
+| `Run deadline exceeded (90s)` or aborted model calls | MiniMax-M3 thinks too long for the 20 s per-call limit; use `MODEL_EXTRA_BODY='{"reasoning_split":true,"thinking":{"type":"disabled"}}'` and restart. |
 
 ## Git
 

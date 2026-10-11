@@ -8,7 +8,7 @@ The specification is split into one file per section so you read only what your 
 | §2 | Lane A interfaces you consume | `harness/spec/02-lane-a-interfaces.md` | §2.1, §2.2, §2.3, §2.4 |
 | §3 | Repository layout after Lane B | `harness/spec/03-repository-layout.md` | — |
 | §4 | Data files | `harness/spec/04-data-files.md` | §4.1, §4.2, §4.3, §4.4 |
-| §5 | Calculations | `harness/spec/05-calculations.md` | §5.1, §5.2, §5.3, §5.4, §5.5, §5.6, §5.7, §5.8, §5.9 |
+| §5 | Calculations | `harness/spec/05-calculations.md` | §5.1, §5.2, §5.3, §5.4, §5.5, §5.6, §5.7, §5.8, §5.9, §5.10 |
 | §6 | Evidence catalogue | `harness/spec/06-evidence-catalogue.md` | §6.1, §6.2, §6.3, §6.4 |
 | §7 | Golden values (computed from the data files; tests must match exactly) | `harness/spec/07-golden-values.md` | — |
 | §8 | Dispute source (the integration seam) | `harness/spec/08-dispute-source.md` | — |
