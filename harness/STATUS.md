@@ -10,7 +10,7 @@ Status values: `TODO`, `IN PROGRESS`, `DONE`, `BLOCKED`. The agent updates its o
 | LB-03 | Geo, money and time helpers | LB-02 | DONE | 32a314b | geo/money/time helpers added; 9 new tests pass (incl. R1 reference route = 7956 m); 83 total; typecheck clean |
 | LB-04 | GPS metrics: route and pickup | LB-03 | DONE | 5a878ee | 23 new tests (route+pickup) pass; 106 total; typecheck clean |
 | LB-05 | Chat and call analysis | LB-04 | DONE | 5ea6805 | 34 new tests (chat tags, sentiment, contact attempts) pass; 140 total; typecheck clean |
-| LB-06 | Fare check and remedy basis | LB-05 | BLOCKED | | Code complete; 32 new tests pass (172 total), typecheck clean. NOT committed: git status shows unrelated changes (see Blockers) |
+| LB-06 | Fare check and remedy basis | LB-05 | DONE | | 32 new tests (fare anomalies + remedy basis) pass; 172 total; typecheck clean |
 | LB-07 | Evidence builder and policy clauses | LB-06 | TODO | | |
 | LB-08 | Dispute source (integration seam) | LB-07 | TODO | | Lane A file touched: agents index |
 | LB-09 | Connect the fixture source to the live API | LB-08 | TODO | | Lane A files touched: app, live-roles, server |
@@ -34,4 +34,4 @@ Status values: `TODO`, `IN PROGRESS`, `DONE`, `BLOCKED`. The agent updates its o
 
 ## Blockers
 
-LB-06 — `git status` shows changes not made by this task: `.env.example`, `README.md`, `scripts/codebuddy-model-config.ts`, `tests/codebuddy-env.test.ts`, `tests/live-wiring.test.ts` (none in the card's Files list) — LB-06 code is complete and verified (fare.test.ts + remedy.test.ts = 32 tests pass; `npm test` 172 pass; `npm run typecheck` clean) but was NOT committed to avoid entangling unrelated work — need the human to review/stash/commit those unrelated changes (and confirm the stray `fc3b9bc Added screenshots` commit), then LB-06 can be committed with `LB-06: add fare validation and remedy basis`. Format: `LB-xx — first error line — what was tried — what is needed`.
+None. Format: `LB-xx — first error line — what was tried — what is needed`.

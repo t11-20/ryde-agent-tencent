@@ -7,3 +7,5 @@ export * from './time.js';
 export * from './route.js';
 export * from './pickup.js';
 export * from './chat.js';
+export * from './fare.js';
+export * from './remedy.js';
