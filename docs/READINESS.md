@@ -1,6 +1,6 @@
 # Setup readiness
 
-Statuses record verified facts, not assumed completion. The permanent project folder is `/Users/edward/Documents/ChatGPT/Tencent`; the previous empty repository was deleted and the working project was renamed. Private runtime configuration is present, but the latest MiniMax connectivity check failed with HTTP 401; authenticated operation remains unverified. No authentic case data are used. The project-open screenshot is recorded, while genuine development-chat evidence remains pending.
+Statuses record verified facts, not assumed completion. The permanent project folder is `/Users/lane-a-owner/Documents/ChatGPT/Tencent`; the previous empty repository was deleted and the working project was renamed. Private runtime configuration is present, but the latest MiniMax connectivity check failed with HTTP 401; authenticated operation remains unverified. No authentic case data are used. The project-open screenshot is recorded, while genuine development-chat evidence remains pending.
 
 | Prerequisite | Owner | Status | Evidence / remaining gate |
 |---|---|---|---|
@@ -24,7 +24,7 @@ Statuses record verified facts, not assumed completion. The permanent project fo
 
 ## Folder status
 
-- **Canonical folder:** `/Users/edward/Documents/ChatGPT/Tencent`.
+- **Canonical folder:** `/Users/lane-a-owner/Documents/ChatGPT/Tencent`.
 - **Filesystem:** one Tencent project folder remains; its original Git metadata and relative npm workspace links are intact. The Codex trust configuration uses this path.
 - **Codex interface:** the project is named Tencent, but its saved folder and the existing chats' recorded working directories still refer to the former name. The two tooltip rows represent a project label and a working-directory record.
 - **Remaining app correction:** use Tencent → Edit project to select the canonical folder and make it primary. Existing chats may retain their original directory; new chats use the corrected primary folder. Desktop control rejects automating Codex itself, so the interface correction is pending rather than claimed complete.
@@ -48,7 +48,7 @@ These are shared-team checks, separate from live API credentials and from partne
 - [ ] Use `/api/fixtures`, create a stub run with `/api/runs`, then poll `/api/runs/:id` with the event sequence cursor. Confirm the UI/data work can consume the responses and explicit stub labels.
 - [ ] Record the actual commands/results, date and project revision or shared archive used. Partner evidence is pending until supplied.
 
-**Contract review** means Edward (Lane A) and the partner jointly agree on the shared interfaces before treating contract version 0.2.0 as frozen:
+**Contract review** means the Lane A owner and the partner jointly agree on the shared interfaces before treating contract version 0.2.0 as frozen:
 
 - [ ] Review `packages/contracts/src/index.ts`, `docs/CONTRACTS.md`, and the valid payloads in `examples` together.
 - [ ] Agree field names, required/optional fields, IDs, category/status enums, ISO timestamps, and money as integer SGD cents.

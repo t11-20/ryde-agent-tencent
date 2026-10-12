@@ -1,9 +1,9 @@
 # Lane A Execution Brief — FairTrip
 
 **Project:** FairTrip — Ryde Multi-Agent Dispute Resolution Prototype
-**Owner:** Lane A (Edward)
+**Owner:** Lane A (the Lane A owner)
 **Collaboration repository:** https://github.com/t11-20/ryde-agent-tencent.git
-**Local workspace:** /Users/edward/Documents/ChatGPT/Tencent
+**Local workspace:** /Users/lane-a-owner/Documents/ChatGPT/Tencent
 **Foundation commit:** ea37153
 **Current branch:** lane-a
 
