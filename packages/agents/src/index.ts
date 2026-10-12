@@ -2,6 +2,7 @@ import {
   AdvocateCaseSchema, JudgeModelResponseSchema, EvidenceSchema, PolicyClauseSchema, DisputeSchema,
   validateCitations, type AdvocateCase, type Dispute, type Evidence, type JudgeModelResponse, type PolicyClause, type ActivityEvent
 } from '@fairtrip/contracts';
+import type { CalculationProvider } from './remedy-builder.js';
 
 export const WORKFLOW_VERSION = '0.2.0';
 export const EXECUTION_LIMITS = Object.freeze({toolRounds: 2, repairAttempts: 1, modelTimeoutMs: 20000, runDeadlineMs: 90000});
@@ -27,6 +28,27 @@ export interface WorkflowEvent {
 
 export interface WorkflowEventEmitter {
   emit(event: WorkflowEvent): void;
+}
+
+// Integration seam (Lane B): a source of fixtures, evidence tools, policy and calculations.
+export interface FixtureListing {
+  id: string;
+  category: Dispute['category'];
+  label: string;
+  kind: 'fixture';
+  purpose: string;
+  riderClaim: string;
+  driverStatement: string;
+}
+export interface DisputeSource {
+  readonly notice: string;
+  listFixtures(): FixtureListing[];
+  getDispute(fixtureId: string): Dispute | undefined;
+  createTools(dispute: Dispute): EvidenceTools;
+  allEvidence(dispute: Dispute): Evidence[];
+  policiesFor(category: Dispute['category']): PolicyClause[];
+  calculationProvider(dispute: Dispute): CalculationProvider;
+  missingDecisiveEvidence(dispute: Dispute): string[];
 }
 
 // Re-export tool-loop, prompts, and remedy builder for consumers
