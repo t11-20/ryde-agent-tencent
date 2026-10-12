@@ -52,6 +52,7 @@ export interface DisputeSource {
 }
 
 // Re-export tool-loop, prompts, and remedy builder for consumers
+export { extractJsonText } from './json-output.js';
 export { runAdvocateToolLoop, type ToolLoopResult, type ToolLoopConfig } from './tool-loop.js';
 export { riderAdvocatePrompt, driverAdvocatePrompt, judgePrompt } from './prompts.js';
 export { createMockEvidenceTools, mockEvidenceStore, mockPolicyStore } from './mock-evidence.js';

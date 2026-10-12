@@ -2,6 +2,7 @@ import {
   AdvocateResponseSchema, AdvocateCaseSchema, type AdvocateCase, type Dispute, type Evidence, type PolicyClause, type AdvocateResponse
 } from '@fairtrip/contracts';
 import type { ModelAdapter, EvidenceTools, WorkflowEventEmitter } from './index.js';
+import { extractJsonText } from './json-output.js';
 
 export interface ToolLoopResult {
   case: AdvocateCase;
@@ -44,7 +45,7 @@ export async function runAdvocateToolLoop(
     // Try to parse as AdvocateResponse
     let response: AdvocateResponse;
     try {
-      const parsed = JSON.parse(rawResponse);
+      const parsed = JSON.parse(extractJsonText(rawResponse));
       response = AdvocateResponseSchema.parse(parsed);
     } catch (parseError) {
       // Attempt repair if within limit

@@ -2,7 +2,8 @@ import { z } from 'zod';
 const EnvSchema = z.object({
   RUN_MODE: z.enum(['stub', 'live']).default('stub'), API_HOST: z.string().min(1).default('127.0.0.1'),
   API_PORT: z.coerce.number().int().min(1).max(65535).default(3001),
-  MODEL_API_KEY: z.string().trim().default(''), MODEL_BASE_URL: z.string().trim().default(''), MODEL_NAME: z.string().trim().default('')
+  MODEL_API_KEY: z.string().trim().default(''), MODEL_BASE_URL: z.string().trim().default(''), MODEL_NAME: z.string().trim().default(''),
+  MODEL_EXTRA_BODY: z.string().trim().default('')
 });
 export function readConfig(env: NodeJS.ProcessEnv = process.env) {
   const parsed = EnvSchema.safeParse(env);
