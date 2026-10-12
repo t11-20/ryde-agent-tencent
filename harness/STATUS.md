@@ -14,7 +14,7 @@ Status values: `TODO`, `IN PROGRESS`, `DONE`, `BLOCKED`. The agent updates its o
 | LB-06A | Formula functions, no hand calculations | LB-06 | DONE | 3af6a18 | `formulas.ts` copied from SPEC §5.10; route/fare/remedy call the named formulas (no inline copies); 7 new tests, 179 total; audit RESULT: OK (68 passed, 2 skips = LB-07/LB-08) |
 | LB-07 | Evidence builder and policy clauses | LB-06 | DONE | d33b729 | facts/policy/build-evidence added; 49 new tests pass, 228 total; typecheck clean; audit RESULT: OK (87 passed, 1 skip = LB-08) |
 | LB-08 | Dispute source (integration seam) | LB-07 | DONE | | Lane A file touched: `agents/src/index.ts` (additive only — ask Edward to review); `createFixtureSource` + `DisputeSource`/`FixtureListing` seam; 13 new source tests, 241 total (67 Lane A intact); typecheck clean; audit RESULT: OK (93 passed, 0 failed, 0 skips) |
-| LB-09 | Connect the fixture source to the live API | LB-08 | TODO | | Lane A files touched: app, live-roles, server |
+| LB-09 | Connect the fixture source to the live API | LB-08 | DONE | | Lane A files touched: app, live-roles, server (exactly the card's edits); `predev` build script added; live mode serves Lane B fixtures/evidence/policy/money via `createFixtureSource`; decisive-evidence guard ends runs `incomplete`; scripted model (SPEC §10) + 6 new integration tests, 247 total (67 Lane A intact); typecheck/build/check:examples clean |
 | LB-10 | Golden flow for all 11 fixtures | LB-09 | TODO | | |
 | LB-11 | Real model connection and output hardening | LB-10 | TODO | | Model latency: … ms · R1 smoke: … · N2 smoke: … |
 | LB-12 | Web foundation | LB-09 | TODO | | |
@@ -28,7 +28,7 @@ Status values: `TODO`, `IN PROGRESS`, `DONE`, `BLOCKED`. The agent updates its o
 | Gate | Condition | Status |
 |---|---|---|
 | G1 | Golden numbers reproduced (LB-04 to LB-07) | MET (check-golden: 93 passed, 0 failed, 0 skips — LB-08 built) |
-| G2 | Live API serves Lane B data; Lane A tests still pass (LB-09) | |
+| G2 | Live API serves Lane B data; Lane A tests still pass (LB-09) | MET (247 tests pass: 67 Lane A + 6 new api-source integration; R1 completes with refund_route_excess 198 cents; X1 ends incomplete on missing gps) |
 | G3 | Real model completes R1 (LB-11) | |
 | G4 | Release gate passes with the real model (LB-15) | |
 | G5 | Submission package complete; fresh clone verifies (LB-16) | |
