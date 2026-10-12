@@ -1,6 +1,6 @@
 import { JudgeModelResponseSchema, validateCitations, type AdvocateCase, type Dispute, type Evidence, type PolicyClause } from '@fairtrip/contracts';
 import {
-  createMockEvidenceTools, runAdvocateToolLoop, riderAdvocatePrompt, driverAdvocatePrompt, judgePrompt,
+  createMockEvidenceTools, extractJsonText, runAdvocateToolLoop, riderAdvocatePrompt, driverAdvocatePrompt, judgePrompt,
   EXECUTION_LIMITS, type EvidenceTools, type ModelAdapter, type WorkflowEventEmitter, type WorkflowRoles
 } from '@fairtrip/agents';
 
@@ -53,7 +53,7 @@ export function createLiveRoles(
         const raw = await model.complete(messages, AbortSignal.any([signal, AbortSignal.timeout(EXECUTION_LIMITS.modelTimeoutMs)]));
         signal.throwIfAborted();
         try {
-          const response = JudgeModelResponseSchema.parse(JSON.parse(raw));
+          const response = JudgeModelResponseSchema.parse(JSON.parse(extractJsonText(raw)));
           validateCitations([], response, retrievedEvidence, retrievedPolicies);
           return response;
         } catch {
