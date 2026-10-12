@@ -1,0 +1,252 @@
+{
+  "fixtureId": "R1",
+  "label": "Material detour, no consent, no diversion",
+  "purpose": "golden",
+  "dispute": {
+    "id": "DSP-R1",
+    "category": "route_deviation",
+    "tripId": "TRP-R1",
+    "riderClaim": "The driver went far out of the way through the east side instead of heading straight to Marina Bay. The trip was much longer than the app's route, he stopped for a few minutes for no reason, and I was charged more. Please refund the extra charge.",
+    "driverStatement": "I took the route I thought was faster at that time because the usual expressway is often jammed. The stop was short."
+  },
+  "filedAt": "2026-10-02T13:23:54Z",
+  "trip": {
+    "pickup": {
+      "lat": 1.351,
+      "lng": 103.848,
+      "label": "Bishan (synthetic pin)"
+    },
+    "dropoff": {
+      "lat": 1.283,
+      "lng": 103.86,
+      "label": "Marina Bay (synthetic pin)"
+    },
+    "startedAt": "2026-10-02T11:05:00Z",
+    "endedAt": "2026-10-02T11:23:54Z",
+    "driverMarkedArrivedAt": null,
+    "cancelledAt": null
+  },
+  "gps": {
+    "status": "available",
+    "referenceRoute": {
+      "points": [
+        [
+          1.351,
+          103.848
+        ],
+        [
+          1.33,
+          103.845
+        ],
+        [
+          1.305,
+          103.848
+        ],
+        [
+          1.29,
+          103.855
+        ],
+        [
+          1.283,
+          103.86
+        ]
+      ],
+      "estDurationSec": 716,
+      "source": "Synthetic reference route (not a routing-service result)"
+    },
+    "driverTrace": [
+      {
+        "ts": "2026-10-02T11:05:00Z",
+        "lat": 1.351,
+        "lng": 103.848
+      },
+      {
+        "ts": "2026-10-02T11:05:49Z",
+        "lat": 1.3488,
+        "lng": 103.8524
+      },
+      {
+        "ts": "2026-10-02T11:06:38Z",
+        "lat": 1.3466,
+        "lng": 103.8568
+      },
+      {
+        "ts": "2026-10-02T11:07:28Z",
+        "lat": 1.3444,
+        "lng": 103.8612
+      },
+      {
+        "ts": "2026-10-02T11:08:17Z",
+        "lat": 1.3422,
+        "lng": 103.8656
+      },
+      {
+        "ts": "2026-10-02T11:09:06Z",
+        "lat": 1.34,
+        "lng": 103.87
+      },
+      {
+        "ts": "2026-10-02T11:10:04Z",
+        "lat": 1.335,
+        "lng": 103.873
+      },
+      {
+        "ts": "2026-10-02T11:11:03Z",
+        "lat": 1.33,
+        "lng": 103.876
+      },
+      {
+        "ts": "2026-10-02T11:12:01Z",
+        "lat": 1.325,
+        "lng": 103.879
+      },
+      {
+        "ts": "2026-10-02T11:13:00Z",
+        "lat": 1.32,
+        "lng": 103.882
+      },
+      {
+        "ts": "2026-10-02T11:13:58Z",
+        "lat": 1.315,
+        "lng": 103.885
+      },
+      {
+        "ts": "2026-10-02T11:14:58Z",
+        "lat": 1.315,
+        "lng": 103.885
+      },
+      {
+        "ts": "2026-10-02T11:15:58Z",
+        "lat": 1.315,
+        "lng": 103.885
+      },
+      {
+        "ts": "2026-10-02T11:16:58Z",
+        "lat": 1.315,
+        "lng": 103.885
+      },
+      {
+        "ts": "2026-10-02T11:17:54Z",
+        "lat": 1.31,
+        "lng": 103.8825
+      },
+      {
+        "ts": "2026-10-02T11:18:50Z",
+        "lat": 1.305,
+        "lng": 103.88
+      },
+      {
+        "ts": "2026-10-02T11:19:46Z",
+        "lat": 1.3,
+        "lng": 103.8775
+      },
+      {
+        "ts": "2026-10-02T11:20:42Z",
+        "lat": 1.295,
+        "lng": 103.875
+      },
+      {
+        "ts": "2026-10-02T11:21:30Z",
+        "lat": 1.292,
+        "lng": 103.87125
+      },
+      {
+        "ts": "2026-10-02T11:22:18Z",
+        "lat": 1.289,
+        "lng": 103.8675
+      },
+      {
+        "ts": "2026-10-02T11:23:06Z",
+        "lat": 1.286,
+        "lng": 103.86375
+      },
+      {
+        "ts": "2026-10-02T11:23:54Z",
+        "lat": 1.283,
+        "lng": 103.86
+      }
+    ],
+    "reroutes": [],
+    "advisories": []
+  },
+  "chat": {
+    "messages": [
+      {
+        "id": "m1",
+        "ts": "2026-10-02T11:09:00Z",
+        "sender": "rider",
+        "text": "Hi, the map shows a different route. Why are we going this way?"
+      },
+      {
+        "id": "m2",
+        "ts": "2026-10-02T11:10:00Z",
+        "sender": "driver",
+        "text": "This way faster, CTE jam."
+      },
+      {
+        "id": "m3",
+        "ts": "2026-10-02T11:11:00Z",
+        "sender": "rider",
+        "text": "The app route looks clear. Please follow the app route."
+      },
+      {
+        "id": "m4",
+        "ts": "2026-10-02T11:11:30Z",
+        "sender": "driver",
+        "text": "Almost there already."
+      }
+    ],
+    "calls": []
+  },
+  "payment": {
+    "status": "available",
+    "currency": "SGD",
+    "rateCard": {
+      "baseCents": 300,
+      "perKmCents": 75,
+      "perMinCents": 20,
+      "noShowFeeCents": 500
+    },
+    "surgeMultiplierX100": 100,
+    "lineItems": [
+      {
+        "code": "base",
+        "label": "Base fare",
+        "cents": 300
+      },
+      {
+        "code": "distance",
+        "label": "Distance",
+        "cents": 795,
+        "quantity": 10598
+      },
+      {
+        "code": "time",
+        "label": "Time",
+        "cents": 378,
+        "quantity": 1134
+      }
+    ],
+    "totalCents": 1473,
+    "paidCents": 1473,
+    "paidAt": "2026-10-02T11:24:24Z"
+  },
+  "history": {
+    "rider": {
+      "partyId": "RDR-R1",
+      "accountAgeDays": 1100,
+      "rating": 4.9,
+      "completedTrips": 210,
+      "disputesFiled90d": 1,
+      "disputesAgainst90d": 0
+    },
+    "driver": {
+      "partyId": "DRV-R1",
+      "accountAgeDays": 800,
+      "rating": 4.7,
+      "completedTrips": 3400,
+      "disputesFiled90d": 0,
+      "disputesAgainst90d": 2
+    }
+  }
+}

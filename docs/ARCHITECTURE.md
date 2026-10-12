@@ -17,7 +17,7 @@ FairTrip resolves ride-hailing disputes through three distinct LLM agents:
 2. **Driver Advocate** — Gathers evidence and builds the driver's defense
 3. **Judge** — Reviews both cases, applies policy, and selects a remedy
 
-The server constructs the final monetary action from the Judge's remedy selection. Current Lane A uses labeled mock calculations; partner calculation integration remains pending.
+The server constructs the final monetary action from the Judge's remedy selection. The labeled mock calculations described below remain the stub/test path; live mode now uses Lane B fixtures and deterministic calculations through the `DisputeSource` seam (see §11).
 
 ### 1.2 Component Diagram
 
@@ -133,7 +133,7 @@ run.started
 ### 2.2 Installation
 
 ```bash
-cd /Users/edward/Documents/ChatGPT/Tencent
+cd /Users/lane-a-owner/Documents/ChatGPT/Tencent
 npm ci
 ```
 
@@ -145,7 +145,7 @@ npm run verify
 
 This runs: `typecheck` → `test` → `build` → `check:examples` → `check:setup`
 
-Expected output: all 48 tests pass, 0 build errors, examples validate.
+Expected output: all 280 root tests and 28 web tests pass, 0 build errors, examples validate.
 
 ### 2.4 Start the API (Stub Mode)
 
@@ -242,6 +242,8 @@ When partner adapters are unavailable, `createMockEvidenceTools(dispute)` return
 
 All provenance is marked `kind: 'contract_example'` with description noting mock origin.
 
+**Live mode (Lane B integrated):** `RUN_MODE=live` no longer uses this mock provider. The API receives `createFixtureSource()` from `@fairtrip/evidence` as its `DisputeSource`, which serves Lane B fixtures, evidence records, policy clauses and money calculations (see §11). The mock path above is retained as the stub/test path: it backs `RUN_MODE=stub` and Lane A's tests, which do not pass a source.
+
 ---
 
 ## 5. Validation and Failure Handling
@@ -306,11 +308,11 @@ All provenance is marked `kind: 'contract_example'` with description noting mock
 
 ### 6.3 Limitations
 
-- **Live model:** Real three-agent adjudication remains unverified; further credential and provider checks are deferred at the user's request. The earlier connectivity attempt returned HTTP 401
-- **Partner calculations:** Lane B source is available on its own branch; the current Lane A API still uses mock `CalculationProvider` until shared integration
-- **Partner fixtures:** Using synthetic contract examples; golden cases pending
-- **Frontend:** Partner-owned; no UI integration tested
-- **Evaluation:** Lane B runner and historical fake-server scorecards exist in the separated integration work; no current real-model golden scorecard is accepted
+- **Live model:** Resolved in Lane B (LB-11, LB-15): MiniMax-M3 through the OpenAI-compatible endpoint completes real three-agent runs; measured results are in §11 and `submission/metrics/`
+- **Partner calculations:** Resolved: live mode uses Lane B's `CalculationProvider` through the `DisputeSource` seam (§11); the mock provider remains the stub/test path
+- **Partner fixtures:** Resolved: 11 synthetic Lane B fixtures with expected outcomes live in `packages/evidence/data/`
+- **Frontend:** Resolved: `apps/web` single-screen React UI (LB-12, LB-13)
+- **Evaluation:** Resolved: `packages/eval` runner with release gate; a real-model scorecard is saved in `submission/metrics/` (LB-14, LB-15)
 - **Persistence:** In-memory only; no database
 - **Authentication:** Not implemented
 - **Hosting:** Local development only
@@ -355,7 +357,7 @@ Genuine CodeBuddy development screenshots to capture:
 2. **CB-02 implementation** — Tool loop execution with mock model responses
 3. **CB-04 verification** — Genuine CodeBuddy view of the current test suite; this audit passes 67 tests
 
-Current screenshot archive: `docs/evidence/00-project-open.png`
+Current screenshot archive and captions (Lane A and Lane B captures): `docs/evidence/README.md`
 
 ---
 
@@ -421,6 +423,42 @@ fairtrip/
 | `lane-a` | Lane A development | Verified code audit `c163321`; publication documentation follows |
 | `lane-b` | Partner development (separate) | `origin/lane-b`: `e2ad1e3` |
 | `ryde-integration` | Combined testing | `0ebd544` (Lane A pin) |
+
+---
+
+## 11. Integrated system (Lane A + Lane B)
+
+Lane B adds the evidence layer, the web UI and the evaluation runner, and connects them to Lane A through one seam. The diagram below is the authoritative integration design (SPEC §1):
+
+```mermaid
+flowchart LR
+  subgraph LaneB["Lane B (you build)"]
+    DATA[("packages/evidence/data<br/>fixtures, policy, expected outcomes")]
+    EVID["@fairtrip/evidence<br/>calculations + evidence builder"]
+    SRC["createFixtureSource()<br/>DisputeSource"]
+    WEB["apps/web<br/>React UI"]
+    EVAL["packages/eval<br/>evaluation runner"]
+  end
+  subgraph LaneA["Lane A (exists)"]
+    API["apps/api Express<br/>createApp(config, model, source)"]
+    WF["@fairtrip/agents<br/>Rider Advocate, Driver Advocate, Judge"]
+    REM["buildFinalAction<br/>server-side money"]
+  end
+  DATA --> EVID --> SRC --> API
+  API --> WF
+  WF -- "get_evidence / get_policy" --> SRC
+  WF --> REM
+  SRC -- "CalculationProvider" --> REM
+  WEB -- "HTTP poll /api" --> API
+  EVAL -- "HTTP /api" --> API
+  EVAL -. "expected outcomes" .-> DATA
+```
+
+**The `DisputeSource` seam.** `createApp(config, model, source)` takes an optional third argument. With `RUN_MODE=stub` the source is ignored and Lane A's labelled contract examples are served exactly as before, so Lane A's tests keep testing the mock path unchanged. With `RUN_MODE=live` the server passes `createFixtureSource()` from `@fairtrip/evidence`: the advocates' `get_evidence` / `get_policy` tool calls, the policy clauses and the `CalculationProvider` money all come from Lane B's synthetic fixtures and demonstration policy. The Judge never produces money — it selects a remedy ID and `buildFinalAction` asks Lane B's calculation provider for the integer-cents amount.
+
+**Decisive-evidence guard.** A deterministic guard marks a run `incomplete` when decisive evidence (GPS or payment) is unavailable, whatever the Judge said. No amount is invented and the UI shows the missing-evidence list with a human-review note (fixtures X1 and X3 exercise this path).
+
+**Evaluation runner.** `packages/eval` drives the live API over HTTP, compares each run against the expected outcomes in `packages/evidence/data` (status, remedy, amount, citations, trace completeness, consistency, latency), enforces the five-condition release gate and writes a scorecard to `submission/metrics/`. The web UI (`apps/web`) polls the same `/api` endpoints and renders every event, so the whole inter-agent exchange stays observable.
 
 ---
 

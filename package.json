@@ -13,14 +13,18 @@
   },
   "packageManager": "npm@10.9.9",
   "scripts": {
+    "predev": "npm run build",
     "dev": "tsx --import ./scripts/codebuddy-env.ts --env-file-if-exists=.env apps/api/src/server.ts",
-    "build": "npm run build -w @fairtrip/contracts && npm run build -w @fairtrip/agents && npm run build -w @fairtrip/api",
-    "typecheck": "npm run build -w @fairtrip/contracts && npm run build -w @fairtrip/agents && tsc --noEmit",
+    "build": "npm run build -w @fairtrip/contracts && npm run build -w @fairtrip/agents && npm run build -w @fairtrip/evidence && npm run build -w @fairtrip/api",
+    "typecheck": "npm run build -w @fairtrip/contracts && npm run build -w @fairtrip/agents && npm run build -w @fairtrip/evidence && tsc --noEmit",
     "test": "vitest run",
     "check:examples": "tsx scripts/check-examples.ts",
     "check:setup": "tsx scripts/check-setup.ts",
     "check:model": "tsx --import ./scripts/codebuddy-env.ts --env-file-if-exists=.env scripts/check-model.ts",
-    "verify": "npm run typecheck && npm run test && npm run build && npm run check:examples && npm run check:setup"
+    "eval": "npm run eval -w @fairtrip/eval --",
+    "dev:web": "npm run build -w @fairtrip/contracts && npm run dev -w @fairtrip/web",
+    "verify:web": "npm run typecheck -w @fairtrip/web && npm run test -w @fairtrip/web && npm run build -w @fairtrip/web",
+    "verify": "npm run typecheck && npm run test && npm run build && npm run check:examples && npm run verify:web && npm run check:setup"
   },
   "devDependencies": {
     "@types/express": "5.0.6",

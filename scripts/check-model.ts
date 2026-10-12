@@ -2,8 +2,9 @@ import { readConfig } from '../apps/api/src/config.js';
 import { createModelAdapter } from '../apps/api/src/model.js';
 try {
   const adapter = createModelAdapter(readConfig());
-  await adapter.complete([{role: 'user', content: 'Reply with the word ready.'}], AbortSignal.timeout(20000));
-  console.log('Live model connectivity verified. No credential or response content logged.');
+  const started = Date.now();
+  await adapter.complete([{role: 'user', content: 'Reply with this JSON object only: {"status":"ready"}'}], AbortSignal.timeout(20000));
+  console.log(`Live model connectivity verified in ${Date.now() - started} ms. No credential or response content logged.`);
 } catch (error) {
   // Only our sanitized diagnostics are emitted. Provider/network response bodies may contain secrets.
   const message = error instanceof Error ? error.message : '';

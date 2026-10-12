@@ -1,0 +1,234 @@
+{
+  "fixtureId": "R3",
+  "label": "Detour caused by a documented road closure",
+  "purpose": "golden",
+  "dispute": {
+    "id": "DSP-R3",
+    "category": "route_deviation",
+    "tripId": "TRP-R3",
+    "riderClaim": "The driver took a detour and I paid more than the app's route. I don't think the detour was needed.",
+    "driverStatement": "The road ahead was closed because of an accident. The navigation app rerouted us and I told the rider in the chat."
+  },
+  "filedAt": "2026-10-02T16:14:30Z",
+  "trip": {
+    "pickup": {
+      "lat": 1.351,
+      "lng": 103.848,
+      "label": "Bishan (synthetic pin)"
+    },
+    "dropoff": {
+      "lat": 1.283,
+      "lng": 103.86,
+      "label": "Marina Bay (synthetic pin)"
+    },
+    "startedAt": "2026-10-02T14:00:00Z",
+    "endedAt": "2026-10-02T14:14:30Z",
+    "driverMarkedArrivedAt": null,
+    "cancelledAt": null
+  },
+  "gps": {
+    "status": "available",
+    "referenceRoute": {
+      "points": [
+        [
+          1.351,
+          103.848
+        ],
+        [
+          1.33,
+          103.845
+        ],
+        [
+          1.305,
+          103.848
+        ],
+        [
+          1.29,
+          103.855
+        ],
+        [
+          1.283,
+          103.86
+        ]
+      ],
+      "estDurationSec": 716,
+      "source": "Synthetic reference route (not a routing-service result)"
+    },
+    "driverTrace": [
+      {
+        "ts": "2026-10-02T14:00:00Z",
+        "lat": 1.351,
+        "lng": 103.848
+      },
+      {
+        "ts": "2026-10-02T14:00:53Z",
+        "lat": 1.34575,
+        "lng": 103.84725
+      },
+      {
+        "ts": "2026-10-02T14:01:46Z",
+        "lat": 1.3405,
+        "lng": 103.8465
+      },
+      {
+        "ts": "2026-10-02T14:02:39Z",
+        "lat": 1.33525,
+        "lng": 103.84575
+      },
+      {
+        "ts": "2026-10-02T14:03:32Z",
+        "lat": 1.33,
+        "lng": 103.845
+      },
+      {
+        "ts": "2026-10-02T14:04:24Z",
+        "lat": 1.32875,
+        "lng": 103.85
+      },
+      {
+        "ts": "2026-10-02T14:05:15Z",
+        "lat": 1.3275,
+        "lng": 103.855
+      },
+      {
+        "ts": "2026-10-02T14:06:07Z",
+        "lat": 1.32625,
+        "lng": 103.86
+      },
+      {
+        "ts": "2026-10-02T14:06:58Z",
+        "lat": 1.325,
+        "lng": 103.865
+      },
+      {
+        "ts": "2026-10-02T14:07:49Z",
+        "lat": 1.32,
+        "lng": 103.866
+      },
+      {
+        "ts": "2026-10-02T14:08:40Z",
+        "lat": 1.315,
+        "lng": 103.867
+      },
+      {
+        "ts": "2026-10-02T14:09:31Z",
+        "lat": 1.31,
+        "lng": 103.868
+      },
+      {
+        "ts": "2026-10-02T14:10:22Z",
+        "lat": 1.305,
+        "lng": 103.869
+      },
+      {
+        "ts": "2026-10-02T14:11:13Z",
+        "lat": 1.3,
+        "lng": 103.87
+      },
+      {
+        "ts": "2026-10-02T14:12:02Z",
+        "lat": 1.29575,
+        "lng": 103.8675
+      },
+      {
+        "ts": "2026-10-02T14:12:52Z",
+        "lat": 1.2915,
+        "lng": 103.865
+      },
+      {
+        "ts": "2026-10-02T14:13:41Z",
+        "lat": 1.28725,
+        "lng": 103.8625
+      },
+      {
+        "ts": "2026-10-02T14:14:30Z",
+        "lat": 1.283,
+        "lng": 103.86
+      }
+    ],
+    "reroutes": [
+      {
+        "ts": "2026-10-02T14:03:32Z",
+        "reason": "road_closure",
+        "detail": "Navigation rerouted: road closed ahead on the reference route (synthetic)."
+      }
+    ],
+    "advisories": [
+      {
+        "id": "ADV-SYN-0412",
+        "ts": "2026-10-02T13:50:00Z",
+        "type": "road_closure",
+        "description": "Synthetic advisory: southbound road closed between the reference route's second and third waypoints due to an accident.",
+        "source": "Synthetic traffic advisory feed (demo)"
+      }
+    ]
+  },
+  "chat": {
+    "messages": [
+      {
+        "id": "m1",
+        "ts": "2026-10-02T14:03:47Z",
+        "sender": "driver",
+        "text": "Sorry, the road ahead is closed due to an accident. The app is rerouting us."
+      },
+      {
+        "id": "m2",
+        "ts": "2026-10-02T14:04:12Z",
+        "sender": "rider",
+        "text": "Oh ok."
+      }
+    ],
+    "calls": []
+  },
+  "payment": {
+    "status": "available",
+    "currency": "SGD",
+    "rateCard": {
+      "baseCents": 300,
+      "perKmCents": 75,
+      "perMinCents": 20,
+      "noShowFeeCents": 500
+    },
+    "surgeMultiplierX100": 100,
+    "lineItems": [
+      {
+        "code": "base",
+        "label": "Base fare",
+        "cents": 300
+      },
+      {
+        "code": "distance",
+        "label": "Distance",
+        "cents": 726,
+        "quantity": 9678
+      },
+      {
+        "code": "time",
+        "label": "Time",
+        "cents": 290,
+        "quantity": 870
+      }
+    ],
+    "totalCents": 1316,
+    "paidCents": 1316,
+    "paidAt": "2026-10-02T14:15:00Z"
+  },
+  "history": {
+    "rider": {
+      "partyId": "RDR-R3",
+      "accountAgeDays": 650,
+      "rating": 4.8,
+      "completedTrips": 150,
+      "disputesFiled90d": 0,
+      "disputesAgainst90d": 0
+    },
+    "driver": {
+      "partyId": "DRV-R3",
+      "accountAgeDays": 1200,
+      "rating": 4.8,
+      "completedTrips": 5100,
+      "disputesFiled90d": 0,
+      "disputesAgainst90d": 1
+    }
+  }
+}

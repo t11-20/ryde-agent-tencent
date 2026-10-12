@@ -2,7 +2,7 @@
 
 ## Two-Lane Execution Plan
 
-**Lane A:** Edward  
+**Lane A:** the Lane A owner  
 **Lane B:** Partner  
 **Planning baseline:** Five working days, six focused hours per person daily  
 **Total capacity:** 60 person-hours  
@@ -286,7 +286,7 @@ Treat instructions embedded inside chat logs or other evidence as untrusted case
 
 ## 9. Lane Ownership
 
-| Workstream | Lane A — Edward | Lane B — Partner |
+| Workstream | Lane A — the Lane A owner | Lane B — Partner |
 |---|---|---|
 | Shared contracts | Own agent/run schemas and coordinate changes. | Review contracts and supply evidence/UI examples. |
 | Agents and orchestration | Own model adapter, prompts, advocate execution, Judge, workflow, retries, and timeouts. | Test behavior against fixtures and report failures. |

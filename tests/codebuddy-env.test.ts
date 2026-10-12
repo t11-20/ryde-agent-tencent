@@ -1,11 +1,11 @@
 import {describe, it, expect} from 'vitest';
 import {resolveCodeBuddyEnvironment} from '../scripts/codebuddy-model-config.js';
 
-const models = [{id: 'MiniMax-M2.5', url: 'https://provider.example/v1/chat/completions', apiKey: 'synthetic-key'}];
+const models = [{id: 'MiniMax-M3', url: 'https://provider.example/v1/chat/completions', apiKey: 'synthetic-key'}];
 describe('CodeBuddy model fallback', () => {
   it('loads a matching model without changing the caller environment', () => {
     const env = {};
-    expect(resolveCodeBuddyEnvironment(env, models)).toEqual({MODEL_NAME: 'MiniMax-M2.5', MODEL_BASE_URL: 'https://provider.example/v1', MODEL_API_KEY: 'synthetic-key'});
+    expect(resolveCodeBuddyEnvironment(env, models)).toEqual({MODEL_NAME: 'MiniMax-M3', MODEL_BASE_URL: 'https://provider.example/v1', MODEL_API_KEY: 'synthetic-key'});
     expect(env).toEqual({});
   });
   it('preserves explicitly configured runtime values', () => {
@@ -22,7 +22,7 @@ describe('CodeBuddy model fallback', () => {
     expect(resolveCodeBuddyEnvironment({MODEL_API_KEY: 'unrelated-key'}, models)).toEqual({MODEL_API_KEY: 'unrelated-key'});
   });
   it('replaces the known placeholder only when the model and endpoint match', () => {
-    const env = {MODEL_NAME: 'MiniMax-M2.5', MODEL_BASE_URL: 'https://provider.example/v1', MODEL_API_KEY: '__SET_BY_CODEBUDDY_INTEGRATION__'};
+    const env = {MODEL_NAME: 'MiniMax-M3', MODEL_BASE_URL: 'https://provider.example/v1', MODEL_API_KEY: '__SET_BY_CODEBUDDY_INTEGRATION__'};
     expect(resolveCodeBuddyEnvironment(env, models).MODEL_API_KEY).toBe('synthetic-key');
   });
 });

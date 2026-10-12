@@ -1,0 +1,20 @@
+{
+  "name": "@fairtrip/evidence",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "@fairtrip/agents": "0.1.0",
+    "@fairtrip/contracts": "0.1.0",
+    "zod": "4.6.5"
+  }
+}
