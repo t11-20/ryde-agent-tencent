@@ -85,8 +85,9 @@ Three are required; five gives you margin. A screen recording of one task also w
 > 1. `packages/agents/src/index.ts`: new `DisputeSource` and `FixtureListing` interfaces (LB-08) and an `extractJsonText` export (LB-11).
 > 2. `apps/api/src/app.ts`, `live-roles.ts`, `server.ts`: optional third `createApp` argument used only in live mode; a guard that marks runs incomplete when GPS or payment data is missing (LB-09).
 > 3. `tool-loop.ts`, `live-roles.ts`, `config.ts`, `model.ts`, `scripts/check-model.ts`, `.env.example`: JSON extraction before parsing, optional `MODEL_EXTRA_BODY`, JSON-mode-safe connectivity check (LB-11).
-> 4. Possibly append-only prompt rules in `prompts.ts` if the live model misjudges golden cases (LB-15).
-> 5. A new section in `docs/ARCHITECTURE.md` and `README.md` (LB-16).
+> 4. `apps/api/src/model.ts`: requests that contain no user message get a neutral kickoff user message, because MiniMax rejects system-only requests (error 2013), and provider error text is included in failures (LB-11A).
+> 5. Possibly append-only prompt rules in `prompts.ts` if the live model misjudges golden cases (LB-15).
+> 6. A new section in `docs/ARCHITECTURE.md` and `README.md` (LB-16).
 > Could you review the PR and say whether you want to present the architecture part of the demo?
 
 ## If you fall behind
@@ -101,7 +102,7 @@ Cut in this order: LB-10 (LB-14 covers it) → timeline styling and chip highlig
 | `../.codebuddy/rules/`, `../.codebuddy/commands/` | Always-on guardrails and the `/lb-task`, `/lb-fix`, `/lb-check` commands |
 | `SPEC.md`, `spec/` | Specification index and the 13 section files, including golden numbers |
 | `reference/` | Your original challenge and submission requirement documents |
-| `tasks/LB-00.md` … `LB-16.md` | One card per task (plus `LB-06A`) |
+| `tasks/LB-00.md` … `LB-16.md` | One card per task (plus `LB-06A` and `LB-11A`) |
 | `audit/show-fixture.mjs` | Prints what the code computes for one fixture |
 | `STATUS.md` | Progress tracker the agent updates |
 | `PROMPTS.md` | Copy-paste prompts if slash commands are unavailable |

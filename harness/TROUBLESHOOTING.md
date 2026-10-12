@@ -41,7 +41,7 @@ Find the first error line, then the matching row. Fix only files your current ca
 |---|---|
 | `Model request failed (HTTP 401)` | Wrong or expired key, or key and endpoint from different MiniMax regions. A Token Plan key (`sk-cp-…`) from platform.minimax.io works with `https://api.minimax.io/v1`; a China-platform key needs the China endpoint. |
 | `HTTP 404` | `MODEL_NAME` must be exactly `MiniMax-M3` (case-sensitive); `MODEL_BASE_URL` must be `https://api.minimax.io/v1`. |
-| `HTTP 400` | An option in `MODEL_EXTRA_BODY` is not accepted; go back to `'{"reasoning_split":true}'`. |
+| `HTTP 400` | If every run fails right after both advocates start, while `npm run check:model` passes, MiniMax is rejecting a request without a user message (error 2013): do task LB-11A. Otherwise an option in `MODEL_EXTRA_BODY` is not accepted; go back to `'{"reasoning_split":true}'`. After LB-11A the error text from MiniMax is shown after the status code. |
 | `HTTP 429` | The Token Plan quota window is used up. The plan is shared by both of you, so coordinate: avoid evaluation runs while someone is coding with it, then retry later. |
 | `Advocate … produced unparseable output` / `output.repair` events | Make sure `.env` has `MODEL_EXTRA_BODY='{"reasoning_split":true}'` and restart the server. |
 | `Each live advocate must independently request evidence and policy` | The model skipped a tool; apply LB-15 step 4. |
