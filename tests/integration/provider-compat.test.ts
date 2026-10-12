@@ -24,6 +24,37 @@ function strictProvider(model: ModelAdapter, seen: string[][]): typeof fetch {
   };
 }
 
+// Behaves like MiniMax-M3 on the advocate final_case turn (LB-11B probe): it fills "counterevidence" with plain
+// strings unless the system prompt shows the object shape ({"claim", "evidenceIds", "policyClauseIds"}) for it.
+const COUNTEREVIDENCE_SHAPE = /"counterevidence"[^\n]*\[\s*\{\s*"claim"/;
+function minimaxLikeModel(): ModelAdapter {
+  const scripted = createScriptedModel();
+  return {
+    async complete(messages, signal) {
+      const content = await scripted.complete(messages, signal);
+      const parsed = JSON.parse(content) as {type?: string; case?: {arguments: {claim: string; evidenceIds: string[]; policyClauseIds: string[]}[]; counterevidence: unknown[]}};
+      if (parsed.type !== 'final_case' || parsed.case === undefined) return content;
+      const first = parsed.case.arguments[0];
+      parsed.case.counterevidence = COUNTEREVIDENCE_SHAPE.test(messages[0]?.content ?? '')
+        ? [{claim: 'The other side disputes this reading of the evidence.', evidenceIds: first?.evidenceIds ?? [], policyClauseIds: []}]
+        : ['The other side disputes this reading of the evidence.'];
+      return JSON.stringify(parsed);
+    }
+  };
+}
+
+async function finishRun(api: ReturnType<typeof createApp>, fixtureId: string) {
+  const started = await request(api).post('/api/runs').send({fixtureId});
+  expect(started.status).toBe(202);
+  let body: unknown;
+  for (let i = 0; i < 400; i++) {
+    body = (await request(api).get(`/api/runs/${started.body.id}`)).body;
+    if (['completed', 'failed', 'incomplete'].includes((body as {status: string}).status)) break;
+    await new Promise(resolve => setTimeout(resolve, 5));
+  }
+  return RunSchema.parse(body);
+}
+
 describe('provider compatibility (MiniMax)', () => {
   it('adds a kickoff user message only when none exists, without mutating the input', () => {
     const systemOnly: Msg[] = [{role: 'system', content: 'S'}];
@@ -56,5 +87,18 @@ describe('provider compatibility (MiniMax)', () => {
     expect(run.result.action.amountCents).toBe(198);
     expect(seen.length).toBeGreaterThanOrEqual(5);
     expect(seen.every(roles => roles.includes('user'))).toBe(true);
+  });
+
+  // LB-11B: live R1/N2 failed with "Advocate … produced unparseable output after 1 repair attempts" because the
+  // advocate prompt showed "counterevidence": [...] and MiniMax-M3 answered with strings instead of argument objects.
+  it.each(['R1', 'N2'])('a live %s run with MiniMax-M3-style counterevidence passes advocate validation', async fixtureId => {
+    const seen: string[][] = [];
+    const api = createApp(liveConfig, createModelAdapter(liveConfig, strictProvider(minimaxLikeModel(), seen)), createFixtureSource());
+    const run = await finishRun(api, fixtureId);
+    if (run.status === 'failed') throw new Error(`run failed: ${run.error.message}`);
+    expect(['completed', 'incomplete']).toContain(run.status);
+    expect(run.events.some(event => event.type === 'output.repair')).toBe(false);
+    expect(run.cases).toHaveLength(2);
+    for (const advocateCase of run.cases) expect(advocateCase.counterevidence).toHaveLength(1);
   });
 });

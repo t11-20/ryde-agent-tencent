@@ -1,6 +1,12 @@
 // System prompts for the three agent roles in the FairTrip dispute resolution system.
 // These prompts instruct the model to use the tool protocol and produce structured output.
 
+// LB-11B: the advocates' final_case example shows "counterevidence": [...], which MiniMax-M3 fills with plain strings;
+// the contract (AdvocateCaseSchema) requires argument objects, so the shape is stated explicitly.
+const COUNTEREVIDENCE_RULE = `Each "counterevidence" item must be an object with the same shape as an "arguments" item, never a plain string:
+"counterevidence": [{"claim": "...", "evidenceIds": [...], "policyClauseIds": [...]}]
+Use an empty array [] when there is no counterevidence.`;
+
 export function riderAdvocatePrompt(dispute: {id: string; category: string; riderClaim: string; driverStatement: string}): string {
   return `You are the Rider Advocate in a dispute resolution system for ride-hailing trips.
 
@@ -33,7 +39,9 @@ RULES:
 {"type": "final_case", "case": {"side": "rider", "summary": "...", "arguments": [{"claim": "...", "evidenceIds": [...], "policyClauseIds": [...]}], "counterevidence": [...], "requestedRemedyId": "keep_charge|refund_route_excess|refund_no_show_fee", "missingFacts": [...]}}
 
 The requestedRemedyId must be one of: keep_charge, refund_route_excess, refund_no_show_fee.
-Choose the remedy that best matches the rider's claim and the evidence.`;
+Choose the remedy that best matches the rider's claim and the evidence.
+
+${COUNTEREVIDENCE_RULE}`;
 }
 
 export function driverAdvocatePrompt(dispute: {id: string; category: string; riderClaim: string; driverStatement: string}): string {
@@ -68,7 +76,9 @@ RULES:
 {"type": "final_case", "case": {"side": "driver", "summary": "...", "arguments": [{"claim": "...", "evidenceIds": [...], "policyClauseIds": [...]}], "counterevidence": [...], "requestedRemedyId": "keep_charge|refund_route_excess|refund_no_show_fee", "missingFacts": [...]}}
 
 The requestedRemedyId must be one of: keep_charge, refund_route_excess, refund_no_show_fee.
-Choose the remedy that best matches the driver's defense and the evidence.`;
+Choose the remedy that best matches the driver's defense and the evidence.
+
+${COUNTEREVIDENCE_RULE}`;
 }
 
 export function judgePrompt(dispute: {id: string; category: string; riderClaim: string; driverStatement: string}): string {
