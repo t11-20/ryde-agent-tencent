@@ -21,7 +21,9 @@
     "check:examples": "tsx scripts/check-examples.ts",
     "check:setup": "tsx scripts/check-setup.ts",
     "check:model": "tsx --import ./scripts/codebuddy-env.ts --env-file-if-exists=.env scripts/check-model.ts",
-    "verify": "npm run typecheck && npm run test && npm run build && npm run check:examples && npm run check:setup"
+    "dev:web": "npm run build -w @fairtrip/contracts && npm run dev -w @fairtrip/web",
+    "verify:web": "npm run typecheck -w @fairtrip/web && npm run test -w @fairtrip/web && npm run build -w @fairtrip/web",
+    "verify": "npm run typecheck && npm run test && npm run build && npm run check:examples && npm run verify:web && npm run check:setup"
   },
   "devDependencies": {
     "@types/express": "5.0.6",
