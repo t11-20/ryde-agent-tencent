@@ -1,14 +1,14 @@
 import express from 'express';
 import { randomUUID } from 'node:crypto';
-import { RunSchema, ActivityEventSchema, StartRunSchema, type Run, type ActivityEvent } from '@fairtrip/contracts';
-import { runWorkflow, EXECUTION_LIMITS, mockEvidenceStore, mockPolicyStore, type ModelAdapter, type WorkflowEventEmitter, type WorkflowRoles } from '@fairtrip/agents';
+import { RunSchema, ActivityEventSchema, StartRunSchema, type Run, type ActivityEvent, type Dispute } from '@fairtrip/contracts';
+import { runWorkflow, EXECUTION_LIMITS, mockEvidenceStore, mockPolicyStore, type ModelAdapter, type WorkflowEventEmitter, type WorkflowRoles, type DisputeSource } from '@fairtrip/agents';
 import { buildFinalAction, createMockCalculationProvider } from '@fairtrip/agents';
 import { catalog, fixtures, examplesFor } from './catalog.js';
 import { readConfig, type Config } from './config.js';
 import { createModelAdapter } from './model.js';
 import { createLiveRoles } from './live-roles.js';
 
-export function createApp(config: Config = readConfig(), modelAdapter?: ModelAdapter) {
+export function createApp(config: Config = readConfig(), modelAdapter?: ModelAdapter, source?: DisputeSource) {
   const app = express();
   const runs = new Map<string, Run>();
   app.disable('x-powered-by');
@@ -16,6 +16,8 @@ export function createApp(config: Config = readConfig(), modelAdapter?: ModelAda
 
   const mode = config.RUN_MODE;
   const contractVersion = '0.2.0';
+  // Lane B fixtures are used only in live mode; stub mode keeps Lane A's contract examples.
+  const liveSource = mode === 'live' ? source : undefined;
 
   app.get('/api/health', (_req, res) => res.json({
     status: 'ok',
@@ -24,12 +26,15 @@ export function createApp(config: Config = readConfig(), modelAdapter?: ModelAda
     modelAccess: mode === 'live' ? 'configured' : 'pending_partner_configuration'
   }));
 
-  app.get('/api/fixtures', (_req, res) => res.json({mode, notice: catalog.notice, fixtures}));
+  app.get('/api/fixtures', (_req, res) => {
+    if (liveSource) res.json({mode, notice: liveSource.notice, fixtures: liveSource.listFixtures()});
+    else res.json({mode, notice: catalog.notice, fixtures});
+  });
 
   app.post('/api/runs', (req, res) => {
     const input = StartRunSchema.safeParse(req.body);
     if (!input.success) {res.status(400).json({error: {code: 'INVALID_INPUT', message: 'Expected fixtureId and optional nonempty riderClaim'}}); return;}
-    const fixture = catalog.disputes.find(f => f.id === input.data.fixtureId);
+    const fixture: Dispute | undefined = liveSource ? liveSource.getDispute(input.data.fixtureId) : catalog.disputes.find(f => f.id === input.data.fixtureId);
     if (!fixture) {res.status(404).json({error: {code: 'UNKNOWN_FIXTURE', message: 'Fixture not found'}}); return;}
     const id = randomUUID();
     const dispute = {...fixture, riderClaim: input.data.riderClaim ?? fixture.riderClaim};
@@ -41,7 +46,7 @@ export function createApp(config: Config = readConfig(), modelAdapter?: ModelAda
       events.push(ActivityEventSchema.parse({runId: id, sequence: events.length + 1, timestamp: new Date().toISOString(), mode, actor, type, summary, evidenceIds, policyClauseIds}));
     };
     emit('system', 'run.started', mode === 'stub' ? 'Development stub started; no model invocation or evidence retrieval.' : 'Live run started; model invocation and evidence retrieval will follow.');
-    const base = {id, fixtureId: fixture.id, mode: mode as Run['mode'], dispute, cases, events, retrievedEvidence, retrievedPolicies};
+    const base = {id, fixtureId: input.data.fixtureId, mode: mode as Run['mode'], dispute, cases, events, retrievedEvidence, retrievedPolicies};
     runs.set(id, RunSchema.parse({...base, status: 'queued'}));
 
     setImmediate(() => {
@@ -62,8 +67,8 @@ export function createApp(config: Config = readConfig(), modelAdapter?: ModelAda
       runs.set(id, RunSchema.parse({...base, status: 'running'}));
 
       const examples = examplesFor(dispute);
-      const evidence = mode === 'live' ? mockEvidenceStore[dispute.id] ?? [] : catalog.evidence;
-      const policies = mode === 'live' ? mockPolicyStore[dispute.category] ?? [] : examples.policies;
+      const evidence = liveSource ? liveSource.allEvidence(dispute) : mode === 'live' ? mockEvidenceStore[dispute.id] ?? [] : catalog.evidence;
+      const policies = liveSource ? liveSource.policiesFor(dispute.category) : mode === 'live' ? mockPolicyStore[dispute.category] ?? [] : examples.policies;
 
       // Create event emitter that also prevents late writes after terminal state
       const emitter: WorkflowEventEmitter = {
@@ -79,7 +84,7 @@ export function createApp(config: Config = readConfig(), modelAdapter?: ModelAda
       };
 
       const roles: WorkflowRoles = mode === 'live'
-        ? createLiveRoles(modelAdapter ?? createModelAdapter(config), emitter, retrievedEvidence, retrievedPolicies, cases)
+        ? createLiveRoles(modelAdapter ?? createModelAdapter(config), emitter, retrievedEvidence, retrievedPolicies, cases, liveSource ? d => liveSource.createTools(d) : undefined)
         : {
         async advocate(side) {
           const c = examples.cases.find(c => c.side === side);
@@ -91,6 +96,13 @@ export function createApp(config: Config = readConfig(), modelAdapter?: ModelAda
       void runWorkflow(dispute, roles, evidence, policies, deadlineController.signal, emitter).then(({modelResponse}) => {
         clearTimeout(deadlineTimeout);
         if (terminal) return;
+        const missingDecisive = liveSource ? liveSource.missingDecisiveEvidence(dispute) : [];
+        if (missingDecisive.length) {
+          emit('system', 'run.incomplete', `Decisive evidence unavailable (${missingDecisive.join('; ')}); no ruling or amount issued.`);
+          terminal = true;
+          runs.set(id, RunSchema.parse({...base, cases, events, retrievedEvidence, retrievedPolicies, status: 'incomplete', missingEvidence: missingDecisive}));
+          return;
+        }
         if (mode === 'live' && modelResponse.ruling === 'incomplete') {
           emit('system', 'run.incomplete', 'Judge requires additional decisive evidence; no monetary action issued.');
           terminal = true;
@@ -100,7 +112,7 @@ export function createApp(config: Config = readConfig(), modelAdapter?: ModelAda
         }
 
         // Server constructs FinalAction from the model's remedyId selection
-        const calculationProvider = createMockCalculationProvider();
+        const calculationProvider = liveSource ? liveSource.calculationProvider(dispute) : createMockCalculationProvider();
         const {action, error} = buildFinalAction(modelResponse, evidence, calculationProvider, dispute.category);
 
         if (error) {
@@ -111,7 +123,7 @@ export function createApp(config: Config = readConfig(), modelAdapter?: ModelAda
         }
 
         const result = {...modelResponse, action};
-        emit('system', 'run.completed', mode === 'stub' ? 'Stub response ready; this is not a real dispute decision.' : 'Live model run completed using synthetic contract examples and mock calculations; this is not a real dispute decision.');
+        emit('system', 'run.completed', mode === 'stub' ? 'Stub response ready; this is not a real dispute decision.' : liveSource ? 'Live model run completed using SYNTHETIC fixtures, DEMONSTRATION POLICY and deterministic calculations; this is not a real dispute decision.' : 'Live model run completed using synthetic contract examples and mock calculations; this is not a real dispute decision.');
         terminal = true;
         runs.set(id, RunSchema.parse({...base, cases, events, retrievedEvidence, retrievedPolicies, status: 'completed', result}));
       }).catch((err) => {
