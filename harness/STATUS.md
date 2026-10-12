@@ -22,7 +22,7 @@ Status values: `TODO`, `IN PROGRESS`, `DONE`, `BLOCKED`. The agent updates its o
 | LB-12 | Web foundation | LB-09 | DONE | b1d8b41 | Web package scaffolded (Vite 8 + React 19, tsconfig, index.html, temporary main.tsx); `src/lib` api client (`ContractMismatchError`/`NetworkError`, `RunSchema` parsing), events merge, view-model, export, format labels (§12.2); 28 web tests pass; root `verify:web`/`dev:web` scripts added; root typecheck clean, 266/266 tests pass |
 | LB-13 | Web UI screen | LB-12 | DONE | b1caeab | Single screen per SPEC §12.1/§12.3: 3-column grid (360px/1fr/380px) + full-width evidence (GPS/Chat/Payment/History) and policy rows; 12 components + `useFixtures`/`useRunPolling` (copied verbatim) hooks; every §12.2 state has distinct text; chips scroll+highlight (1.5 s); export via `buildExport`/`downloadJson`; README demo operator script added; `verify:web` and full `verify` pass (28 web + 266 root tests); manual stub/live checks and the screenshot moment handed to the human |
 | LB-14 | Evaluation runner and scorecard | LB-10 | DONE | | `@fairtrip/eval` (tsx CLI, no build): client (verbatim), 7 checks (§11.2), plan sets, release gate (5 named conditions), scorecard md/json; root `eval` script; 14 new tests (sets/gate/scorecard + eval-checks mutations + release e2e with scripted model, gate PASS); 280 total pass; typecheck clean; check-golden RESULT: OK; CLI smoke against a closed port prints result line + scorecard path, exit 1. Live `npm run eval -- --fixtures R1` left to the human |
-| LB-15 | Live acceptance with the real model | LB-11, LB-13, LB-14 | TODO | | Golden: … / 6 · Gate: … |
+| LB-15 | Live acceptance with the real model | LB-11, LB-13, LB-14 | DONE | | Golden: 6 / 6 (first run, run 20261012-152259) · Gate: PASS (run 20261012-153045, 15/15 runs, 11/11 fixtures, consistency 2/2, p50 21.2 s, max 39.4 s) · Model MiniMax-M3 @ api.minimax.io, MODEL_EXTRA_BODY reasoning_split + thinking disabled · No prompt changes (prompts.ts untouched) · Scorecard saved in `submission/metrics/` · `npm run verify` pass (280 root + 28 web) · Human UI rehearsal (R1, N2 ×3) and visual notes: pending human |
 | LB-16 | Documentation and submission package | LB-15 | TODO | | |
 
 ## Gates
@@ -32,7 +32,7 @@ Status values: `TODO`, `IN PROGRESS`, `DONE`, `BLOCKED`. The agent updates its o
 | G1 | Golden numbers reproduced (LB-04 to LB-07) | MET (check-golden: 93 passed, 0 failed, 0 skips — LB-08 built) |
 | G2 | Live API serves Lane B data; Lane A tests still pass (LB-09) | MET (247 tests pass: 67 Lane A + 6 new api-source integration; R1 completes with refund_route_excess 198 cents; X1 ends incomplete on missing gps) |
 | G3 | Real model completes R1 (LB-11) | MET (live smoke R1 `completed: refund_route_excess, 198 cents, ruling rider_favored, confidence 0.92`; N2 `completed: keep_charge, 0 cents`; check:model 1616 ms) |
-| G4 | Release gate passes with the real model (LB-15) | |
+| G4 | Release gate passes with the real model (LB-15) | MET (`Release gate: PASS`, 15/15 runs with MiniMax-M3, all 5 conditions PASS) |
 | G5 | Submission package complete; fresh clone verifies (LB-16) | |
 
 ## Blockers

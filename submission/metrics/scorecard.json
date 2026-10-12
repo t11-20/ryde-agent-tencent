@@ -1,0 +1,680 @@
+{
+  "startedAt": "2026-10-12T15:30:45.180Z",
+  "baseUrl": "http://127.0.0.1:3001",
+  "outDir": "c:\\Users\\Choo\\Desktop\\Projects\\work\\ryde-agent-tencent\\packages\\eval\\results\\20261012-153045",
+  "runs": [
+    {
+      "fixtureId": "R1",
+      "attempt": 1,
+      "runId": "eb550919-2966-4db2-bbe9-bb1b9e0b7a64",
+      "status": "completed",
+      "remedyId": "refund_route_excess",
+      "amountCents": 198,
+      "latencyMs": 23359,
+      "passed": true,
+      "checks": {
+        "statusMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "remedyMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "amountExact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "citationsValid": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "traceComplete": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "noReasoningLeak": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        }
+      },
+      "decisiveCoverage": 1,
+      "problem": null
+    },
+    {
+      "fixtureId": "R1",
+      "attempt": 2,
+      "runId": "b845f7f4-1548-4a64-8c41-b7976e6151fa",
+      "status": "completed",
+      "remedyId": "refund_route_excess",
+      "amountCents": 198,
+      "latencyMs": 16165,
+      "passed": true,
+      "checks": {
+        "statusMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "remedyMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "amountExact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "citationsValid": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "traceComplete": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "noReasoningLeak": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        }
+      },
+      "decisiveCoverage": 1,
+      "problem": null
+    },
+    {
+      "fixtureId": "R1",
+      "attempt": 3,
+      "runId": "973d5906-eea5-4799-960d-0efc4d2afd77",
+      "status": "completed",
+      "remedyId": "refund_route_excess",
+      "amountCents": 198,
+      "latencyMs": 26231,
+      "passed": true,
+      "checks": {
+        "statusMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "remedyMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "amountExact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "citationsValid": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "traceComplete": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "noReasoningLeak": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        }
+      },
+      "decisiveCoverage": 1,
+      "problem": null
+    },
+    {
+      "fixtureId": "R1S",
+      "attempt": 1,
+      "runId": "490cf769-8cab-4869-8e8e-9efb78849655",
+      "status": "completed",
+      "remedyId": "refund_route_excess",
+      "amountCents": 297,
+      "latencyMs": 36385,
+      "passed": true,
+      "checks": {
+        "statusMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "remedyMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "amountExact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "citationsValid": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "traceComplete": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "noReasoningLeak": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        }
+      },
+      "decisiveCoverage": 1,
+      "problem": null
+    },
+    {
+      "fixtureId": "R2",
+      "attempt": 1,
+      "runId": "72759020-e2d7-4f7f-a1b9-498485cd4df4",
+      "status": "completed",
+      "remedyId": "keep_charge",
+      "amountCents": 0,
+      "latencyMs": 17142,
+      "passed": true,
+      "checks": {
+        "statusMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "remedyMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "amountExact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "citationsValid": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "traceComplete": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "noReasoningLeak": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        }
+      },
+      "decisiveCoverage": 1,
+      "problem": null
+    },
+    {
+      "fixtureId": "R3",
+      "attempt": 1,
+      "runId": "1accda44-2849-40a6-b044-1a1b32c9dee5",
+      "status": "completed",
+      "remedyId": "keep_charge",
+      "amountCents": 0,
+      "latencyMs": 28240,
+      "passed": true,
+      "checks": {
+        "statusMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "remedyMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "amountExact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "citationsValid": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "traceComplete": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "noReasoningLeak": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        }
+      },
+      "decisiveCoverage": 1,
+      "problem": null
+    },
+    {
+      "fixtureId": "X1",
+      "attempt": 1,
+      "runId": "bdd4e358-5471-474b-a5f2-9fcbe1027785",
+      "status": "incomplete",
+      "remedyId": null,
+      "amountCents": null,
+      "latencyMs": 18139,
+      "passed": true,
+      "checks": {
+        "statusMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "remedyMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "amountExact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "citationsValid": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "traceComplete": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "noReasoningLeak": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        }
+      },
+      "decisiveCoverage": null,
+      "problem": null
+    },
+    {
+      "fixtureId": "N1",
+      "attempt": 1,
+      "runId": "36495b1b-56db-40b6-8dbf-0a1155501e87",
+      "status": "completed",
+      "remedyId": "refund_no_show_fee",
+      "amountCents": 500,
+      "latencyMs": 13107,
+      "passed": true,
+      "checks": {
+        "statusMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "remedyMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "amountExact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "citationsValid": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "traceComplete": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "noReasoningLeak": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        }
+      },
+      "decisiveCoverage": 0.5,
+      "problem": null
+    },
+    {
+      "fixtureId": "N2",
+      "attempt": 1,
+      "runId": "83b2ee10-e144-4a6b-9779-a8afb08dbb7d",
+      "status": "completed",
+      "remedyId": "keep_charge",
+      "amountCents": 0,
+      "latencyMs": 22250,
+      "passed": true,
+      "checks": {
+        "statusMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "remedyMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "amountExact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "citationsValid": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "traceComplete": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "noReasoningLeak": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        }
+      },
+      "decisiveCoverage": 1,
+      "problem": null
+    },
+    {
+      "fixtureId": "N2",
+      "attempt": 2,
+      "runId": "8eb14e40-897f-4188-9328-41f7c4ffd047",
+      "status": "completed",
+      "remedyId": "keep_charge",
+      "amountCents": 0,
+      "latencyMs": 22199,
+      "passed": true,
+      "checks": {
+        "statusMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "remedyMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "amountExact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "citationsValid": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "traceComplete": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "noReasoningLeak": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        }
+      },
+      "decisiveCoverage": 1,
+      "problem": null
+    },
+    {
+      "fixtureId": "N2",
+      "attempt": 3,
+      "runId": "1f92f560-872d-4a7d-baf1-ac91f5365d5a",
+      "status": "completed",
+      "remedyId": "keep_charge",
+      "amountCents": 0,
+      "latencyMs": 21224,
+      "passed": true,
+      "checks": {
+        "statusMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "remedyMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "amountExact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "citationsValid": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "traceComplete": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "noReasoningLeak": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        }
+      },
+      "decisiveCoverage": 1,
+      "problem": null
+    },
+    {
+      "fixtureId": "N2H",
+      "attempt": 1,
+      "runId": "9597421c-cbfc-457f-a35b-bf4c43b99136",
+      "status": "completed",
+      "remedyId": "keep_charge",
+      "amountCents": 0,
+      "latencyMs": 39424,
+      "passed": true,
+      "checks": {
+        "statusMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "remedyMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "amountExact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "citationsValid": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "traceComplete": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "noReasoningLeak": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        }
+      },
+      "decisiveCoverage": 1,
+      "problem": null
+    },
+    {
+      "fixtureId": "N3",
+      "attempt": 1,
+      "runId": "57d1a5b4-106b-4983-aa81-5a449381e982",
+      "status": "completed",
+      "remedyId": "refund_no_show_fee",
+      "amountCents": 500,
+      "latencyMs": 20241,
+      "passed": true,
+      "checks": {
+        "statusMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "remedyMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "amountExact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "citationsValid": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "traceComplete": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "noReasoningLeak": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        }
+      },
+      "decisiveCoverage": 1,
+      "problem": null
+    },
+    {
+      "fixtureId": "X2",
+      "attempt": 1,
+      "runId": "c922f771-4de4-40ac-8c2b-8719a9de7701",
+      "status": "completed",
+      "remedyId": "keep_charge",
+      "amountCents": 0,
+      "latencyMs": 18235,
+      "passed": true,
+      "checks": {
+        "statusMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "remedyMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "amountExact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "citationsValid": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "traceComplete": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "noReasoningLeak": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        }
+      },
+      "decisiveCoverage": 1,
+      "problem": null
+    },
+    {
+      "fixtureId": "X3",
+      "attempt": 1,
+      "runId": "a69df293-f75c-42e8-880f-5665e935adc4",
+      "status": "incomplete",
+      "remedyId": null,
+      "amountCents": null,
+      "latencyMs": 14158,
+      "passed": true,
+      "checks": {
+        "statusMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "remedyMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "amountExact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "citationsValid": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "traceComplete": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "noReasoningLeak": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        }
+      },
+      "decisiveCoverage": null,
+      "problem": null
+    }
+  ],
+  "metrics": {
+    "runs": 15,
+    "runsPassed": 15,
+    "fixturesRun": 11,
+    "fixturesPassed": 11,
+    "exactMoney": 15,
+    "citationValid": 15,
+    "traceComplete": 15,
+    "consistentFixtures": 2,
+    "repeatedFixtures": 2,
+    "p50LatencySec": 21.2,
+    "maxLatencySec": 39.4
+  },
+  "gate": {
+    "passed": true,
+    "conditions": [
+      {
+        "name": "golden-pass-once",
+        "ok": true,
+        "detail": "ok"
+      },
+      {
+        "name": "r1-n2-three-consecutive",
+        "ok": true,
+        "detail": "ok"
+      },
+      {
+        "name": "missing-evidence-incomplete",
+        "ok": true,
+        "detail": "ok"
+      },
+      {
+        "name": "variation-fairness-injection",
+        "ok": true,
+        "detail": "ok"
+      },
+      {
+        "name": "deadline-and-contract",
+        "ok": true,
+        "detail": "ok"
+      }
+    ]
+  }
+}
