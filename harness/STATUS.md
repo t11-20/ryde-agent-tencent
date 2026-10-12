@@ -15,7 +15,7 @@ Status values: `TODO`, `IN PROGRESS`, `DONE`, `BLOCKED`. The agent updates its o
 | LB-07 | Evidence builder and policy clauses | LB-06 | DONE | d33b729 | facts/policy/build-evidence added; 49 new tests pass, 228 total; typecheck clean; audit RESULT: OK (87 passed, 1 skip = LB-08) |
 | LB-08 | Dispute source (integration seam) | LB-07 | DONE | | Lane A file touched: `agents/src/index.ts` (additive only — ask Edward to review); `createFixtureSource` + `DisputeSource`/`FixtureListing` seam; 13 new source tests, 241 total (67 Lane A intact); typecheck clean; audit RESULT: OK (93 passed, 0 failed, 0 skips) |
 | LB-09 | Connect the fixture source to the live API | LB-08 | DONE | | Lane A files touched: app, live-roles, server (exactly the card's edits); `predev` build script added; live mode serves Lane B fixtures/evidence/policy/money via `createFixtureSource`; decisive-evidence guard ends runs `incomplete`; scripted model (SPEC §10) + 6 new integration tests, 247 total (67 Lane A intact); typecheck/build/check:examples clean |
-| LB-10 | Golden flow for all 11 fixtures | LB-09 | TODO | | |
+| LB-10 | Golden flow for all 11 fixtures | LB-09 | DONE | | 11 golden-flow integration tests (scripted model, no network): status/remedy/amount, trace shape, family coverage, citations; 258 total pass; file runs ~0.8 s; typecheck clean |
 | LB-11 | Real model connection and output hardening | LB-10 | TODO | | Model latency: … ms · R1 smoke: … · N2 smoke: … |
 | LB-12 | Web foundation | LB-09 | TODO | | |
 | LB-13 | Web UI screen | LB-12 | TODO | | |
