@@ -1,8 +1,9 @@
 # FairTrip measured metrics
 
-- Date of run: 2026-10-12 (release-gate run `20261012-153045`, UTC timestamp in `scorecard.md`)
+- Date of run: 2026-10-12 (release-gate run `20261012-155433`, UTC timestamp in `scorecard.md`)
 - Command: `npm run eval -- --fixtures release --release-gate`
-- Result: `Release gate: PASS` (15 / 15 runs passed)
+- Result: `Release gate: PASS` (15 / 15 runs passed, exit code 0)
+- Prompts: advocate and Judge prompts include the LB-15 step 4 rule lines (append-only)
 - Model: `MiniMax-M3`
 - Model base URL host: `api.minimax.io`
 - Run mode: live (real model calls through the FairTrip API at `http://127.0.0.1:3001`)
