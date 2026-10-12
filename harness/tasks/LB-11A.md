@@ -2,7 +2,7 @@
 
 **Goal:** fix the live HTTP 400 so real runs work with MiniMax-M3, make provider errors readable, add a regression test that would have caught it, then finish LB-11's live smoke runs.
 **Requires:** LB-10, plus LB-11's code steps A1–A9 committed (`git log` shows "LB-11: harden model output parsing and add live smoke script") · **Who:** agent, with the human for the server · **SPEC:** §9 · **Screenshot moment:** YES
-**⚠ Touches one Lane A file** (`apps/api/src/model.ts`). This card authorizes exactly the edits below. Edward reviews them in the pull request.
+**⚠ Touches one Lane A file** (`apps/api/src/model.ts`). This card authorizes exactly the edits below. The Lane A owner reviews them in the pull request.
 
 ## Background (already diagnosed, do not re-investigate)
 

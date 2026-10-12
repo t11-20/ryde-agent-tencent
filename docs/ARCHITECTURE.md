@@ -133,7 +133,7 @@ run.started
 ### 2.2 Installation
 
 ```bash
-cd /Users/edward/Documents/ChatGPT/Tencent
+cd /Users/lane-a-owner/Documents/ChatGPT/Tencent
 npm ci
 ```
 

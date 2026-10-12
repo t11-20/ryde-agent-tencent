@@ -75,11 +75,11 @@ Three are required; five gives you margin. A screen recording of one task also w
 
 - Install Node/npm; create `.env` with your key; start and stop servers (`npm run dev`, `npm run dev:web`).
 - Take screenshots; push the branch; open the pull request into `main`.
-- Get Edward's review of the Lane A edits (message below).
+- Get the Lane A owner's review of the Lane A edits (message below).
 - Export the cover PNGs; build the slides; record the optional video; fill in and submit the form; save the confirmation.
 - Decide what to do with the old `lane-b` branch (nothing here uses it).
 
-## Message to Edward
+## Message to the Lane A owner
 
 > Lane B is being rebuilt in CodeBuddy on `lane-b-codebuddy`. It needs a few small edits in Lane A files, all tested against your 67 tests:
 > 1. `packages/agents/src/index.ts`: new `DisputeSource` and `FixtureListing` interfaces (LB-08) and an `extractJsonText` export (LB-11).
