@@ -1,68 +1,67 @@
 import type { AdvocateCase, Run } from '@fairtrip/contracts';
 import { Chip } from './Chip.js';
-import { percent, rulingLabel } from '../lib/format.js';
+import { useClampToggle } from './Clamp.js';
 import type { CompletedResult } from '../lib/view-model.js';
 
 interface JudgePanelProps {
   result: CompletedResult | null;
-  knownIds: Set<string>;
   status: Run['status'];
 }
 
 type Argument = AdvocateCase['arguments'][number];
 
-function FindingItem({finding, knownIds}: {finding: Argument; knownIds: Set<string>}) {
+function FindingItem({finding}: {finding: Argument}) {
   return (
-    <li>
+    <li className="argument">
       <p>{finding.claim}</p>
       <div className="chip-row">
-        {finding.evidenceIds.map((id, index) => <Chip key={`ev-${id}-${index}`} id={id} kind="evidence" known={knownIds.has(id)} />)}
-        {finding.policyClauseIds.map((id, index) => <Chip key={`pol-${id}-${index}`} id={id} kind="policy" known={knownIds.has(id)} />)}
+        {finding.evidenceIds.map((id, index) => <Chip key={`ev-${id}-${index}`} id={id} kind="evidence" />)}
+        {finding.policyClauseIds.map((id, index) => <Chip key={`pol-${id}-${index}`} id={id} kind="policy" />)}
       </div>
     </li>
   );
 }
 
-export function JudgePanel({result, knownIds, status}: JudgePanelProps) {
+export function JudgePanel({result, status}: JudgePanelProps) {
+  const {ref, expanded, showToggle, toggle} = useClampToggle(result === null ? null : result.reasoning);
   return (
-    <section className="panel panel-judge" aria-labelledby="judge-heading">
-      <h2 id="judge-heading" className="panel-title">Judge</h2>
+    <section className="panel judge-panel hearing-judge" aria-labelledby="judge-heading">
+      <h2 id="judge-heading" className="advocate-title judge-title">Judge's findings</h2>
       {result === null ? (
-        <p className="placeholder">
-          {status === 'incomplete'
-            ? 'No ruling or payment was issued; this case needs human review.'
-            : status === 'failed'
-              ? 'The Judge issued no ruling.'
-              : 'Waiting for both advocate cases…'}
-        </p>
+        status === 'queued' || status === 'running' || status === null ? (
+          <p className="placeholder">Waiting for both advocate cases…</p>
+        ) : (
+          <>
+            <p className="judge-no-ruling">No ruling</p>
+            <p className="placeholder judge-no-ruling-note">
+              {status === 'failed' ? 'The run failed before the Judge ruled.' : 'Decisive evidence was missing.'}
+            </p>
+          </>
+        )
       ) : (
         <>
-          <p className="judge-ruling">{rulingLabel(result.ruling)}</p>
-          <div className="panel-section">
-            <h3>Findings</h3>
-            {result.findings.length === 0 ? <p className="placeholder">None.</p> : (
-              <ul>{result.findings.map((finding, index) => <FindingItem key={index} finding={finding} knownIds={knownIds} />)}</ul>
-            )}
-          </div>
-          <div className="confidence">
-            <p>Model-assessed confidence {percent(result.confidence)}</p>
-            <div className="confidence-bar" role="img" aria-label={`Model-assessed confidence ${percent(result.confidence)}`}>
-              <div className="confidence-fill" style={{width: `${percent(result.confidence)}`}} />
+          {result.findings.length === 0 ? <p className="placeholder">No findings.</p> : (
+            <ul className="argument-list">
+              {result.findings.map((finding, index) => <FindingItem key={index} finding={finding} />)}
+            </ul>
+          )}
+          <div ref={ref}>
+            <p className={expanded ? 'clamp clamp-4 clamp-open' : 'clamp clamp-4'}>{result.reasoning}</p>
+            <div className="judge-explanations">
+              <div>
+                <h3 className="judge-explanation-label">To the rider</h3>
+                <p className={expanded ? 'clamp clamp-3 clamp-open' : 'clamp clamp-3'}>{result.riderExplanation}</p>
+              </div>
+              <div>
+                <h3 className="judge-explanation-label">To the driver</h3>
+                <p className={expanded ? 'clamp clamp-3 clamp-open' : 'clamp clamp-3'}>{result.driverExplanation}</p>
+              </div>
             </div>
-          </div>
-          <div className="panel-section">
-            <h3>Reasoning</h3>
-            <p>{result.reasoning}</p>
-          </div>
-          <div className="judge-explanations">
-            <div className="panel-section">
-              <h3>To the rider</h3>
-              <p>{result.riderExplanation}</p>
-            </div>
-            <div className="panel-section">
-              <h3>To the driver</h3>
-              <p>{result.driverExplanation}</p>
-            </div>
+            {showToggle ? (
+              <button type="button" className="btn-text" aria-expanded={expanded} onClick={toggle}>
+                {expanded ? 'Show less' : 'Read full reasoning'}
+              </button>
+            ) : null}
           </div>
         </>
       )}
