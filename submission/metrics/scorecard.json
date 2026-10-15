@@ -1,16 +1,16 @@
 {
-  "startedAt": "2026-10-12T15:54:33.433Z",
+  "startedAt": "2026-10-13T14:44:17.036Z",
   "baseUrl": "http://127.0.0.1:3001",
-  "outDir": "C:\\Users\\Choo\\Desktop\\Projects\\work\\ryde-agent-tencent\\packages\\eval\\results\\20261012-155433",
+  "outDir": "packages/eval/results/20261013-144417",
   "runs": [
     {
       "fixtureId": "R1",
       "attempt": 1,
-      "runId": "23195dc0-f1d5-4316-bdd9-9974d329398e",
+      "runId": "11aeee9d-faaf-4a43-9dc3-7c77557626ba",
       "status": "completed",
       "remedyId": "refund_route_excess",
       "amountCents": 198,
-      "latencyMs": 20500,
+      "latencyMs": 16235,
       "passed": true,
       "checks": {
         "statusMatch": {
@@ -40,19 +40,29 @@
         "withinDeadline": {
           "ok": true,
           "detail": "ok"
+        },
+        "riskSignalsIntact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "contextOnly": {
+          "ok": true,
+          "detail": "ok"
         }
       },
       "decisiveCoverage": 1,
-      "problem": null
+      "problem": null,
+      "escalated": false,
+      "riskOverall": "low"
     },
     {
       "fixtureId": "R1",
       "attempt": 2,
-      "runId": "087fac09-89a0-4a50-a6dc-7c0c51d9ab2b",
+      "runId": "d9f3356e-922d-4965-ad1f-86fa283ebdcf",
       "status": "completed",
       "remedyId": "refund_route_excess",
       "amountCents": 198,
-      "latencyMs": 24267,
+      "latencyMs": 19174,
       "passed": true,
       "checks": {
         "statusMatch": {
@@ -82,19 +92,29 @@
         "withinDeadline": {
           "ok": true,
           "detail": "ok"
+        },
+        "riskSignalsIntact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "contextOnly": {
+          "ok": true,
+          "detail": "ok"
         }
       },
       "decisiveCoverage": 1,
-      "problem": null
+      "problem": null,
+      "escalated": false,
+      "riskOverall": "low"
     },
     {
       "fixtureId": "R1",
       "attempt": 3,
-      "runId": "4b761941-70c0-4f6c-9186-cc581ef28b20",
+      "runId": "03851c00-2a75-45e3-a657-8daed30723bd",
       "status": "completed",
       "remedyId": "refund_route_excess",
       "amountCents": 198,
-      "latencyMs": 17172,
+      "latencyMs": 18189,
       "passed": true,
       "checks": {
         "statusMatch": {
@@ -124,19 +144,29 @@
         "withinDeadline": {
           "ok": true,
           "detail": "ok"
+        },
+        "riskSignalsIntact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "contextOnly": {
+          "ok": true,
+          "detail": "ok"
         }
       },
       "decisiveCoverage": 1,
-      "problem": null
+      "problem": null,
+      "escalated": false,
+      "riskOverall": "low"
     },
     {
       "fixtureId": "R1S",
       "attempt": 1,
-      "runId": "b0b58dbd-38bb-4b30-b2e9-76139b93d119",
+      "runId": "d99018a1-15e1-466c-9e3c-7f5dee8b6555",
       "status": "completed",
       "remedyId": "refund_route_excess",
       "amountCents": 297,
-      "latencyMs": 20237,
+      "latencyMs": 17177,
       "passed": true,
       "checks": {
         "statusMatch": {
@@ -166,19 +196,29 @@
         "withinDeadline": {
           "ok": true,
           "detail": "ok"
+        },
+        "riskSignalsIntact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "contextOnly": {
+          "ok": true,
+          "detail": "ok"
         }
       },
       "decisiveCoverage": 1,
-      "problem": null
+      "problem": null,
+      "escalated": false,
+      "riskOverall": "low"
     },
     {
       "fixtureId": "R2",
       "attempt": 1,
-      "runId": "d773a729-3b95-482a-86e3-acf7e04f83a5",
+      "runId": "18f263f3-9e78-452c-bd21-d754db20b14a",
       "status": "completed",
       "remedyId": "keep_charge",
       "amountCents": 0,
-      "latencyMs": 19250,
+      "latencyMs": 14188,
       "passed": true,
       "checks": {
         "statusMatch": {
@@ -208,19 +248,29 @@
         "withinDeadline": {
           "ok": true,
           "detail": "ok"
+        },
+        "riskSignalsIntact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "contextOnly": {
+          "ok": true,
+          "detail": "ok"
         }
       },
       "decisiveCoverage": 1,
-      "problem": null
+      "problem": null,
+      "escalated": false,
+      "riskOverall": "medium"
     },
     {
       "fixtureId": "R3",
       "attempt": 1,
-      "runId": "71d97d78-607b-47d7-9d4f-9defdf7f2c71",
+      "runId": "66157c45-f4ed-4cdc-8c30-5fe0fcc2f7c5",
       "status": "completed",
       "remedyId": "keep_charge",
       "amountCents": 0,
-      "latencyMs": 20190,
+      "latencyMs": 15140,
       "passed": true,
       "checks": {
         "statusMatch": {
@@ -250,19 +300,237 @@
         "withinDeadline": {
           "ok": true,
           "detail": "ok"
+        },
+        "riskSignalsIntact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "contextOnly": {
+          "ok": true,
+          "detail": "ok"
         }
       },
       "decisiveCoverage": 1,
-      "problem": null
+      "problem": null,
+      "escalated": false,
+      "riskOverall": "low"
+    },
+    {
+      "fixtureId": "R4",
+      "attempt": 1,
+      "runId": "de7d73a2-c623-4d69-9882-a3fe692c5447",
+      "status": "completed",
+      "remedyId": "keep_charge",
+      "amountCents": 0,
+      "latencyMs": 16142,
+      "passed": true,
+      "checks": {
+        "statusMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "remedyMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "amountExact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "citationsValid": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "traceComplete": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "noReasoningLeak": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "riskSignalsIntact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "contextOnly": {
+          "ok": true,
+          "detail": "ok"
+        }
+      },
+      "decisiveCoverage": 1,
+      "problem": null,
+      "escalated": false,
+      "riskOverall": "low"
+    },
+    {
+      "fixtureId": "R1F",
+      "attempt": 1,
+      "runId": "341ded6b-64e6-4e2b-bc89-2ef0ff2be634",
+      "status": "completed",
+      "remedyId": "refund_route_excess",
+      "amountCents": 198,
+      "latencyMs": 17167,
+      "passed": true,
+      "checks": {
+        "statusMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "remedyMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "amountExact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "citationsValid": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "traceComplete": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "noReasoningLeak": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "riskSignalsIntact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "contextOnly": {
+          "ok": true,
+          "detail": "ok"
+        }
+      },
+      "decisiveCoverage": 1,
+      "problem": null,
+      "escalated": true,
+      "riskOverall": "high"
+    },
+    {
+      "fixtureId": "R1F",
+      "attempt": 2,
+      "runId": "614bf4eb-c95d-4f56-b606-e18f5d74c98f",
+      "status": "completed",
+      "remedyId": "refund_route_excess",
+      "amountCents": 198,
+      "latencyMs": 18181,
+      "passed": true,
+      "checks": {
+        "statusMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "remedyMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "amountExact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "citationsValid": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "traceComplete": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "noReasoningLeak": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "riskSignalsIntact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "contextOnly": {
+          "ok": true,
+          "detail": "ok"
+        }
+      },
+      "decisiveCoverage": 1,
+      "problem": null,
+      "escalated": true,
+      "riskOverall": "high"
+    },
+    {
+      "fixtureId": "R1F",
+      "attempt": 3,
+      "runId": "757340ce-6ba3-4e8e-99bc-16f5e26cc6ea",
+      "status": "completed",
+      "remedyId": "refund_route_excess",
+      "amountCents": 198,
+      "latencyMs": 18206,
+      "passed": true,
+      "checks": {
+        "statusMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "remedyMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "amountExact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "citationsValid": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "traceComplete": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "noReasoningLeak": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "riskSignalsIntact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "contextOnly": {
+          "ok": true,
+          "detail": "ok"
+        }
+      },
+      "decisiveCoverage": 1,
+      "problem": null,
+      "escalated": true,
+      "riskOverall": "high"
     },
     {
       "fixtureId": "X1",
       "attempt": 1,
-      "runId": "d8e72998-088b-4ccd-965d-e3a382a684d3",
+      "runId": "c709a71d-5f47-4256-b657-682589f3adf5",
       "status": "incomplete",
       "remedyId": null,
       "amountCents": null,
-      "latencyMs": 10096,
+      "latencyMs": 17208,
       "passed": true,
       "checks": {
         "statusMatch": {
@@ -292,19 +560,81 @@
         "withinDeadline": {
           "ok": true,
           "detail": "ok"
+        },
+        "riskSignalsIntact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "contextOnly": {
+          "ok": true,
+          "detail": "ok"
         }
       },
       "decisiveCoverage": null,
-      "problem": null
+      "problem": null,
+      "escalated": false,
+      "riskOverall": "low"
+    },
+    {
+      "fixtureId": "X4",
+      "attempt": 1,
+      "runId": "9b436bab-368e-49e1-956a-407c1a1d526d",
+      "status": "incomplete",
+      "remedyId": null,
+      "amountCents": null,
+      "latencyMs": 17196,
+      "passed": true,
+      "checks": {
+        "statusMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "remedyMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "amountExact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "citationsValid": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "traceComplete": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "noReasoningLeak": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "riskSignalsIntact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "contextOnly": {
+          "ok": true,
+          "detail": "ok"
+        }
+      },
+      "decisiveCoverage": null,
+      "problem": null,
+      "escalated": false,
+      "riskOverall": "low"
     },
     {
       "fixtureId": "N1",
       "attempt": 1,
-      "runId": "8c87b495-9cbe-4c23-a763-b6ef556e1e8c",
+      "runId": "39092034-3f20-4978-a0e5-b85adb2bf62e",
       "status": "completed",
       "remedyId": "refund_no_show_fee",
       "amountCents": 500,
-      "latencyMs": 21238,
+      "latencyMs": 14130,
       "passed": true,
       "checks": {
         "statusMatch": {
@@ -334,19 +664,81 @@
         "withinDeadline": {
           "ok": true,
           "detail": "ok"
+        },
+        "riskSignalsIntact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "contextOnly": {
+          "ok": true,
+          "detail": "ok"
         }
       },
-      "decisiveCoverage": 1,
-      "problem": null
+      "decisiveCoverage": 0.5,
+      "problem": null,
+      "escalated": false,
+      "riskOverall": "medium"
+    },
+    {
+      "fixtureId": "N1R",
+      "attempt": 1,
+      "runId": "53d93577-fd41-4d88-b5a7-c6dfa8d70d56",
+      "status": "completed",
+      "remedyId": "refund_no_show_fee",
+      "amountCents": 500,
+      "latencyMs": 14149,
+      "passed": true,
+      "checks": {
+        "statusMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "remedyMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "amountExact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "citationsValid": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "traceComplete": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "noReasoningLeak": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "riskSignalsIntact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "contextOnly": {
+          "ok": true,
+          "detail": "ok"
+        }
+      },
+      "decisiveCoverage": 0.5,
+      "problem": null,
+      "escalated": true,
+      "riskOverall": "high"
     },
     {
       "fixtureId": "N2",
       "attempt": 1,
-      "runId": "76841bd9-8695-40a1-bca0-1da0ce5999fd",
+      "runId": "31b537b5-66dd-4ed0-a0a5-962154b2d2ea",
       "status": "completed",
       "remedyId": "keep_charge",
       "amountCents": 0,
-      "latencyMs": 15153,
+      "latencyMs": 15116,
       "passed": true,
       "checks": {
         "statusMatch": {
@@ -376,19 +768,29 @@
         "withinDeadline": {
           "ok": true,
           "detail": "ok"
+        },
+        "riskSignalsIntact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "contextOnly": {
+          "ok": true,
+          "detail": "ok"
         }
       },
       "decisiveCoverage": 1,
-      "problem": null
+      "problem": null,
+      "escalated": false,
+      "riskOverall": "low"
     },
     {
       "fixtureId": "N2",
       "attempt": 2,
-      "runId": "9c5a98ba-2f20-4ca4-b3a8-a3684f2eeac7",
+      "runId": "ddbfc7e8-5ac2-4f4b-af76-53fc3a50b1d2",
       "status": "completed",
       "remedyId": "keep_charge",
       "amountCents": 0,
-      "latencyMs": 12107,
+      "latencyMs": 17170,
       "passed": true,
       "checks": {
         "statusMatch": {
@@ -418,19 +820,29 @@
         "withinDeadline": {
           "ok": true,
           "detail": "ok"
+        },
+        "riskSignalsIntact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "contextOnly": {
+          "ok": true,
+          "detail": "ok"
         }
       },
       "decisiveCoverage": 1,
-      "problem": null
+      "problem": null,
+      "escalated": false,
+      "riskOverall": "low"
     },
     {
       "fixtureId": "N2",
       "attempt": 3,
-      "runId": "db95ce88-4fd1-4f9a-8a44-122c30b4afd6",
+      "runId": "9a4834de-ed55-4587-98dc-bb57692ff77f",
       "status": "completed",
       "remedyId": "keep_charge",
       "amountCents": 0,
-      "latencyMs": 16174,
+      "latencyMs": 16114,
       "passed": true,
       "checks": {
         "statusMatch": {
@@ -460,19 +872,29 @@
         "withinDeadline": {
           "ok": true,
           "detail": "ok"
+        },
+        "riskSignalsIntact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "contextOnly": {
+          "ok": true,
+          "detail": "ok"
         }
       },
       "decisiveCoverage": 1,
-      "problem": null
+      "problem": null,
+      "escalated": false,
+      "riskOverall": "low"
     },
     {
       "fixtureId": "N2H",
       "attempt": 1,
-      "runId": "3b8aeaa6-2895-4987-a9d9-bd701d899a90",
+      "runId": "52b7a28a-fbfa-4644-9b63-5df494e4a1e6",
       "status": "completed",
       "remedyId": "keep_charge",
       "amountCents": 0,
-      "latencyMs": 24273,
+      "latencyMs": 16149,
       "passed": true,
       "checks": {
         "statusMatch": {
@@ -502,19 +924,29 @@
         "withinDeadline": {
           "ok": true,
           "detail": "ok"
+        },
+        "riskSignalsIntact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "contextOnly": {
+          "ok": true,
+          "detail": "ok"
         }
       },
       "decisiveCoverage": 1,
-      "problem": null
+      "problem": null,
+      "escalated": true,
+      "riskOverall": "high"
     },
     {
       "fixtureId": "N3",
       "attempt": 1,
-      "runId": "895a8e44-a04c-4833-bd0a-0c52c5551a9b",
+      "runId": "da6e6075-2e55-4326-a150-e0164598a590",
       "status": "completed",
       "remedyId": "refund_no_show_fee",
       "amountCents": 500,
-      "latencyMs": 11113,
+      "latencyMs": 15131,
       "passed": true,
       "checks": {
         "statusMatch": {
@@ -544,19 +976,185 @@
         "withinDeadline": {
           "ok": true,
           "detail": "ok"
+        },
+        "riskSignalsIntact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "contextOnly": {
+          "ok": true,
+          "detail": "ok"
         }
       },
       "decisiveCoverage": 1,
-      "problem": null
+      "problem": null,
+      "escalated": false,
+      "riskOverall": "low"
+    },
+    {
+      "fixtureId": "N4",
+      "attempt": 1,
+      "runId": "e96a7dd5-1534-4648-b9b7-7af6c3e3a2f7",
+      "status": "completed",
+      "remedyId": "refund_no_show_fee",
+      "amountCents": 500,
+      "latencyMs": 14159,
+      "passed": true,
+      "checks": {
+        "statusMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "remedyMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "amountExact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "citationsValid": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "traceComplete": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "noReasoningLeak": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "riskSignalsIntact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "contextOnly": {
+          "ok": true,
+          "detail": "ok"
+        }
+      },
+      "decisiveCoverage": 1,
+      "problem": null,
+      "escalated": false,
+      "riskOverall": "low"
+    },
+    {
+      "fixtureId": "N5",
+      "attempt": 1,
+      "runId": "dc001fa8-39fe-4ac1-89e9-41e5926d1a5c",
+      "status": "completed",
+      "remedyId": "keep_charge",
+      "amountCents": 0,
+      "latencyMs": 15149,
+      "passed": true,
+      "checks": {
+        "statusMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "remedyMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "amountExact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "citationsValid": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "traceComplete": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "noReasoningLeak": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "riskSignalsIntact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "contextOnly": {
+          "ok": true,
+          "detail": "ok"
+        }
+      },
+      "decisiveCoverage": 1,
+      "problem": null,
+      "escalated": false,
+      "riskOverall": "medium"
+    },
+    {
+      "fixtureId": "N6",
+      "attempt": 1,
+      "runId": "2e92f5fc-1cd4-4ab6-b8a6-9be1a64b0d8e",
+      "status": "completed",
+      "remedyId": "keep_charge",
+      "amountCents": 0,
+      "latencyMs": 14133,
+      "passed": true,
+      "checks": {
+        "statusMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "remedyMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "amountExact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "citationsValid": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "traceComplete": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "noReasoningLeak": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "riskSignalsIntact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "contextOnly": {
+          "ok": true,
+          "detail": "ok"
+        }
+      },
+      "decisiveCoverage": 1,
+      "problem": null,
+      "escalated": false,
+      "riskOverall": "low"
     },
     {
       "fixtureId": "X2",
       "attempt": 1,
-      "runId": "1d006c27-6cc1-4835-bbd5-5b0dc15c6eb8",
+      "runId": "8adbc460-916e-4c73-90a7-7d08e2d711da",
       "status": "completed",
       "remedyId": "keep_charge",
       "amountCents": 0,
-      "latencyMs": 16157,
+      "latencyMs": 16148,
       "passed": true,
       "checks": {
         "statusMatch": {
@@ -584,21 +1182,31 @@
           "detail": "ok"
         },
         "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "riskSignalsIntact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "contextOnly": {
           "ok": true,
           "detail": "ok"
         }
       },
       "decisiveCoverage": 1,
-      "problem": null
+      "problem": null,
+      "escalated": true,
+      "riskOverall": "high"
     },
     {
       "fixtureId": "X3",
       "attempt": 1,
-      "runId": "477ab636-8e8f-4e23-9c61-537be77949e1",
+      "runId": "fcbf9434-06c8-4822-81fe-1dd6d012dc84",
       "status": "incomplete",
       "remedyId": null,
       "amountCents": null,
-      "latencyMs": 16171,
+      "latencyMs": 15128,
       "passed": true,
       "checks": {
         "statusMatch": {
@@ -626,26 +1234,201 @@
           "detail": "ok"
         },
         "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "riskSignalsIntact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "contextOnly": {
           "ok": true,
           "detail": "ok"
         }
       },
       "decisiveCoverage": null,
-      "problem": null
+      "problem": null,
+      "escalated": false,
+      "riskOverall": "low"
+    },
+    {
+      "fixtureId": "X5",
+      "attempt": 1,
+      "runId": "a73d8264-8992-4e0b-a636-abeed7e196a3",
+      "status": "incomplete",
+      "remedyId": null,
+      "amountCents": null,
+      "latencyMs": 15121,
+      "passed": true,
+      "checks": {
+        "statusMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "remedyMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "amountExact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "citationsValid": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "traceComplete": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "noReasoningLeak": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "riskSignalsIntact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "contextOnly": {
+          "ok": true,
+          "detail": "ok"
+        }
+      },
+      "decisiveCoverage": null,
+      "problem": null,
+      "escalated": false,
+      "riskOverall": "low"
+    },
+    {
+      "fixtureId": "X6",
+      "attempt": 1,
+      "runId": "78e09da6-e7d6-4ee9-b291-779df4423a82",
+      "status": "completed",
+      "remedyId": "keep_charge",
+      "amountCents": 0,
+      "latencyMs": 17127,
+      "passed": true,
+      "checks": {
+        "statusMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "remedyMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "amountExact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "citationsValid": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "traceComplete": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "noReasoningLeak": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "riskSignalsIntact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "contextOnly": {
+          "ok": true,
+          "detail": "ok"
+        }
+      },
+      "decisiveCoverage": 1,
+      "problem": null,
+      "escalated": true,
+      "riskOverall": "high"
+    },
+    {
+      "fixtureId": "N2",
+      "attempt": 4,
+      "runId": "6ee9e186-7060-4e16-9d81-cb68564ac6c4",
+      "status": "completed",
+      "remedyId": "keep_charge",
+      "amountCents": 0,
+      "latencyMs": 16108,
+      "passed": true,
+      "checks": {
+        "statusMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "remedyMatch": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "amountExact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "citationsValid": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "traceComplete": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "noReasoningLeak": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "withinDeadline": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "riskSignalsIntact": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "contextOnly": {
+          "ok": true,
+          "detail": "ok"
+        }
+      },
+      "decisiveCoverage": 1,
+      "problem": null,
+      "escalated": false,
+      "riskOverall": "low",
+      "probe": "feedback",
+      "feedbackPrecedent": {
+        "ok": true,
+        "detail": "ok"
+      }
     }
   ],
   "metrics": {
-    "runs": 15,
-    "runsPassed": 15,
-    "fixturesRun": 11,
-    "fixturesPassed": 11,
-    "exactMoney": 15,
-    "citationValid": 15,
-    "traceComplete": 15,
-    "consistentFixtures": 2,
-    "repeatedFixtures": 2,
-    "p50LatencySec": 17.2,
-    "maxLatencySec": 24.3
+    "runs": 27,
+    "runsPassed": 27,
+    "fixturesRun": 20,
+    "fixturesPassed": 20,
+    "exactMoney": 27,
+    "citationValid": 27,
+    "traceComplete": 27,
+    "consistentFixtures": 3,
+    "repeatedFixtures": 3,
+    "p50LatencySec": 16.1,
+    "maxLatencySec": 19.2,
+    "riskIntact": 27,
+    "escalatedRuns": 7,
+    "escalatedOutcomeUnchanged": 7,
+    "feedbackProbe": "pass"
   },
   "gate": {
     "passed": true,
@@ -656,7 +1439,7 @@
         "detail": "ok"
       },
       {
-        "name": "r1-n2-three-consecutive",
+        "name": "consistency-three-consecutive",
         "ok": true,
         "detail": "ok"
       },
@@ -674,7 +1457,27 @@
         "name": "deadline-and-contract",
         "ok": true,
         "detail": "ok"
+      },
+      {
+        "name": "risk-context-only",
+        "ok": true,
+        "detail": "ok"
+      },
+      {
+        "name": "human-review-feedback",
+        "ok": true,
+        "detail": "ok"
       }
     ]
+  },
+  "feedback": {
+    "confirmFixtureId": "X2",
+    "confirmRunId": "8adbc460-916e-4c73-90a7-7d08e2d711da",
+    "overrideFixtureId": "N2H",
+    "overrideRunId": "52b7a28a-fbfa-4644-9b63-5df494e4a1e6",
+    "overrideRemedyId": "refund_no_show_fee",
+    "overrideAmountCents": 500,
+    "expectedOverrideAmountCents": 500,
+    "problems": []
   }
 }

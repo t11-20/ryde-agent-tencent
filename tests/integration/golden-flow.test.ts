@@ -92,11 +92,19 @@ describe.each(dataset.expected)('golden flow $fixtureId', (expected) => {
     expect(run.fixtureId).toBe(expected.fixtureId);
     expect(run.status).toBe(expected.expectedStatus);
 
+    // Every terminal live run carries the deterministic policy verdict, and an
+    // unescalated completed run can never diverge from it.
+    expect(run.verdict).toBeDefined();
+    expect(run.events.some(e => e.type === 'verdict.computed')).toBe(true);
+
     if (run.status === 'completed') {
       expect(run.result.action.remedyId).toBe(expected.expectedRemedyId);
       expect(run.result.action.amountCents).toBe(expected.expectedAmountCents);
+      expect(run.verdict?.outcome).toBe(expected.expectedRemedyId);
+      if (run.escalation === undefined) expect(run.divergence).toBeUndefined();
     } else if (run.status === 'incomplete') {
       expect('result' in run).toBe(false);
+      expect(run.verdict?.outcome).toBe('incomplete');
       const firstFamily = expected.missingFamilies[0];
       if (firstFamily === undefined) throw new Error(`Expected outcome ${expected.fixtureId} is incomplete without missingFamilies`);
       expect(run.missingEvidence[0]?.startsWith(`${firstFamily}:`)).toBe(true);
@@ -104,5 +112,25 @@ describe.each(dataset.expected)('golden flow $fixtureId', (expected) => {
 
     expectTrace(run, fixture);
     expectCitations(run, fixture);
+  });
+});
+
+describe('escalation with the scripted model', () => {
+  it.each(['R1F', 'N1R', 'X6'])('%s completes with a high_risk escalation and the expected outcome', async (fixtureId) => {
+    const expected = dataset.expected.find(e => e.fixtureId === fixtureId);
+    if (expected === undefined) throw new Error(`No expected outcome for ${fixtureId}`);
+    const run = await runFixture(fixtureId);
+    expect(run.status).toBe('completed');
+    if (run.status !== 'completed') throw new Error('unreachable');
+    expect(run.escalation?.reasons).toContain('high_risk');
+    expect(run.result.action.remedyId).toBe(expected.expectedRemedyId);
+    expect(run.result.action.amountCents).toBe(expected.expectedAmountCents);
+  });
+
+  it.each(['N5', 'R4'])('%s completes without an escalation', async (fixtureId) => {
+    const run = await runFixture(fixtureId);
+    expect(run.status).toBe('completed');
+    if (run.status !== 'completed') throw new Error('unreachable');
+    expect(run.escalation).toBeUndefined();
   });
 });

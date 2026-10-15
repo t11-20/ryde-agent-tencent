@@ -43,6 +43,33 @@ describe('checkFare — valid fixtures (SPEC §5.8, §7)', () => {
     expect(p.totalCents).toBe(1910);
     expect(checkFare(p)).toEqual({ arithmeticValid: true, anomalies: [] });
   });
+
+  it('R4 line items and total match SPEC §7', () => {
+    const p = paymentOf('R4');
+    expect(item(p, 'base').cents).toBe(300);
+    expect(item(p, 'distance').cents).toBe(645);
+    expect(item(p, 'distance').quantity).toBe(8603);
+    expect(item(p, 'time').cents).toBe(422);
+    expect(item(p, 'time').quantity).toBe(1265);
+    expect(p.totalCents).toBe(1367);
+    expect(p.paidCents).toBe(1367);
+    expect(checkFare(p)).toEqual({ arithmeticValid: true, anomalies: [] });
+  });
+
+  it('R1F line items and total match R1 and SPEC §7', () => {
+    const p = paymentOf('R1F');
+    expect(item(p, 'base').cents).toBe(300);
+    expect(item(p, 'distance').cents).toBe(795);
+    expect(item(p, 'time').cents).toBe(378);
+    expect(p.totalCents).toBe(1473);
+    expect(checkFare(p)).toEqual({ arithmeticValid: true, anomalies: [] });
+  });
+
+  it('X4 payment is unavailable; X5 keeps an available payment (GPS is missing instead)', () => {
+    expect(findFixture(ds, 'X4')?.payment.status).toBe('unavailable');
+    expect(findFixture(ds, 'X5')?.payment.status).toBe('available');
+    expect(findFixture(ds, 'X5')?.gps.status).toBe('unavailable');
+  });
 });
 
 describe('checkFare — anomaly codes (SPEC §5.8)', () => {

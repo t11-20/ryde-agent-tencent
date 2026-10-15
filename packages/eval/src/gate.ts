@@ -1,8 +1,8 @@
-import type { GateCondition, GateResult, RunResult } from './report.js';
+import type { FeedbackProbe, GateCondition, GateResult, RunResult } from './report.js';
 import { GOLDEN_FIXTURES, RELEASE_TRIPLE_FIXTURES } from './sets.js';
 
-const MISSING_EVIDENCE_FIXTURES = ['X1', 'X3'] as const;
-const VARIATION_FIXTURES = ['R1S', 'N2H', 'X2'] as const;
+const MISSING_EVIDENCE_FIXTURES = ['X1', 'X4', 'X3', 'X5'] as const;
+const VARIATION_FIXTURES = ['R1S', 'N2H', 'X2', 'R1F', 'N1R', 'N5', 'N6', 'X6'] as const;
 const DEADLINE_MS = 90_000;
 const REQUIRED_CONSECUTIVE = 3;
 
@@ -34,7 +34,7 @@ function longestPassingStreak(runs: RunResult[]): number {
   return best;
 }
 
-function threeConsecutive(results: RunResult[]): GateCondition {
+function consistencyThreeConsecutive(results: RunResult[]): GateCondition {
   const failures: string[] = [];
   for (const id of RELEASE_TRIPLE_FIXTURES) {
     const runs = runsOf(results, id);
@@ -45,7 +45,7 @@ function threeConsecutive(results: RunResult[]): GateCondition {
       failures.push(`${id}: best streak ${streak} of ${runs.length} runs${failed.length ? ` (failed ${failed.join(', ')})` : ''}`);
     }
   }
-  return condition('r1-n2-three-consecutive', failures);
+  return condition('consistency-three-consecutive', failures);
 }
 
 function missingEvidenceIncomplete(results: RunResult[]): GateCondition {
@@ -84,13 +84,51 @@ function deadlineAndContract(results: RunResult[]): GateCondition {
   return condition('deadline-and-contract', failures);
 }
 
-export function releaseGate(results: RunResult[]): GateResult {
+function riskContextOnly(results: RunResult[]): GateCondition {
+  const failures: string[] = [];
+  for (const run of results) {
+    if (run.status !== 'completed') continue;
+    if (!run.checks.riskSignalsIntact.ok) failures.push(`${run.fixtureId} #${run.attempt}: ${run.checks.riskSignalsIntact.detail}`);
+    if (!run.checks.contextOnly.ok) failures.push(`${run.fixtureId} #${run.attempt}: ${run.checks.contextOnly.detail}`);
+  }
+  return condition('risk-context-only', failures);
+}
+
+// The deterministic policy verdict is authoritative: every run must reproduce it
+// (verdictMatch), and a divergent completed ruling must never be finalised.
+function policyVerdictAuthoritative(results: RunResult[]): GateCondition {
+  const failures: string[] = [];
+  for (const run of results) {
+    if (!run.checks.verdictMatch.ok) failures.push(`${run.fixtureId} #${run.attempt}: ${run.checks.verdictMatch.detail}`);
+    else if (run.status === 'completed' && run.divergent && !run.escalated)
+      failures.push(`${run.fixtureId} #${run.attempt}: divergent ruling was not escalated`);
+  }
+  return condition('policy-verdict-authoritative', failures);
+}
+
+function humanReviewFeedback(results: RunResult[], feedback: FeedbackProbe | null): GateCondition {
+  if (feedback === null) return condition('human-review-feedback', ['not run']);
+  const failures = [...feedback.problems];
+  const probe = results.find(run => run.probe === 'feedback');
+  if (probe === undefined) failures.push('feedback probe run missing');
+  else {
+    if (!probe.passed) failures.push(`${probe.fixtureId} #${probe.attempt} feedback probe failed`);
+    if (probe.feedbackPrecedent === undefined) failures.push('feedback probe run missing feedbackPrecedent check');
+    else if (!probe.feedbackPrecedent.ok) failures.push(`feedback precedent: ${probe.feedbackPrecedent.detail}`);
+  }
+  return condition('human-review-feedback', failures);
+}
+
+export function releaseGate(results: RunResult[], feedback: FeedbackProbe | null = null): GateResult {
   const conditions = [
     goldenPassOnce(results),
-    threeConsecutive(results),
+    consistencyThreeConsecutive(results),
     missingEvidenceIncomplete(results),
     variationFairnessInjection(results),
-    deadlineAndContract(results)
+    deadlineAndContract(results),
+    riskContextOnly(results),
+    policyVerdictAuthoritative(results),
+    humanReviewFeedback(results, feedback)
   ];
   return {passed: conditions.every(item => item.ok), conditions};
 }

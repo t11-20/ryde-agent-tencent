@@ -17,7 +17,7 @@ describe('prerequisite API', () => {
     const api = app();
     const health = await request(api).get('/api/health');
     expect(health.body.mode).toBe('stub');
-    expect(health.body.contractVersion).toBe('0.2.0');
+    expect(health.body.contractVersion).toBe('0.3.3');
     const list = await request(api).get('/api/fixtures');
     expect(list.status).toBe(200); expect(list.body.fixtures).toHaveLength(2);
     for (const fixture of list.body.fixtures) {
@@ -38,8 +38,9 @@ describe('prerequisite API', () => {
       expect(eventTypes.filter(t => t === 'case.completed')).toHaveLength(2);
       expect(eventTypes).toContain('judge.started');
       const polled = await request(api).get(`/api/runs/${run.id}?after=2`);
-      expect(polled.body.events.map((e: {sequence: number}) => e.sequence)).toEqual([3, 4, 5, 6, 7, 8, 9, 10, 11]);
-      expect((await request(api).get(`/api/runs/${run.id}?after=11`)).body.events).toEqual([]);
+      expect(polled.body.events.map((e: {sequence: number}) => e.sequence)).toEqual(run.events.slice(2).map(e => e.sequence));
+      const lastSequence = run.events[run.events.length - 1]!.sequence;
+      expect((await request(api).get(`/api/runs/${run.id}?after=${lastSequence}`)).body.events).toEqual([]);
     }
   });
   it('isolates concurrent runs', async () => {
@@ -49,6 +50,13 @@ describe('prerequisite API', () => {
     const results = await Promise.all(starts.map(start => finished(api, start.body.id)));
     expect(results.map(r => r.body.dispute.riderClaim)).toEqual(['claim A', 'claim B']);
     for (const result of results) expect(result.body.events.every((e: {runId: string}) => e.runId === result.body.id)).toBe(true);
+  });
+  it('reports the provider profile in health — generic reports thinking as extra-body', async () => {
+    const generic = await request(app()).get('/api/health');
+    expect(generic.body.model).toEqual({provider: 'generic', thinking: 'extra-body', serviceTier: 'standard'});
+    const minimax = createApp(readConfig({RUN_MODE: 'live', MODEL_API_KEY: 'k', MODEL_BASE_URL: 'https://api.minimax.io/v1', MODEL_NAME: 'MiniMax-M3'}));
+    const health = await request(minimax).get('/api/health');
+    expect(health.body.model).toEqual({provider: 'minimax', thinking: 'adaptive', serviceTier: 'standard'});
   });
   it('rejects invalid inputs, unknown IDs, malformed JSON and invalid cursors', async () => {
     const api = app();

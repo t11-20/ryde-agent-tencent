@@ -31,7 +31,7 @@ describe('live API with the Lane B fixture source', () => {
     const response = await request(app()).get('/api/fixtures');
     expect(response.status).toBe(200);
     expect(response.body.mode).toBe('live');
-    expect(response.body.fixtures).toHaveLength(11);
+    expect(response.body.fixtures).toHaveLength(20);
     expect(response.body.fixtures[0].id).toBe('R1');
   });
 

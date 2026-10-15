@@ -603,7 +603,7 @@ Describe confidence as model-assessed confidence, not calibrated certainty. Pres
 
 | Artifact | Owner | Acceptance |
 |---|---|---|
-| Project identity | Lane B | Working title: **FairTrip**. Working blurb: **“Three agents resolve ride disputes with transparent evidence.”** |
+| Project identity | Lane B | Working title: **FairTrip**. Working blurb: **“Four agents resolve ride disputes transparently, with human oversight.”** |
 | Project description | Lane B with Lane A inputs | Covers scenarios, users, value, pain points, workflow, architecture, prompting, metrics, expected impact, and limitations. |
 | Presentation | Lane B | Opening states the exact Ryde case study. Includes workflow, architecture, demonstrations, evaluation, Buddy usage, and limitations. |
 | Architecture diagram | Lane A | Accurately matches the implemented agents, evidence tools, policy, validation, and trace. |

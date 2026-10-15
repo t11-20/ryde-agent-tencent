@@ -5,6 +5,7 @@ const config = () => readConfig({MODEL_API_KEY: 'test-secret', MODEL_BASE_URL: '
 describe('backend configuration and connectivity adapter', () => {
   it('permits offline stub mode and blocks live mode with missing credentials', () => {
     expect(readConfig({}).RUN_MODE).toBe('stub');
+    expect(readConfig({}).ESCALATION_CONFIDENCE_THRESHOLD).toBe(0.8);
     expect(() => readConfig({RUN_MODE: 'live'})).toThrow('Model access pending');
     expect(() => createModelAdapter(readConfig({}))).toThrow('Model access pending');
     expect(() => readConfig({API_PORT: 'bad'})).toThrow('Invalid environment');

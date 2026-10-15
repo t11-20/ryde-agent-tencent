@@ -1,24 +1,23 @@
-interface HeaderProps { mode: string }
+interface HeaderProps { mode: string; recordedAt?: string }
 
-function modeBadge(mode: string): {text: string; live: boolean} | null {
-  if (mode === 'live') return {text: 'LIVE MODEL', live: true};
-  if (mode === 'stub') return {text: 'STUB', live: false};
+export function modeLabel(mode: string, recordedAt?: string): string | null {
+  if (mode === 'live') return 'Live model';
+  if (mode === 'stub') return 'Stub';
+  if (mode === 'replay') return recordedAt === undefined ? 'Replay of live run' : `Replay of live run · recorded ${recordedAt.slice(0, 10)}`;
   if (mode === '') return null;
-  return {text: mode.toUpperCase(), live: false};
+  return mode;
 }
 
-export function Header({mode}: HeaderProps) {
-  const badge = modeBadge(mode);
+export function Header({mode, recordedAt}: HeaderProps) {
+  const modeText = modeLabel(mode, recordedAt);
   return (
     <header className="header">
-      <div>
-        <h1 className="header-product">FairTrip</h1>
-        <p className="header-sub">Ryde dispute resolution prototype</p>
-      </div>
-      <div className="header-badges">
-        <span className="badge">DEMONSTRATION POLICY</span>
-        <span className="badge">SYNTHETIC DATA</span>
-        {badge === null ? null : <span className={badge.live ? 'badge badge-live' : 'badge'}>{badge.text}</span>}
+      <h1 className="header-title">FairTrip</h1>
+      <p className="header-sub">Ryde dispute resolution prototype</p>
+      <div className="header-notes">
+        <span className="header-note">Demonstration policy</span>
+        <span className="header-note">Synthetic data</span>
+        {modeText === null ? null : <span className="header-note">{modeText}</span>}
       </div>
     </header>
   );

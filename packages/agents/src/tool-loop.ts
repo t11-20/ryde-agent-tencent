@@ -2,7 +2,9 @@ import {
   AdvocateResponseSchema, AdvocateCaseSchema, type AdvocateCase, type Dispute, type Evidence, type PolicyClause, type AdvocateResponse
 } from '@fairtrip/contracts';
 import type { ModelAdapter, EvidenceTools, WorkflowEventEmitter } from './index.js';
-import { extractJsonText } from './json-output.js';
+import { extractJsonText, outputValidationReason } from './json-output.js';
+import { normaliseAdvocateOutput } from './normalise.js';
+import { EXECUTION_LIMITS } from './limits.js';
 
 export interface ToolLoopResult {
   case: AdvocateCase;
@@ -14,6 +16,16 @@ export interface ToolLoopConfig {
   maxRounds: number;
   maxRepairAttempts: number;
   modelTimeoutMs: number;
+  // Thinking depth for post-tool calls; the first (tool-request) call always runs 'off'.
+  thinking?: 'default' | 'adaptive' | 'off';
+  // Optional directed-repair hook run on every final_case: throws when the case
+  // cites identifiers no tool returned. The thrown message names the bad IDs and
+  // is echoed back to the model in the repair request.
+  validateFinalCase?: (finalCase: AdvocateCase, retrievedEvidence: Evidence[], retrievedPolicies: PolicyClause[]) => void;
+}
+
+export function defaultToolLoopConfig(): ToolLoopConfig {
+  return {maxRounds: EXECUTION_LIMITS.toolRounds, maxRepairAttempts: EXECUTION_LIMITS.repairAttempts, modelTimeoutMs: EXECUTION_LIMITS.modelTimeoutMs, thinking: 'default'};
 }
 
 export async function runAdvocateToolLoop(
@@ -24,7 +36,7 @@ export async function runAdvocateToolLoop(
   emitter: WorkflowEventEmitter | undefined,
   signal: AbortSignal,
   systemPrompt: string,
-  config: ToolLoopConfig = {maxRounds: 2, maxRepairAttempts: 1, modelTimeoutMs: 20000}
+  config: ToolLoopConfig = defaultToolLoopConfig()
 ): Promise<ToolLoopResult> {
   const retrievedEvidence: Evidence[] = [];
   const retrievedPolicies: PolicyClause[] = [];
@@ -38,40 +50,86 @@ export async function runAdvocateToolLoop(
   while (true) {
     signal.throwIfAborted();
 
-    // Call the model
+    // Call the model. Before any tool result has been fed back the call is a
+    // cheap tool-request turn (thinking off, tight hedge); later calls produce
+    // the case and get the configured thinking depth and a wider hedge window.
     const modelSignal = AbortSignal.any([signal, AbortSignal.timeout(config.modelTimeoutMs)]);
-    const rawResponse = await modelAdapter.complete(conversation, modelSignal);
+    const firstCall = toolRounds === 0;
+    const rawResponse = await modelAdapter.complete(conversation, modelSignal, {
+      thinking: firstCall ? 'off' : config.thinking ?? 'default',
+      hedgeAfterMs: firstCall ? EXECUTION_LIMITS.hedgeAfterMs.toolRequest : EXECUTION_LIMITS.hedgeAfterMs.advocateCase,
+      onRecovery: event => emitter?.emit({
+        actor: side,
+        type: event.kind === 'retry' ? 'model.retry' : 'model.hedge',
+        summary: event.summary,
+        evidenceIds: [],
+        policyClauseIds: []
+      })
+    });
 
     // Try to parse as AdvocateResponse
     let response: AdvocateResponse;
     try {
       const parsed = JSON.parse(extractJsonText(rawResponse));
-      response = AdvocateResponseSchema.parse(parsed);
+      const normalised = normaliseAdvocateOutput(parsed);
+      if (normalised.notes.length > 0) {
+        emitter?.emit({
+          actor: side,
+          type: 'output.normalised',
+          summary: `${side} output normalised without a repair: ${normalised.notes.join('; ')}`,
+          evidenceIds: [],
+          policyClauseIds: []
+        });
+      }
+      response = AdvocateResponseSchema.parse(normalised.value);
     } catch (parseError) {
+      const reason = outputValidationReason(parseError);
       // Attempt repair if within limit
       if (repairAttempts < config.maxRepairAttempts) {
         repairAttempts++;
         emitter?.emit({
           actor: side,
           type: 'output.repair',
-          summary: `Malformed advocate response; repair attempt ${repairAttempts}`,
+          summary: `Malformed advocate response (${reason}); repair attempt ${repairAttempts}`,
           evidenceIds: [],
           policyClauseIds: []
         });
         conversation.push({role: 'assistant', content: rawResponse});
         conversation.push({
           role: 'user',
-          content: 'Your previous response was not valid JSON or did not match the required schema. Please respond with a valid JSON object following the format specified in your instructions.'
+          content: `Your previous response failed validation (${reason}). Please respond with a valid JSON object following the format specified in your instructions.`
         });
         continue;
       }
-      throw new Error(`Advocate ${side} produced unparseable output after ${repairAttempts} repair attempts`);
+      throw new Error(`Advocate ${side} produced unparseable output after ${repairAttempts} repair attempts (${reason})`);
     }
 
     if (response.type === 'final_case') {
       // Validate the case side matches
       if (response.case.side !== side) {
         throw new Error(`Advocate returned wrong side: expected ${side}, got ${response.case.side}`);
+      }
+      try {
+        config.validateFinalCase?.(response.case, retrievedEvidence, retrievedPolicies);
+      } catch (validationError) {
+        // Parse repairs and citation repairs share the single repairAttempts budget.
+        if (repairAttempts < config.maxRepairAttempts) {
+          repairAttempts++;
+          emitter?.emit({
+            actor: side,
+            type: 'output.repair',
+            summary: `Advocate case failed citation validation; repair attempt ${repairAttempts}`,
+            evidenceIds: [],
+            policyClauseIds: []
+          });
+          conversation.push({role: 'assistant', content: rawResponse});
+          conversation.push({
+            role: 'user',
+            content: `Your case cited identifiers that no tool returned: ${validationError instanceof Error ? validationError.message : String(validationError)}. Remove or replace them, citing only evidence and policy IDs from the tool results, and return the final_case JSON again.`
+          });
+          continue;
+        }
+        throw validationError;
       }
       return {case: response.case, retrievedEvidence, retrievedPolicies};
     }

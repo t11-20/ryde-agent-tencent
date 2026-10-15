@@ -2,10 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { DisputeSchema, PolicyClauseSchema } from '@fairtrip/contracts';
 import { findExpected, findFixture, findFixtureByDisputeId, loadDataset } from '../src/index.js';
 
-const CANONICAL_FIXTURE_IDS = ['R1', 'R1S', 'R2', 'R3', 'X1', 'N1', 'N2', 'N2H', 'N3', 'X2', 'X3'];
+const CANONICAL_FIXTURE_IDS = ['R1', 'R1S', 'R2', 'R3', 'R4', 'R1F', 'X1', 'X4', 'N1', 'N1R', 'N2', 'N2H', 'N3', 'N4', 'N5', 'N6', 'X2', 'X3', 'X5', 'X6'];
 
 describe('dataset loader', () => {
-  it('loads the eleven fixtures in the canonical expected-outcome order', () => {
+  it('loads the twenty fixtures in the canonical expected-outcome order', () => {
     const fixtureIds = loadDataset().fixtures.map(fixture => fixture.fixtureId);
     expect(fixtureIds).toEqual(CANONICAL_FIXTURE_IDS);
   });

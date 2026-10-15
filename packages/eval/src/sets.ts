@@ -2,8 +2,8 @@ import type { Dataset } from '@fairtrip/evidence';
 
 export interface PlannedRun { fixtureId: string; attempt: number }
 
-export const GOLDEN_FIXTURES = ['R1', 'R2', 'R3', 'N1', 'N2', 'N3'] as const;
-export const RELEASE_TRIPLE_FIXTURES = ['R1', 'N2'] as const;
+export const GOLDEN_FIXTURES = ['R1', 'R2', 'R3', 'R4', 'N1', 'N2', 'N3', 'N4'] as const;
+export const RELEASE_TRIPLE_FIXTURES = ['R1', 'N2', 'R1F'] as const;
 
 function baseList(spec: string, dataset: Dataset): string[] {
   const all = dataset.expected.map(outcome => outcome.fixtureId);

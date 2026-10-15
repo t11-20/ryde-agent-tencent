@@ -7,13 +7,13 @@
 **Publication target:** [collaboration repository, branch `lane-a`](https://github.com/t11-20/ryde-agent-tencent/tree/lane-a)
 **Shared snapshot:** [collaboration repository, branch `main`](https://github.com/t11-20/ryde-agent-tencent/tree/main), integrating Lane A revision `bbbe32d` with the original main history.
 **Current audit:** restored Lane A portions of the saved CodeBuddy work and corrected defects found during verification.
-**Release status:** Local verification passes; real-model verification is deferred at the user's request; shared release acceptance remains pending.
+**Release status:** Local verification passes. This is the historical Lane A record as of 11 October 2026; real-model verification and the live release gate were completed later in Lane B (LB-11, LB-15; see the root README and `submission/metrics/`).
 
 ## Scope and preserved work
 
 Lane A stays separate from Lane B. The ten original Lane A commits are retained. CodeBuddy's later live-mode callbacks, model bootstrap, and live-wiring tests were recovered from stash `742bf388fd1b38e77a8c976c022a66ff1169386a` and adapted to Lane A's synthetic examples without importing Lane B packages.
 
-The integrated history remains on local branch `codex/lane-a-b-integration-backup-20261010` at `8e942b0`; the original stash and generated integration reports remain available. Integration-only adapters and fixtures are not part of the current Lane A branch. Lane A publication uses the collaboration repository's `lane-a` branch. See that branch's history for the latest documentation revision.
+The integrated history remains on a local backup branch at `8e942b0`; the original stash and generated integration reports remain available. Integration-only adapters and fixtures are not part of the current Lane A branch. Lane A publication uses the collaboration repository's `lane-a` branch. See that branch's history for the latest documentation revision.
 
 ## Main branch merge — 11 October 2026
 

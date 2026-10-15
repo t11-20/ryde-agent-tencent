@@ -6,21 +6,21 @@ const dataset = loadDataset();
 const label = (plan: {fixtureId: string; attempt: number}[]) => plan.map(run => `${run.fixtureId}#${run.attempt}`);
 
 describe('planRuns', () => {
-  it('golden gives the six golden fixtures once', () => {
-    expect(planRuns('golden', 1, dataset)).toEqual(['R1', 'R2', 'R3', 'N1', 'N2', 'N3'].map(fixtureId => ({fixtureId, attempt: 1})));
+  it('golden gives the eight golden fixtures once', () => {
+    expect(planRuns('golden', 1, dataset)).toEqual(['R1', 'R2', 'R3', 'R4', 'N1', 'N2', 'N3', 'N4'].map(fixtureId => ({fixtureId, attempt: 1})));
   });
 
   it('all gives every fixture in canonical order', () => {
     expect(planRuns('all', 1, dataset).map(run => run.fixtureId)).toEqual(dataset.expected.map(outcome => outcome.fixtureId));
   });
 
-  it('release gives 15 runs with R1 and N2 three consecutive times', () => {
+  it('release gives 26 runs with R1, N2 and R1F three consecutive times', () => {
     const plan = label(planRuns('release', 1, dataset));
-    expect(plan).toHaveLength(15);
-    const r1 = plan.indexOf('R1#1');
-    expect(plan.slice(r1, r1 + 3)).toEqual(['R1#1', 'R1#2', 'R1#3']);
-    const n2 = plan.indexOf('N2#1');
-    expect(plan.slice(n2, n2 + 3)).toEqual(['N2#1', 'N2#2', 'N2#3']);
+    expect(plan).toHaveLength(26);
+    for (const id of ['R1', 'N2', 'R1F']) {
+      const first = plan.indexOf(`${id}#1`);
+      expect(plan.slice(first, first + 3)).toEqual([`${id}#1`, `${id}#2`, `${id}#3`]);
+    }
   });
 
   it('a comma list with repeat repeats each fixture in a row', () => {

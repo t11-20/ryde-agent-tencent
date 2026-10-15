@@ -35,6 +35,11 @@ const eventLabels: Record<string, string> = {
   'run.completed': 'Ruling issued',
   'run.incomplete': 'Incomplete: needs human review',
   'run.failed': 'Run failed',
+  'verdict.computed': 'Policy verdict computed',
+  'run.retrying': 'Automatic re-run started',
+  'model.retry': 'Model call retried',
+  'model.hedge': 'Hedged model call',
+  'output.normalised': 'Output normalised',
 };
 
 const actorLabels: Record<string, string> = {
