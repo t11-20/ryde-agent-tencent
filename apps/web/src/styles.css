@@ -13,6 +13,9 @@
   --system: #748391;
   --warn: #C8341B;
   --amber-text: #8A5300;
+  --risk: #C77700;
+  --risk-text: #8A5300;
+  --risk-tint: #FFF4E0;
   --tint-rider: #EAF2FC;
   --tint-driver: #E6F5EC;
   --tint-judge: #F5E8F7;
@@ -176,22 +179,28 @@ summary:hover, summary:focus-visible { text-decoration: underline; }
 .lane-label-rider { fill: var(--rider); }
 .lane-label-judge { fill: var(--judge); }
 .lane-label-driver { fill: var(--driver-text); }
+.lane-label-risk { fill: var(--risk-text); }
 .lane-rail { stroke-width: 2; stroke-opacity: 0.25; }
 .lane-rail-rider { stroke: var(--rider); }
 .lane-rail-judge { stroke: var(--judge); }
 .lane-rail-driver { stroke: var(--driver-line); }
+.lane-rail-risk { stroke: var(--risk); }
 .lane-segment { stroke-width: 4; stroke-linecap: round; }
 .lane-segment-rider { stroke: var(--rider); }
 .lane-segment-judge { stroke: var(--judge); }
 .lane-segment-driver { stroke: var(--driver-line); }
+.lane-segment-risk { stroke: var(--risk); }
 .handoff-curve { fill: none; stroke-width: 4; }
 .handoff-curve-rider { stroke: var(--rider); }
 .handoff-curve-driver { stroke: var(--driver-line); }
+.handoff-curve-risk { stroke: var(--risk); }
 .station-dot { fill: #FFFFFF; stroke-width: 3; }
 .station-dot-rider { stroke: var(--rider); }
 .station-dot-driver { stroke: var(--driver-line); }
 .station-dot-judge { stroke: var(--judge); }
 .station-dot-system { stroke: var(--system); }
+.station-dot-risk { stroke: var(--risk); }
+.station-dot-precedent { stroke: var(--judge); }
 .station-dot-handoff { stroke: var(--ink); }
 .end-dot-ruling { fill: var(--judge); }
 .end-dot-incomplete { fill: var(--amber-text); }
@@ -331,6 +340,31 @@ details pre {
 .policy-criteria { color: var(--muted); max-width: 75ch; }
 .policy-more .policy-list { margin-top: 12px; }
 
+/* Risk analyst */
+.risk-level { color: var(--risk-text); }
+.risk-source, .risk-caveat { color: var(--muted); font-size: var(--t-14); }
+.risk-summary { max-width: 75ch; }
+.risk-party { display: grid; gap: 8px; }
+.risk-party-label { font-size: var(--t-14); font-weight: 600; color: var(--muted); }
+.risk-signals { display: grid; gap: 16px; }
+.risk-signal { display: grid; gap: 4px; }
+.risk-signal-name { font-weight: 600; }
+.risk-signal-severity { color: var(--muted); font-size: var(--t-14); }
+.risk-signal-detail { max-width: 75ch; }
+
+/* Judge precedents */
+.precedents { display: grid; gap: 8px; }
+.precedents-title { font-size: var(--t-14); font-weight: 400; color: var(--muted); }
+.precedents-list { display: grid; gap: 8px; }
+.precedent { max-width: 75ch; }
+.precedents-note { color: var(--muted); font-size: var(--t-14); }
+
+/* Human review */
+.review-form { display: grid; gap: 12px; max-width: 560px; }
+.review-field { display: grid; gap: 4px; }
+.review-label { font-size: var(--t-14); color: var(--muted); }
+.review-error { color: var(--warn); font-size: var(--t-14); }
+
 /* Timeline (inside the activity log disclosure) */
 .timeline-list { display: grid; }
 .timeline-item { display: grid; grid-template-columns: 16px 1fr; gap: 8px; padding: 4px 0; }
@@ -339,6 +373,8 @@ details pre {
 .timeline-actor-driver .timeline-dot { background: var(--driver-line); }
 .timeline-actor-judge .timeline-dot { background: var(--judge); }
 .timeline-actor-system .timeline-dot { background: var(--system); }
+.timeline-actor-risk .timeline-dot { background: var(--risk); }
+.timeline-actor-precedent .timeline-dot { background: var(--judge); }
 .timeline-body { display: grid; gap: 4px; min-width: 0; }
 .timeline-meta { display: flex; flex-wrap: wrap; gap: 8px; font-size: var(--t-14); }
 .timeline-actor { font-weight: 600; }
@@ -346,6 +382,8 @@ details pre {
 .timeline-actor-driver .timeline-actor { color: var(--driver-text); }
 .timeline-actor-judge .timeline-actor { color: var(--judge); }
 .timeline-actor-system .timeline-actor { color: var(--system); }
+.timeline-actor-risk .timeline-actor { color: var(--risk-text); }
+.timeline-actor-precedent .timeline-actor { color: var(--judge); }
 .timeline-elapsed { color: var(--muted); font-variant-numeric: tabular-nums; }
 .timeline-handoff-note { font-weight: 600; color: var(--judge); }
 

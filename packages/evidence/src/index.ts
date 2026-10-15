@@ -14,3 +14,7 @@ export * from './facts.js';
 export * from './policy.js';
 export * from './build-evidence.js';
 export * from './source.js';
+export * from './features.js';
+export * from './verdict.js';
+export * from './risk.js';
+export * from './precedents.js';

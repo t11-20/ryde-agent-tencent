@@ -39,13 +39,16 @@ function check(label, fn) {
 const eq = (label, expected, actual) => (same(expected, actual) ? [] : [`${label}: expected ${show(expected)}, got ${show(actual)}`]);
 
 // ---------- golden values (harness/spec/07-golden-values.md) ----------
-const ORDER = ['R1', 'R1S', 'R2', 'R3', 'X1', 'N1', 'N2', 'N2H', 'N3', 'X2', 'X3'];
+const ORDER = ['R1', 'R1S', 'R2', 'R3', 'R4', 'R1F', 'X1', 'X4', 'N1', 'N1R', 'N2', 'N2H', 'N3', 'N4', 'N5', 'N6', 'X2', 'X3', 'X5', 'X6'];
 const routeBase = {referenceMeters: 7956, thresholdMeters: 796, referenceDurationSec: 716};
 const ROUTE = {
   R1: {...routeBase, actualMeters: 10598, excessMeters: 2642, excessPct: 33.2, exceedsThreshold: true, actualDurationSec: 1134, extraDurationSec: 418, pingCount: 22, stops: [[180, '2026-10-02T11:13:58Z']]},
   R1S: {...routeBase, actualMeters: 10598, excessMeters: 2642, excessPct: 33.2, exceedsThreshold: true, actualDurationSec: 1134, extraDurationSec: 418, pingCount: 22, stops: [[180, '2026-10-02T12:28:58Z']]},
   R2: {...routeBase, actualMeters: 9505, excessMeters: 1549, excessPct: 19.5, exceedsThreshold: true, actualDurationSec: 855, extraDurationSec: 139, pingCount: 18, stops: []},
   R3: {...routeBase, actualMeters: 9678, excessMeters: 1722, excessPct: 21.6, exceedsThreshold: true, actualDurationSec: 870, extraDurationSec: 154, pingCount: 18, stops: []},
+  R4: {...routeBase, actualMeters: 8603, excessMeters: 647, excessPct: 8.1, exceedsThreshold: false, actualDurationSec: 1265, extraDurationSec: 549, pingCount: 24, stops: []},
+  R1F: {...routeBase, actualMeters: 10598, excessMeters: 2642, excessPct: 33.2, exceedsThreshold: true, actualDurationSec: 1134, extraDurationSec: 418, pingCount: 22, stops: [[180, '2026-10-04T11:13:58Z']]},
+  X4: {...routeBase, actualMeters: 10598, excessMeters: 2642, excessPct: 33.2, exceedsThreshold: true, actualDurationSec: 1134, extraDurationSec: 418, pingCount: 22, stops: [[180, '2026-10-04T11:13:58Z']]},
 };
 const pick = (meters, ts, first, wait, within, waited) => ({closestApproachMeters: meters, closestApproachTs: ts, firstWithinThresholdTs: first, waitSecondsWithinThreshold: wait, checks: {withinDistance: within, waitedMinimum: waited}});
 const PICKUP = {
@@ -55,6 +58,11 @@ const PICKUP = {
   N3: pick(24, '2026-10-03T10:22:44Z', '2026-10-03T10:22:44Z', 210, true, false),
   X2: pick(31, '2026-10-03T11:02:44Z', '2026-10-03T11:02:44Z', 430, true, true),
   X3: pick(31, '2026-10-03T11:42:44Z', '2026-10-03T11:42:44Z', 430, true, true),
+  N1R: pick(414, '2026-10-04T08:01:58Z', null, null, false, false),
+  N4: pick(31, '2026-10-04T09:02:44Z', '2026-10-04T09:02:44Z', 430, true, true),
+  N5: pick(31, '2026-10-04T09:02:44Z', '2026-10-04T09:02:44Z', 430, true, true),
+  N6: pick(145, '2026-10-04T09:04:54Z', '2026-10-04T09:04:54Z', 300, true, true),
+  X6: pick(31, '2026-10-04T09:02:44Z', '2026-10-04T09:02:44Z', 430, true, true),
 };
 const n2Tags = {'CHAT-01': ['location_claim'], 'CHAT-02': ['agreement'], 'CHAT-03': ['location_claim']};
 const TAGS = {
@@ -62,13 +70,32 @@ const TAGS = {
   R2: {'CHAT-01': ['route_request'], 'CHAT-03': ['agreement']}, R3: {'CHAT-02': ['agreement']}, X1: {'CHAT-01': ['objection']},
   N1: {'CHAT-01': ['location_claim'], 'CHAT-02': ['location_claim']}, N2: n2Tags, N2H: n2Tags, X3: n2Tags,
   X2: {...n2Tags, 'CHAT-04': ['instruction_like']}, N3: {'CHAT-01': ['location_claim']},
+  R4: {'CHAT-01': ['objection']},
+  R1F: {'CHAT-01': ['objection'], 'CHAT-03': ['objection'], 'CHAT-05': ['instruction_like']},
+  X4: {'CHAT-01': ['objection'], 'CHAT-03': ['objection']},
+  N1R: {'CHAT-01': ['location_claim'], 'CHAT-02': ['location_claim'], 'CHAT-04': ['threat']},
+  N4: {'CHAT-01': ['location_claim']},
+  N5: {'CHAT-01': ['location_claim'], 'CHAT-02': ['agreement'], 'CHAT-03': ['threat', 'location_claim']},
+  N6: {'CHAT-01': ['location_claim']},
+  X5: n2Tags,
+  X6: {...n2Tags, 'CHAT-04': ['instruction_like']},
 };
 const s = (positive, neutral, negative) => ({positive, neutral, negative});
-const SENTIMENT = {R1: s(0, 2, 2), R1S: s(0, 2, 2), R2: s(0, 4, 0), R3: s(0, 2, 0), X1: s(0, 1, 1), N1: s(0, 3, 0), N2: s(0, 3, 0), N2H: s(0, 3, 0), X3: s(0, 3, 0), N3: s(0, 2, 0), X2: s(0, 4, 0)};
+const SENTIMENT = {
+  R1: s(0, 2, 2), R1S: s(0, 2, 2), R2: s(0, 4, 0), R3: s(0, 2, 0), X1: s(0, 1, 1), N1: s(0, 3, 0), N2: s(0, 3, 0),
+  N2H: s(0, 3, 0), X3: s(0, 3, 0), N3: s(0, 2, 0), X2: s(0, 4, 0),
+  R4: s(0, 1, 1), R1F: s(0, 3, 2), X4: s(0, 2, 2), N1R: s(0, 3, 1), N4: s(0, 2, 0), N5: s(0, 2, 1), N6: s(0, 1, 0),
+  X5: s(0, 3, 0), X6: s(0, 4, 0),
+};
 const three = [3, ['CHAT-01', 'CHAT-03', 'CALL-01']];
-const ATTEMPTS = {R1: [null, []], R2: [null, []], N1: [1, ['CHAT-01']], N2: three, N2H: three, X2: three, X3: three, N3: [1, ['CHAT-01']]};
-const ROUTE_REFUND = {R1: 198, R1S: 297, R2: 116, R3: 129};
-const NOSHOW_REFUND = {N1: 500, N2: 500, N2H: 500, N3: 500, X2: 500};
+const ATTEMPTS = {
+  R1: [null, []], R2: [null, []], N1: [1, ['CHAT-01']], N2: three, N2H: three, X2: three, X3: three, N3: [1, ['CHAT-01']],
+  R4: [null, []], R1F: [null, []], X4: [null, []],
+  N1R: [1, ['CHAT-01']], N4: [0, []], N5: three, N6: [1, ['CALL-01']], X5: three,
+  X6: [4, ['CHAT-01', 'CHAT-03', 'CHAT-04', 'CALL-01']],
+};
+const ROUTE_REFUND = {R1: 198, R1S: 297, R2: 116, R3: 129, R1F: 198};
+const NOSHOW_REFUND = {N1: 500, N2: 500, N2H: 500, N3: 500, X2: 500, N1R: 500, N4: 500, N5: 500, N6: 500, X5: 500};
 const routeIds = ['GPS-ROUTE', 'CHAT-01', 'CHAT-02', 'CHAT-03', 'CHAT-04', 'CHAT-SUMMARY', 'PAY-FARE', 'PAY-REMEDY', 'HIST-RIDER', 'HIST-DRIVER'];
 const n2Ids = ['GPS-PICKUP', 'CHAT-01', 'CHAT-02', 'CHAT-03', 'CALL-01', 'CHAT-SUMMARY', 'PAY-FARE', 'PAY-REMEDY', 'HIST-RIDER', 'HIST-DRIVER'];
 const IDS = {
@@ -80,11 +107,22 @@ const IDS = {
   N3: [['GPS-PICKUP', 'CHAT-01', 'CHAT-02', 'CHAT-SUMMARY', 'PAY-FARE', 'PAY-REMEDY', 'HIST-RIDER', 'HIST-DRIVER'], []],
   X2: [['GPS-PICKUP', 'CHAT-01', 'CHAT-02', 'CHAT-03', 'CHAT-04', 'CALL-01', 'CHAT-SUMMARY', 'PAY-FARE', 'PAY-REMEDY', 'HIST-RIDER', 'HIST-DRIVER'], []],
   X3: [['GPS-PICKUP', 'CHAT-01', 'CHAT-02', 'CHAT-03', 'CALL-01', 'CHAT-SUMMARY', 'HIST-RIDER', 'HIST-DRIVER'], ['payment']],
+  R4: [['GPS-ROUTE', 'CHAT-01', 'CHAT-02', 'CHAT-SUMMARY', 'PAY-FARE', 'PAY-REMEDY', 'HIST-RIDER', 'HIST-DRIVER'], []],
+  R1F: [['GPS-ROUTE', 'CHAT-01', 'CHAT-02', 'CHAT-03', 'CHAT-04', 'CHAT-05', 'CHAT-SUMMARY', 'PAY-FARE', 'PAY-REMEDY', 'HIST-RIDER', 'HIST-DRIVER'], []],
+  X4: [['GPS-ROUTE', 'CHAT-01', 'CHAT-02', 'CHAT-03', 'CHAT-04', 'CHAT-SUMMARY', 'HIST-RIDER', 'HIST-DRIVER'], ['payment']],
+  N1R: [['GPS-PICKUP', 'CHAT-01', 'CHAT-02', 'CHAT-03', 'CHAT-04', 'CHAT-SUMMARY', 'PAY-FARE', 'PAY-REMEDY', 'HIST-RIDER', 'HIST-DRIVER'], []],
+  N4: [['GPS-PICKUP', 'CHAT-01', 'CHAT-02', 'CALL-01', 'CHAT-SUMMARY', 'PAY-FARE', 'PAY-REMEDY', 'HIST-RIDER', 'HIST-DRIVER'], []],
+  N5: [n2Ids, []],
+  N6: [['GPS-PICKUP', 'CHAT-01', 'CALL-01', 'CHAT-SUMMARY', 'PAY-FARE', 'PAY-REMEDY', 'HIST-RIDER', 'HIST-DRIVER'], []],
+  X5: [['CHAT-01', 'CHAT-02', 'CHAT-03', 'CALL-01', 'CHAT-SUMMARY', 'PAY-FARE', 'PAY-REMEDY', 'HIST-RIDER', 'HIST-DRIVER'], ['gps']],
+  X6: [['GPS-PICKUP', 'CHAT-01', 'CHAT-02', 'CHAT-03', 'CHAT-04', 'CALL-01', 'CHAT-SUMMARY', 'PAY-FARE', 'PAY-REMEDY', 'HIST-RIDER', 'HIST-DRIVER'], []],
 };
 const PHRASES = [
   ['R1', 'GPS-ROUTE', ['EXCEEDED (material detour)', '+2642 m']], ['N1', 'GPS-PICKUP', ['NOT MET', 'never within 150 m']],
   ['N3', 'GPS-PICKUP', ['Waited 210 s', 'NOT MET']], ['N2', 'CHAT-SUMMARY', ['Driver contact attempts before cancellation: 3']],
   ['R1', 'PAY-FARE', ['S$14.73', 'VALID']], ['R1', 'PAY-REMEDY', ['refund_route_excess S$1.98']],
+  ['R4', 'GPS-ROUTE', ['not exceeded (not material)', '+647 m']], ['N6', 'GPS-PICKUP', ['Waited 300 s', 'MET']],
+  ['N4', 'CHAT-SUMMARY', ['Driver contact attempts before cancellation: 0']],
 ];
 const TEST_TOKENS = {
   'LB-03': ['7956', '111195', '113', '198', '297', '796', 'S$1.98', '1134'],
@@ -129,7 +167,7 @@ group('LB-02  Data files and loader', ['loadDataset'], () => {
     const files = ['policy.json', 'expected-outcomes.json', ...readdirSync(join(pristineData, 'fixtures')).map((n) => join('fixtures', n))];
     return files.filter((f) => !existsSync(join(copied, f)) || readFileSync(join(copied, f), 'utf8').replace(/\r\n/g, '\n') !== readFileSync(join(pristineData, f), 'utf8').replace(/\r\n/g, '\n')).map((f) => `${f} differs or is missing`);
   });
-  check('fixture order is R1, R1S, R2, R3, X1, N1, N2, N2H, N3, X2, X3', () => eq('order', ORDER, ev.loadDataset().fixtures.map((f) => f.fixtureId)));
+  check('fixture order is R1, R1S, R2, R3, R4, R1F, X1, X4, N1, N1R, N2, N2H, N3, N4, N5, N6, X2, X3, X5, X6', () => eq('order', ORDER, ev.loadDataset().fixtures.map((f) => f.fixtureId)));
   check('policy has 7 route and 4 no-show clauses', () => {
     const c = ev.loadDataset().policy.clauses;
     return [...eq('route clauses', 7, c.filter((x) => x.category === 'route_deviation').length), ...eq('no-show clauses', 4, c.filter((x) => x.category === 'no_show').length)];
@@ -171,7 +209,7 @@ group('LB-04  GPS metrics (route deviation and pickup)', ['routeMetrics', 'picku
   }
   check('routeMetrics is null for X1 (no GPS) and N2 (no-show)', () => [...eq('X1', null, ev.routeMetrics(fresh('X1'), params)), ...eq('N2', null, ev.routeMetrics(fresh('N2'), params))]);
   for (const [id, expected] of Object.entries(PICKUP)) check(`${id} pickup metrics`, () => diffFields(expected, ev.pickupMetrics(fresh(id), params)));
-  check('pickupMetrics is null for R1', () => eq('R1', null, ev.pickupMetrics(fresh('R1'), params)));
+  check('pickupMetrics is null for R1 (route) and X5 (no GPS)', () => [...eq('R1', null, ev.pickupMetrics(fresh('R1'), params)), ...eq('X5', null, ev.pickupMetrics(fresh('X5'), params))]);
 });
 
 // ---------- LB-05 ----------
@@ -214,7 +252,11 @@ group('LB-06  Fare check and remedy basis', ['checkFare', 'remedyBasis', 'routeM
     const b = basisFor('X1')?.find((x) => x.remedyId === 'refund_route_excess');
     return [...eq('eligibleCents', null, b?.eligibleCents), ...eq('unavailableReason', 'GPS route metrics unavailable', b?.unavailableReason)];
   });
-  check('X3 has no remedy basis (payment unavailable)', () => eq('basis', null, basisFor('X3')));
+  check('R4 route refund unavailable (detour not material under RD-1)', () => {
+    const b = basisFor('R4')?.find((x) => x.remedyId === 'refund_route_excess');
+    return [...eq('eligibleCents', null, b?.eligibleCents), ...eq('unavailableReason', 'detour not material under RD-1', b?.unavailableReason)];
+  });
+  check('X3 and X4 have no remedy basis (payment unavailable)', () => [...eq('X3 basis', null, basisFor('X3')), ...eq('X4 basis', null, basisFor('X4'))]);
   check('keep_charge is always 0', () => ORDER.filter((id) => fixtures[id].payment.status === 'available').flatMap((id) => eq(`${id} keep_charge`, 0, cents(basisFor(id), 'keep_charge'))));
 });
 
@@ -248,7 +290,7 @@ group('LB-07  Evidence records and policy clauses', ['buildEvidence', 'policyCla
 group('LB-08  Dispute source (money and missing evidence)', ['createFixtureSource'], () => {
   const src = ev.createFixtureSource();
   const dispute = (id) => src.getDispute(id);
-  check('listFixtures returns the 11 fixtures in order', () => eq('ids', ORDER, src.listFixtures().map((f) => f.id)));
+  check('listFixtures returns the 20 fixtures in order', () => eq('ids', ORDER, src.listFixtures().map((f) => f.id)));
   const calc = (id) => src.calculationProvider(dispute(id));
   check('route refunds: R1 198, R1S 297', () => [
     ...eq('R1', 198, calc('R1').calculateRouteExcess(src.allEvidence(dispute('R1')))?.amountCents),
@@ -265,6 +307,20 @@ group('LB-08  Dispute source (money and missing evidence)', ['createFixtureSourc
     ...eq('X3', ['payment: Payment record not received from the billing service (synthetic outage).'], src.missingDecisiveEvidence(dispute('X3'))),
     ...eq('R1', [], src.missingDecisiveEvidence(dispute('R1'))),
   ]);
+});
+
+// ---------- policy verdict reproduces expected outcomes ----------
+group('Policy verdict reproduces expected outcomes', ['createFixtureSource', 'policyVerdict'], () => {
+  const src = ev.createFixtureSource();
+  const expected = readJson(join(pristineData, 'expected-outcomes.json'));
+  for (const entry of expected) {
+    check(`${entry.fixtureId} verdict outcome`, () => {
+      const dispute = src.getDispute(entry.fixtureId);
+      const verdict = src.policyVerdict(dispute);
+      const wanted = entry.expectedStatus === 'incomplete' ? 'incomplete' : entry.expectedRemedyId;
+      return eq('outcome', wanted, verdict.outcome);
+    });
+  }
 });
 
 // ---------- LB-06A: named formula functions ----------

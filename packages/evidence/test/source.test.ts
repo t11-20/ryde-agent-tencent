@@ -6,7 +6,7 @@ const source = createFixtureSource(ds);
 const signal = new AbortController().signal;
 
 // Canonical fixture order (SPEC §4.3, the expected-outcomes order the loader enforces).
-const CANONICAL_FIXTURE_IDS = ['R1', 'R1S', 'R2', 'R3', 'X1', 'N1', 'N2', 'N2H', 'N3', 'X2', 'X3'];
+const CANONICAL_FIXTURE_IDS = ['R1', 'R1S', 'R2', 'R3', 'R4', 'R1F', 'X1', 'X4', 'N1', 'N1R', 'N2', 'N2H', 'N3', 'N4', 'N5', 'N6', 'X2', 'X3', 'X5', 'X6'];
 
 function disputeOf(fixtureId: string) {
   const dispute = source.getDispute(fixtureId);
@@ -20,9 +20,9 @@ describe('createFixtureSource — notice, listing and lookup (SPEC §8)', () => 
     expect(source.notice).toBe('SYNTHETIC fixtures and DEMONSTRATION POLICY (not Ryde data or Ryde policy).');
   });
 
-  it('lists 11 fixtures in canonical order, every kind === "fixture"', () => {
+  it('lists 20 fixtures in canonical order, every kind === "fixture"', () => {
     const listing = source.listFixtures();
-    expect(listing).toHaveLength(11);
+    expect(listing).toHaveLength(20);
     expect(listing.map(item => item.id)).toEqual(CANONICAL_FIXTURE_IDS);
     expect(listing.every(item => item.kind === 'fixture')).toBe(true);
   });

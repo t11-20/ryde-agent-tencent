@@ -1,10 +1,15 @@
 import { describe, expect, it } from 'vitest';
+import { RISK_CAVEAT } from '@fairtrip/contracts';
+import type { ActivityEvent, Escalation, PolicyVerdict, RiskAssessment, Run, RunDivergence } from '@fairtrip/contracts';
 import { completedRun, event, sampleEvents } from './test-runs.js';
 import { elapsedSeconds } from './events.js';
 import {
-  actionHeadline, categoryLabel, clauseLabel, describeError, evidenceLabel, firstSentence,
-  formatCount, formatSeconds, hearingGeometry, pageState, partitionClauses, paymentGauge,
-  pickupGauge, plural, routeGauge, sgtTime, stageOf, stoppedAfterSeconds,
+  actionHeadline, actorDisplay, categoryLabel, clauseLabel, describeError, divergenceComparison,
+  escalationLines, eventDisplay, evidenceLabel, firstSentence, formatCount, formatSeconds,
+  hearingGeometry, pageState, partitionClauses, paymentGauge, pickupGauge, plural,
+  policyVerdictRemedy, precedentOriginLabel, remedyOptions, retryNote, reviewHeadline,
+  reviewState, riskLevelLabel, routeGauge, sgtTime, signalLabel, stageOf, stoppedAfterSeconds,
+  verdictAgreement, verdictLine, verdictOutcomeLabel,
 } from './present.js';
 import type { Facts } from './present.js';
 
@@ -189,7 +194,7 @@ describe('stoppedAfterSeconds / formatSeconds', () => {
 describe('hearingGeometry', () => {
   it('is empty geometry when there are no events', () => {
     const g = hearingGeometry([], null);
-    expect(g.rails.map(r => r.lane)).toEqual(['rider', 'judge', 'driver']);
+    expect(g.rails.map(r => r.lane)).toEqual(['rider', 'judge', 'driver', 'risk']);
     expect(g.stations).toHaveLength(0);
     expect(g.segments).toHaveLength(0);
     expect(g.handoff).toBeNull();
@@ -204,7 +209,7 @@ describe('hearingGeometry', () => {
       event(3, 'driver', 'model.start'), event(4, 'system', 'run.failed'),
     ];
     const g = hearingGeometry(evts, 'failed');
-    expect(g.rails).toHaveLength(3);
+    expect(g.rails).toHaveLength(4);
     expect(g.segments.map(s => s.lane)).toEqual(['rider', 'driver']);
     const last = evts[evts.length - 1];
     if (last === undefined) throw new Error('missing event');
@@ -254,6 +259,45 @@ describe('hearingGeometry', () => {
     const g = hearingGeometry(sampleEvents, 'completed');
     const station = g.stations.find(s => s.sequence === driverEvent.sequence);
     expect(station?.title).toBe(`Driver Advocate: Evidence retrieved, +${elapsedSeconds(sampleEvents, driverEvent).toFixed(1)} s`);
+  });
+
+  it('maps risk events to the risk lane and precedent events to the judge lane', () => {
+    const evts = [
+      event(1, 'system', 'run.started'), event(2, 'risk', 'model.start'),
+      event(3, 'risk', 'risk.assessed'), event(4, 'precedent', 'precedent.retrieved'),
+      event(5, 'judge', 'judge.started'), event(6, 'system', 'run.completed'),
+    ];
+    const g = hearingGeometry(evts, 'completed');
+    const riskStations = g.stations.filter(s => s.lane === 'risk');
+    expect(riskStations.map(s => s.sequence)).toEqual([2, 3]);
+    expect(riskStations[1]?.title).toContain('Risk Analyst: risk risk.assessed');
+    expect(g.stations.find(s => s.sequence === 4)?.lane).toBe('judge');
+    expect(g.stations.find(s => s.sequence === 4)?.title).toContain('Precedent: precedent precedent.retrieved');
+    expect(g.segments.map(s => s.lane)).toContain('risk');
+    expect(g.handoff?.risk).toBe(true);
+  });
+
+  it('snaps stations within the start window to 0 s in the drawing but keeps exact times in titles', () => {
+    const at = (sequence: number, actor: ActivityEvent['actor'], type: ActivityEvent['type'], ms: number): ActivityEvent =>
+      ({...event(sequence, actor, type), timestamp: new Date(Date.UTC(2026, 9, 2, 13, 30, 0, ms)).toISOString()});
+    const evts = [
+      at(1, 'system', 'run.started', 0), at(2, 'rider', 'model.start', 40),
+      at(3, 'driver', 'model.start', 140), at(4, 'risk', 'model.start', 240),
+      at(5, 'driver', 'tool.requested', 900),
+    ];
+    const g = hearingGeometry(evts, 'running');
+    for (const sequence of [2, 3, 4]) expect(g.stations.find(s => s.sequence === sequence)?.x).toBe(0);
+    expect(g.stations.find(s => s.sequence === 3)?.title).toContain('+0.1 s');
+    expect(g.stations.find(s => s.sequence === 5)?.x).toBeGreaterThan(0);
+    expect(g.segments.find(s => s.lane === 'driver')?.x1).toBe(0);
+    expect(g.segments.find(s => s.lane === 'risk')?.x1).toBe(0);
+  });
+
+  it('draws no risk curve when there are no risk stations or no handoff', () => {
+    const g = hearingGeometry(sampleEvents, 'completed');
+    expect(g.handoff?.risk).toBe(false);
+    const noHandoff = hearingGeometry([event(1, 'risk', 'model.start'), event(2, 'risk', 'risk.assessed')], 'running');
+    expect(noHandoff.handoff).toBeNull();
   });
 });
 
@@ -358,5 +402,171 @@ describe('paymentGauge', () => {
     expect(paymentGauge({kind: 'remedy_basis'}, null)).toBeNull();
     expect(paymentGauge({kind: 'fare_breakdown'}, null)).toBeNull();
     expect(paymentGauge(undefined, undefined)).toBeNull();
+  });
+});
+
+const highRisk: RiskAssessment = {
+  overall: 'high',
+  signals: [{code: 'repeat_subject', party: 'driver', severity: 'high', detail: '6 disputes against in 90 days.', evidenceIds: ['HIST-DRIVER']}],
+  summary: 'Driver shows a repeated-complaint pattern.',
+  caveat: RISK_CAVEAT,
+  source: 'model',
+};
+
+function escalatedRun(withReview: boolean): Run {
+  const run = completedRun();
+  if (run.status !== 'completed') throw new Error('expected completed run');
+  return {
+    ...run,
+    escalation: {reasons: ['high_risk'], confidence: 0.9, threshold: 0.75, summary: 'Escalated for human review (high risk).'},
+    ...(withReview
+      ? {review: {decision: 'confirmed' as const, decidedAt: '2026-10-02T13:40:00Z', note: 'Checked.', ruling: 'rider_favored' as const, action: run.result.action}}
+      : {}),
+  };
+}
+
+describe('reviewState', () => {
+  it('maps escalation and review to none/pending/decided', () => {
+    expect(reviewState(completedRun())).toBe('none');
+    expect(reviewState(escalatedRun(false))).toBe('pending');
+    expect(reviewState(escalatedRun(true))).toBe('decided');
+  });
+});
+
+function escalatedCompleted(escalation: Escalation, extra: {risk?: RiskAssessment; verdict?: PolicyVerdict; divergence?: RunDivergence} = {}): Run {
+  const run = completedRun();
+  if (run.status !== 'completed') throw new Error('unreachable');
+  return {...run, escalation, ...extra};
+}
+
+const divergentVerdict: PolicyVerdict = {
+  outcome: 'keep_charge', clauseIds: ['RD-1', 'RD-4'], basis: 'the reroute was documented',
+  features: ['rd1_exceeded', 'documented_reroute'], missingFamilies: []
+};
+
+describe('escalationLines', () => {
+  it('writes one sentence per reason', () => {
+    const run = escalatedCompleted(
+      {reasons: ['low_confidence', 'high_risk'], confidence: 0.9, threshold: 0.75, summary: 'x'},
+      {risk: highRisk});
+    expect(escalationLines(run)).toEqual([
+      'Judge confidence 0.90 is below the 0.75 review threshold',
+      'Risk high — Driver shows a repeated-complaint pattern.',
+    ]);
+  });
+
+  it('explains policy_divergence with the verdict, clauses and the Judge remedy', () => {
+    const run = escalatedCompleted(
+      {reasons: ['policy_divergence'], confidence: 0.9, threshold: 0.8, summary: 'x'},
+      {verdict: divergentVerdict, divergence: {judgeRemedyId: 'refund_route_excess', verdictOutcome: 'keep_charge', summary: 'x'}});
+    expect(escalationLines(run)).toEqual([
+      'The policy rules give Keep the charge (no refund) under RD-1, RD-4; the Judge chose Refund the excess-distance charge. Nothing is paid until a reviewer decides.',
+    ]);
+  });
+
+  it('explains policy_undetermined with the verdict basis', () => {
+    const verdict: PolicyVerdict = {outcome: 'undetermined', clauseIds: ['RD-3'], basis: 'conflicting rider chat signals: consent and objection', features: ['rd1_exceeded', 'rider_agreement', 'rider_objection'], missingFamilies: []};
+    const run = escalatedCompleted({reasons: ['policy_undetermined'], confidence: 0.9, threshold: 0.8, summary: 'x'}, {verdict});
+    expect(escalationLines(run)).toEqual([
+      "The policy rules could not determine this case (conflicting rider chat signals: consent and objection); the Judge's ruling is a recommendation until a reviewer decides.",
+    ]);
+  });
+
+  it('returns a line for every escalation reason — the switch is exhaustive over the enum', () => {
+    const reasons: Escalation['reasons'] = ['low_confidence', 'high_risk', 'policy_divergence', 'policy_undetermined'];
+    const verdict: PolicyVerdict = {outcome: 'undetermined', clauseIds: ['RD-3'], basis: 'conflicting signals', features: [], missingFamilies: []};
+    const run = escalatedCompleted(
+      {reasons, confidence: 0.9, threshold: 0.8, summary: 'x'},
+      {risk: highRisk, verdict, divergence: {judgeRemedyId: 'refund_route_excess', verdictOutcome: 'undetermined', summary: 'x'}});
+    const lines = escalationLines(run);
+    expect(lines).toHaveLength(4);
+    for (const line of lines) expect(line.length).toBeGreaterThan(0);
+  });
+});
+
+describe('policy verdict presentation', () => {
+  const divergentRun = escalatedCompleted(
+    {reasons: ['policy_divergence'], confidence: 0.9, threshold: 0.8, summary: 'x'},
+    {verdict: divergentVerdict, divergence: {judgeRemedyId: 'refund_route_excess', verdictOutcome: 'keep_charge', summary: 'x'}});
+
+  it('labels verdict outcomes, including the non-remedy ones', () => {
+    expect(verdictOutcomeLabel('keep_charge')).toBe('Keep the charge (no refund)');
+    expect(verdictOutcomeLabel('refund_route_excess')).toBe('Refund the excess-distance charge');
+    expect(verdictOutcomeLabel('incomplete')).toBe('Incomplete — decisive evidence missing');
+    expect(verdictOutcomeLabel('undetermined')).toBe('Undetermined by the policy rules');
+  });
+
+  it('changes the review headline when the Judge disagrees', () => {
+    expect(reviewHeadline(divergentRun)).toBe('Sent to human review — Judge disagrees with the policy rules');
+    expect(reviewHeadline(completedRun())).toBe('Sent to human review');
+  });
+
+  it('builds the two-line policy/Judge comparison', () => {
+    expect(divergenceComparison(divergentRun)).toEqual({
+      policy: 'Policy rules: Keep the charge (no refund) (RD-1, RD-4)',
+      judge: 'Judge: Refund the excess-distance charge · confidence 86%',
+    });
+    expect(divergenceComparison(completedRun())).toBeNull();
+  });
+
+  it('offers the verdict remedy only when it differs and is a remedy', () => {
+    expect(policyVerdictRemedy(divergentRun)).toBe('keep_charge');
+    expect(policyVerdictRemedy(completedRun())).toBeNull();
+    const matching = escalatedCompleted(
+      {reasons: ['policy_divergence'], confidence: 0.9, threshold: 0.8, summary: 'x'},
+      {verdict: {...divergentVerdict, outcome: 'refund_route_excess'}});
+    expect(policyVerdictRemedy(matching)).toBeNull();
+    const undetermined = escalatedCompleted(
+      {reasons: ['policy_undetermined'], confidence: 0.9, threshold: 0.8, summary: 'x'},
+      {verdict: {outcome: 'undetermined', clauseIds: ['RD-3'], basis: 'x', features: [], missingFamilies: []}});
+    expect(policyVerdictRemedy(undetermined)).toBeNull();
+  });
+
+  it('summarises the verdict for the Judge column and flags agreement', () => {
+    expect(verdictLine(divergentVerdict)).toBe('Keep the charge (no refund) — RD-1, RD-4 — the reroute was documented');
+    expect(verdictAgreement(divergentVerdict, 'keep_charge')).toBe('Judge agrees with the policy rules.');
+    expect(verdictAgreement(divergentVerdict, 'refund_route_excess')).toBeNull();
+    expect(verdictAgreement(undefined, 'keep_charge')).toBeNull();
+  });
+
+  it('writes the automatic re-run note', () => {
+    expect(retryNote('The operation was aborted due to timeout')).toBe('First attempt failed (provider timeout); this is the automatic re-run.');
+    expect(retryNote('fetch failed')).toBe('First attempt failed (workflow failure); this is the automatic re-run.');
+  });
+});
+
+describe('remedyOptions', () => {
+  it('lists the category remedies', () => {
+    expect(remedyOptions('route_deviation').map(option => option.id)).toEqual(['keep_charge', 'refund_route_excess']);
+    expect(remedyOptions('no_show').map(option => option.id)).toEqual(['keep_charge', 'refund_no_show_fee']);
+    expect(remedyOptions('route_deviation').map(option => option.label)).toEqual(['Keep the charge (no refund)', 'Refund the excess-distance charge']);
+  });
+});
+
+describe('stretch labels', () => {
+  it('labels risk levels', () => {
+    expect(riskLevelLabel('low')).toBe('Low risk');
+    expect(riskLevelLabel('medium')).toBe('Medium risk');
+    expect(riskLevelLabel('high')).toBe('High risk');
+  });
+  it('labels signal codes and falls back to the code', () => {
+    expect(signalLabel('repeat_subject')).toBe('Repeated complaints against');
+    expect(signalLabel('instruction_like_chat')).toBe('Instruction-like chat');
+    expect(signalLabel('other_code')).toBe('other_code');
+  });
+  it('labels precedent origins', () => {
+    expect(precedentOriginLabel('seed')).toBe('Seed case');
+    expect(precedentOriginLabel('run')).toBe('Earlier run');
+    expect(precedentOriginLabel('human_override')).toBe('Human override');
+  });
+  it('labels the new actors and event types', () => {
+    expect(actorDisplay('risk')).toBe('Risk Analyst');
+    expect(actorDisplay('precedent')).toBe('Precedent');
+    expect(actorDisplay('judge')).toBe('Judge');
+    expect(eventDisplay('risk.assessed')).toBe('Risk assessed');
+    expect(eventDisplay('precedent.retrieved')).toBe('Precedents retrieved');
+    expect(eventDisplay('run.escalated')).toBe('Escalated for human review');
+    expect(eventDisplay('review.decided')).toBe('Review decided');
+    expect(eventDisplay('run.completed')).toBe('Ruling issued');
   });
 });

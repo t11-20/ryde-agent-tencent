@@ -1,7 +1,11 @@
 import type { CalculationProvider, DisputeSource, EvidenceTools, FixtureListing } from '@fairtrip/agents';
-import type { Dispute, Evidence } from '@fairtrip/contracts';
+import type { Dispute, Evidence, Precedent } from '@fairtrip/contracts';
 import { z } from 'zod';
 import { buildEvidence, type EvidenceBundle } from './build-evidence.js';
+import { caseFeatures as featuresFor } from './features.js';
+import { policyVerdict as verdictFor } from './verdict.js';
+import { loadPrecedentSeed, matchPrecedents } from './precedents.js';
+import { assessRisk } from './risk.js';
 import { findFixture, findFixtureByDisputeId, loadDataset, type Dataset } from './dataset.js';
 import { policyClausesFor } from './policy.js';
 
@@ -116,6 +120,27 @@ export function createFixtureSource(dataset: Dataset = loadDataset()): DisputeSo
         if (entry !== undefined) missing.push(`${entry.family}: ${entry.reason}`);
       }
       return missing;
+    },
+
+    policyVerdict(dispute: Dispute) {
+      const bundle = bundleFor(dispute);
+      return verdictFor(dispute.category, featuresFor(bundle.records, dispute.category), bundle.unavailable);
+    },
+
+    riskAssessment(dispute: Dispute) {
+      return assessRisk(allEvidence(dispute));
+    },
+
+    caseFeatures(dispute: Dispute) {
+      return featuresFor(allEvidence(dispute), dispute.category);
+    },
+
+    precedentSeed() {
+      return structuredClone(loadPrecedentSeed());
+    },
+
+    similarPrecedents(dispute: Dispute, store: readonly Precedent[], limit?: number) {
+      return matchPrecedents(store, dispute.category, featuresFor(allEvidence(dispute), dispute.category), limit);
     },
   };
 }

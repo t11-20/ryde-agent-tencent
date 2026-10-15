@@ -4,9 +4,9 @@ import { findExpected, findFixtureByDisputeId, loadDataset } from '@fairtrip/evi
 
 // SPEC §10: a deterministic test double that drives the real workflow, tools,
 // evidence and money without a network. Never used by the server.
-export type ScriptedModel = ModelAdapter & { calls: { rider: number; driver: number; judge: number } };
+export type ScriptedModel = ModelAdapter & { calls: { rider: number; driver: number; judge: number; risk: number } };
 
-type Role = 'rider' | 'driver' | 'judge';
+type Role = 'rider' | 'driver' | 'judge' | 'risk';
 type Message = { role: 'system' | 'user' | 'assistant'; content: string };
 
 const idListSchema = z.array(z.object({ id: z.string() }));
@@ -16,6 +16,7 @@ const judgeContextSchema = z.object({
 });
 
 function roleOf(system: string): Role {
+  if (system.startsWith('You are the Risk Analyst')) return 'risk';
   if (system.startsWith('You are the Rider Advocate')) return 'rider';
   if (system.startsWith('You are the Driver Advocate')) return 'driver';
   if (system.startsWith('You are the Judge')) return 'judge';
@@ -41,13 +42,14 @@ function retrievalIds(messages: Message[], header: string): string[] {
 
 export function createScriptedModel(): ScriptedModel {
   const dataset = loadDataset();
-  const calls = { rider: 0, driver: 0, judge: 0 };
+  const calls = { rider: 0, driver: 0, judge: 0, risk: 0 };
   return {
     calls,
     async complete(messages) {
       const system = messages[0]?.content ?? '';
       const role = roleOf(system);
       calls[role] += 1;
+      if (role === 'risk') return '{"summary": "Scripted risk summary."}';
       const disputeId = promptLine(system, 'DISPUTE ID');
       const fixture = findFixtureByDisputeId(dataset, disputeId);
       if (fixture === undefined) throw new Error(`Scripted model: unknown dispute ${disputeId}`);

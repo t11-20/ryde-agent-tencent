@@ -1,6 +1,6 @@
 import type { ActivityEvent } from '@fairtrip/contracts';
 import { Chip } from './Chip.js';
-import { actorLabel, eventLabel } from '../lib/format.js';
+import { actorDisplay, eventDisplay } from '../lib/present.js';
 import { elapsedSeconds } from '../lib/events.js';
 
 interface TimelineProps { events: ActivityEvent[] }
@@ -21,8 +21,8 @@ export function Timeline({events}: TimelineProps) {
             <span className="timeline-dot" aria-hidden="true" />
             <div className="timeline-body">
               <p className="timeline-meta">
-                <span className="timeline-actor">{actorLabel(event.actor)}</span>
-                <span>{eventLabel(event.type)}</span>
+                <span className="timeline-actor">{actorDisplay(event.actor)}</span>
+                <span>{eventDisplay(event.type)}</span>
                 <span className="timeline-elapsed">+{elapsedSeconds(events, event)} s</span>
               </p>
               <p className="timeline-summary">{event.summary}</p>

@@ -1,0 +1,250 @@
+{
+  "fixtureId": "R4",
+  "label": "Detour over 500 m but under 10 %: not material",
+  "purpose": "golden",
+  "dispute": {
+    "id": "DSP-R4",
+    "category": "route_deviation",
+    "tripId": "TRP-R4",
+    "riderClaim": "The driver took a longer route through the east side and I was charged more than usual. It was not a huge detour but it was definitely longer than the app's route. Please check whether a refund is due.",
+    "driverStatement": "I went slightly east to avoid some congestion on the usual road. It was not a big detour."
+  },
+  "filedAt": "2026-10-04T13:26:54Z",
+  "trip": {
+    "pickup": {
+      "lat": 1.351,
+      "lng": 103.848,
+      "label": "Bishan (synthetic pin)"
+    },
+    "dropoff": {
+      "lat": 1.283,
+      "lng": 103.86,
+      "label": "Marina Bay (synthetic pin)"
+    },
+    "startedAt": "2026-10-04T11:05:00Z",
+    "endedAt": "2026-10-04T11:26:05Z",
+    "driverMarkedArrivedAt": null,
+    "cancelledAt": null
+  },
+  "gps": {
+    "status": "available",
+    "referenceRoute": {
+      "points": [
+        [
+          1.351,
+          103.848
+        ],
+        [
+          1.33,
+          103.845
+        ],
+        [
+          1.305,
+          103.848
+        ],
+        [
+          1.29,
+          103.855
+        ],
+        [
+          1.283,
+          103.86
+        ]
+      ],
+      "estDurationSec": 716,
+      "source": "Synthetic reference route (not a routing-service result)"
+    },
+    "driverTrace": [
+      {
+        "ts": "2026-10-04T11:05:00Z",
+        "lat": 1.351,
+        "lng": 103.848
+      },
+      {
+        "ts": "2026-10-04T11:05:55Z",
+        "lat": 1.348,
+        "lng": 103.85
+      },
+      {
+        "ts": "2026-10-04T11:06:50Z",
+        "lat": 1.345,
+        "lng": 103.8525
+      },
+      {
+        "ts": "2026-10-04T11:07:45Z",
+        "lat": 1.342,
+        "lng": 103.8538
+      },
+      {
+        "ts": "2026-10-04T11:08:40Z",
+        "lat": 1.339,
+        "lng": 103.8605
+      },
+      {
+        "ts": "2026-10-04T11:09:35Z",
+        "lat": 1.336,
+        "lng": 103.8613
+      },
+      {
+        "ts": "2026-10-04T11:10:30Z",
+        "lat": 1.333,
+        "lng": 103.862
+      },
+      {
+        "ts": "2026-10-04T11:11:25Z",
+        "lat": 1.33,
+        "lng": 103.8625
+      },
+      {
+        "ts": "2026-10-04T11:12:20Z",
+        "lat": 1.327,
+        "lng": 103.8627
+      },
+      {
+        "ts": "2026-10-04T11:13:15Z",
+        "lat": 1.324,
+        "lng": 103.8627
+      },
+      {
+        "ts": "2026-10-04T11:14:10Z",
+        "lat": 1.321,
+        "lng": 103.8627
+      },
+      {
+        "ts": "2026-10-04T11:15:05Z",
+        "lat": 1.318,
+        "lng": 103.8625
+      },
+      {
+        "ts": "2026-10-04T11:16:00Z",
+        "lat": 1.315,
+        "lng": 103.8623
+      },
+      {
+        "ts": "2026-10-04T11:16:55Z",
+        "lat": 1.312,
+        "lng": 103.8623
+      },
+      {
+        "ts": "2026-10-04T11:17:50Z",
+        "lat": 1.309,
+        "lng": 103.8623
+      },
+      {
+        "ts": "2026-10-04T11:18:45Z",
+        "lat": 1.306,
+        "lng": 103.8625
+      },
+      {
+        "ts": "2026-10-04T11:19:40Z",
+        "lat": 1.303,
+        "lng": 103.8628
+      },
+      {
+        "ts": "2026-10-04T11:20:35Z",
+        "lat": 1.3,
+        "lng": 103.8632
+      },
+      {
+        "ts": "2026-10-04T11:21:30Z",
+        "lat": 1.297,
+        "lng": 103.8637
+      },
+      {
+        "ts": "2026-10-04T11:22:25Z",
+        "lat": 1.294,
+        "lng": 103.8587
+      },
+      {
+        "ts": "2026-10-04T11:23:20Z",
+        "lat": 1.291,
+        "lng": 103.8592
+      },
+      {
+        "ts": "2026-10-04T11:24:15Z",
+        "lat": 1.288,
+        "lng": 103.8596
+      },
+      {
+        "ts": "2026-10-04T11:25:10Z",
+        "lat": 1.2855,
+        "lng": 103.8598
+      },
+      {
+        "ts": "2026-10-04T11:26:05Z",
+        "lat": 1.283,
+        "lng": 103.86
+      }
+    ],
+    "reroutes": [],
+    "advisories": []
+  },
+  "chat": {
+    "messages": [
+      {
+        "id": "m1",
+        "ts": "2026-10-04T11:09:00Z",
+        "sender": "rider",
+        "text": "Why are you going this way? It's longer than the app route."
+      },
+      {
+        "id": "m2",
+        "ts": "2026-10-04T11:10:00Z",
+        "sender": "driver",
+        "text": "This way is usually quicker at this time of day."
+      }
+    ],
+    "calls": []
+  },
+  "payment": {
+    "status": "available",
+    "currency": "SGD",
+    "rateCard": {
+      "baseCents": 300,
+      "perKmCents": 75,
+      "perMinCents": 20,
+      "noShowFeeCents": 500
+    },
+    "surgeMultiplierX100": 100,
+    "lineItems": [
+      {
+        "code": "base",
+        "label": "Base fare",
+        "cents": 300
+      },
+      {
+        "code": "distance",
+        "label": "Distance",
+        "cents": 645,
+        "quantity": 8603
+      },
+      {
+        "code": "time",
+        "label": "Time",
+        "cents": 422,
+        "quantity": 1265
+      }
+    ],
+    "totalCents": 1367,
+    "paidCents": 1367,
+    "paidAt": "2026-10-04T11:26:35Z"
+  },
+  "history": {
+    "rider": {
+      "partyId": "RDR-R4",
+      "accountAgeDays": 1100,
+      "rating": 4.9,
+      "completedTrips": 210,
+      "disputesFiled90d": 1,
+      "disputesAgainst90d": 0
+    },
+    "driver": {
+      "partyId": "DRV-R4",
+      "accountAgeDays": 800,
+      "rating": 4.7,
+      "completedTrips": 3400,
+      "disputesFiled90d": 0,
+      "disputesAgainst90d": 2
+    }
+  }
+}

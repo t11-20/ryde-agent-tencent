@@ -6,16 +6,22 @@ import { Timeline } from './Timeline.js';
 
 interface HearingLinesProps { events: ActivityEvent[]; status: Run['status'] | null }
 
-const LABEL_W = 160;
 const PAD_R = 16;
+// Below this width the lane labels shorten so the plot keeps most of the space.
+const COMPACT_W = 600;
+// Rough advance width of 14px Barlow, used only to pick a handoff label that fits.
+const NOTE_CHAR_W = 7.2;
+const HANDOFF_NOTES = ['Both cases handed to the Judge', 'Handoff to the Judge', 'Handoff'];
 const RIDER_Y = 28;
 const JUDGE_Y = 68;
 const DRIVER_Y = 108;
-const TICK_Y = 140;
-const HEIGHT = 150;
+const RISK_Y = 148;
+const TICK_Y = 180;
+const HEIGHT = 190;
 
-const LANE_Y: Record<HearingLane, number> = {rider: RIDER_Y, judge: JUDGE_Y, driver: DRIVER_Y};
-const LANE_LABEL: Record<HearingLane, string> = {rider: 'Rider Advocate', judge: 'Judge', driver: 'Driver Advocate'};
+const LANE_Y: Record<HearingLane, number> = {rider: RIDER_Y, judge: JUDGE_Y, driver: DRIVER_Y, risk: RISK_Y};
+const LANE_LABEL: Record<HearingLane, string> = {rider: 'Rider Advocate', judge: 'Judge', driver: 'Driver Advocate', risk: 'Risk Analyst'};
+const LANE_LABEL_SHORT: Record<HearingLane, string> = {rider: 'Rider', judge: 'Judge', driver: 'Driver', risk: 'Risk'};
 
 function useContainerWidth(): [(node: HTMLDivElement | null) => void, number] {
   const [element, setElement] = useState<HTMLDivElement | null>(null);
@@ -37,6 +43,9 @@ function useContainerWidth(): [(node: HTMLDivElement | null) => void, number] {
 export function HearingLines({events, status}: HearingLinesProps) {
   const [containerRef, width] = useContainerWidth();
   const geometry = hearingGeometry(events, status);
+  const compact = width < COMPACT_W;
+  const LABEL_W = compact ? 64 : 160;
+  const laneLabels = compact ? LANE_LABEL_SHORT : LANE_LABEL;
   const plotW = Math.max(0, width - LABEL_W - PAD_R);
   const px = (x: number): number => LABEL_W + (x / 100) * plotW;
   const end = geometry.end;
@@ -47,12 +56,16 @@ export function HearingLines({events, status}: HearingLinesProps) {
   const stationDx = new Map<number, number>();
   for (const lane of HEARING_LANES) {
     const laneStations = geometry.stations.filter(s => s.lane === lane);
-    const cap = lane === 'judge'
+    const laneCap = lane === 'judge'
       ? (end === null ? Number.POSITIVE_INFINITY : px(end.x) - 12)
       : (handoff === null ? Number.POSITIVE_INFINITY : px(handoff.x) - 44);
     let prev = Number.NEGATIVE_INFINITY;
     for (const s of laneStations) {
       const floor = lane === 'judge' && handoff !== null && s.seconds >= handoff.seconds ? px(handoff.x) + 14 : Number.NEGATIVE_INFINITY;
+      // A Judge-lane station before the interchange stays 12 px left of the marker.
+      const cap = lane === 'judge' && handoff !== null && s.seconds < handoff.seconds
+        ? Math.min(laneCap, px(handoff.x) - 12)
+        : laneCap;
       const dx = Math.min(Math.max(px(s.x), prev + 12, floor), cap);
       stationDx.set(s.sequence, dx);
       prev = dx;
@@ -70,6 +83,11 @@ export function HearingLines({events, status}: HearingLinesProps) {
   };
 
   const endAnchorEnd = end !== null && end.x > 85;
+  const handoffNote = handoff === null ? null : (() => {
+    const room = width - PAD_R - (px(handoff.x) + 12);
+    const text = HANDOFF_NOTES.find(note => note.length * NOTE_CHAR_W <= room) ?? 'Handoff';
+    return {text, fits: text.length * NOTE_CHAR_W <= room};
+  })();
 
   return (
     <section className="panel lines" aria-labelledby="lines-heading">
@@ -84,7 +102,7 @@ export function HearingLines({events, status}: HearingLinesProps) {
         >
           {geometry.rails.map(rail => (
             <text key={`label-${rail.lane}`} x={0} y={LANE_Y[rail.lane] + 5} className={`lane-label lane-label-${rail.lane}`}>
-              {LANE_LABEL[rail.lane]}
+              {laneLabels[rail.lane]}
             </text>
           ))}
           {geometry.rails.map(rail => (
@@ -114,11 +132,26 @@ export function HearingLines({events, status}: HearingLinesProps) {
                 d={`M ${Math.max(LABEL_W, px(handoff.x) - 40)} ${DRIVER_Y} C ${px(handoff.x) - 16} ${DRIVER_Y}, ${px(handoff.x) - 16} ${JUDGE_Y}, ${px(handoff.x)} ${JUDGE_Y}`}
                 className="handoff-curve handoff-curve-driver"
               />
+              {handoff.risk ? (
+                <path
+                  d={`M ${Math.max(LABEL_W, px(handoff.x) - 40)} ${RISK_Y} C ${px(handoff.x) - 16} ${RISK_Y}, ${px(handoff.x) - 16} ${JUDGE_Y}, ${px(handoff.x)} ${JUDGE_Y}`}
+                  className="handoff-curve handoff-curve-risk"
+                />
+              ) : null}
               <g role="img" aria-label={handoff.title} className="station station-handoff">
                 <title>{handoff.title}</title>
                 <circle cx={px(handoff.x)} cy={JUDGE_Y} r={7} className="station-dot station-dot-handoff" />
               </g>
-              <text x={px(handoff.x) + 12} y={JUDGE_Y + 22} className="lines-handoff-note">Both cases handed to the Judge</text>
+              {handoffNote === null ? null : (
+                <text
+                  x={handoffNote.fits ? px(handoff.x) + 12 : width - PAD_R}
+                  y={JUDGE_Y + 22}
+                  textAnchor={handoffNote.fits ? 'start' : 'end'}
+                  className="lines-handoff-note"
+                >
+                  {handoffNote.text}
+                </text>
+              )}
             </>
           )}
           {geometry.stations.map(station => (
@@ -153,7 +186,7 @@ export function HearingLines({events, status}: HearingLinesProps) {
               key={tick.label}
               x={px(tick.x)}
               y={TICK_Y}
-              textAnchor={index === 0 ? 'start' : 'middle'}
+              textAnchor={index === 0 ? 'start' : tick.x > 95 ? 'end' : 'middle'}
               className="lines-tick"
             >
               {tick.label}

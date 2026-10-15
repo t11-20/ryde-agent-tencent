@@ -1,0 +1,82 @@
+[
+  {
+    "id": "PREC-001",
+    "category": "route_deviation",
+    "decidedAt": "2026-09-03T09:15:00.000Z",
+    "origin": "seed",
+    "ruling": "rider_favored",
+    "remedyId": "refund_route_excess",
+    "features": ["rd1_exceeded", "rider_objection"],
+    "summary": "Synthetic precedent: a material detour the rider objected to in chat was refunded for the excess."
+  },
+  {
+    "id": "PREC-002",
+    "category": "route_deviation",
+    "decidedAt": "2026-09-07T14:40:00.000Z",
+    "origin": "seed",
+    "ruling": "driver_favored",
+    "remedyId": "keep_charge",
+    "features": ["rd1_exceeded", "rider_agreement"],
+    "summary": "Synthetic precedent: a material detour the rider agreed to in chat kept the charge."
+  },
+  {
+    "id": "PREC-003",
+    "category": "route_deviation",
+    "decidedAt": "2026-09-11T11:05:00.000Z",
+    "origin": "seed",
+    "ruling": "driver_favored",
+    "remedyId": "keep_charge",
+    "features": ["rd1_exceeded", "documented_reroute"],
+    "summary": "Synthetic precedent: a material detour backed by a documented reroute kept the charge."
+  },
+  {
+    "id": "PREC-004",
+    "category": "route_deviation",
+    "decidedAt": "2026-09-16T16:20:00.000Z",
+    "origin": "seed",
+    "ruling": "driver_favored",
+    "remedyId": "keep_charge",
+    "features": ["rd1_not_exceeded"],
+    "summary": "Synthetic precedent: a detour below the materiality threshold kept the charge."
+  },
+  {
+    "id": "PREC-005",
+    "category": "no_show",
+    "decidedAt": "2026-09-05T10:30:00.000Z",
+    "origin": "seed",
+    "ruling": "driver_favored",
+    "remedyId": "keep_charge",
+    "features": ["ns1_distance_met", "ns1_wait_met", "ns1_contact_met"],
+    "summary": "Synthetic precedent: a cancellation where every no-show condition was met kept the charge."
+  },
+  {
+    "id": "PREC-006",
+    "category": "no_show",
+    "decidedAt": "2026-09-09T13:50:00.000Z",
+    "origin": "seed",
+    "ruling": "rider_favored",
+    "remedyId": "refund_no_show_fee",
+    "features": ["ns1_distance_not_met"],
+    "summary": "Synthetic precedent: a cancellation where the driver never reached the pickup area refunded the fee."
+  },
+  {
+    "id": "PREC-007",
+    "category": "no_show",
+    "decidedAt": "2026-09-14T08:25:00.000Z",
+    "origin": "seed",
+    "ruling": "rider_favored",
+    "remedyId": "refund_no_show_fee",
+    "features": ["ns1_wait_not_met"],
+    "summary": "Synthetic precedent: a cancellation where the driver did not wait the minimum time refunded the fee."
+  },
+  {
+    "id": "PREC-008",
+    "category": "no_show",
+    "decidedAt": "2026-09-19T17:45:00.000Z",
+    "origin": "seed",
+    "ruling": "rider_favored",
+    "remedyId": "refund_no_show_fee",
+    "features": ["ns1_contact_not_met"],
+    "summary": "Synthetic precedent: a cancellation without the required contact attempts refunded the fee."
+  }
+]

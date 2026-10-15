@@ -7,4 +7,5 @@ coverage/
 .tools/
 *.log
 .DS_Store
+.claude/
 docs/evidence/private/.codebuddy/models.json

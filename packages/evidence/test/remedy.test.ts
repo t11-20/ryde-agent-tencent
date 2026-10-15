@@ -39,6 +39,7 @@ describe('remedyBasis — refund_route_excess golden values (SPEC §7)', () => {
     ['R1S', 297],
     ['R2', 116],
     ['R3', 129],
+    ['R1F', 198],
   ])('%s → %i', (id, expected) => {
     const e = get(basis(id), 'refund_route_excess');
     expect(e.eligibleCents).toBe(expected);
@@ -53,7 +54,7 @@ describe('remedyBasis — refund_route_excess golden values (SPEC §7)', () => {
 });
 
 describe('remedyBasis — refund_no_show_fee golden values (SPEC §7)', () => {
-  it.each(['N1', 'N2', 'N2H', 'N3', 'X2'])('%s → 500', id => {
+  it.each(['N1', 'N2', 'N2H', 'N3', 'X2', 'N1R', 'N4', 'N5', 'N6', 'X5', 'X6'])('%s → 500', id => {
     const e = get(basis(id), 'refund_no_show_fee');
     expect(e.eligibleCents).toBe(500);
     expect(e.unavailableReason).toBeNull();
@@ -71,8 +72,18 @@ describe('remedyBasis — edge cases (SPEC §5.9)', () => {
     expect(basis('X3')).toBeNull();
   });
 
+  it('X4 returns null (payment unavailable)', () => {
+    expect(basis('X4')).toBeNull();
+  });
+
+  it('R4 refund_route_excess is null because the detour is not material under RD-1', () => {
+    const e = get(basis('R4'), 'refund_route_excess');
+    expect(e.eligibleCents).toBeNull();
+    expect(e.unavailableReason).toBe('detour not material under RD-1');
+  });
+
   it('keep_charge is always eligibleCents 0 with null reason', () => {
-    for (const id of ['R1', 'R1S', 'R2', 'R3', 'X1', 'N1', 'N2', 'N2H', 'N3', 'X2']) {
+    for (const id of ['R1', 'R1S', 'R2', 'R3', 'X1', 'N1', 'N2', 'N2H', 'N3', 'X2', 'R4', 'R1F', 'N1R', 'N4', 'N5', 'N6', 'X5', 'X6']) {
       const e = get(basis(id), 'keep_charge');
       expect(e.eligibleCents, id).toBe(0);
       expect(e.unavailableReason, id).toBeNull();

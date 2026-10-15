@@ -1,6 +1,8 @@
 # Setup readiness
 
-Statuses record verified facts, not assumed completion. The permanent project folder is `/Users/lane-a-owner/Documents/ChatGPT/Tencent`; the previous empty repository was deleted and the working project was renamed. Private runtime configuration is present, but the latest MiniMax connectivity check failed with HTTP 401; authenticated operation remains unverified. No authentic case data are used. The project-open screenshot is recorded, while genuine development-chat evidence remains pending.
+**Status update, 15 October 2026:** this document is the historical Lane A setup record from 8–11 October 2026. The gates it lists as pending were closed in Lane B: the MiniMax-M3 connection was verified (LB-11, `npm run check:model`), the live release gate passed (LB-15, run `20261013-144417`), and seven genuine CodeBuddy development-chat captures with captions are in `docs/evidence/`. The remaining human steps are in `submission/CHECKLIST.md`.
+
+Statuses below record verified facts at the time of writing, not assumed completion. The project folder is referred to as `<Project-Folder>`; the previous empty repository was deleted and the working project was renamed. At that time private runtime configuration was present but the MiniMax connectivity check failed with HTTP 401. No authentic case data are used.
 
 | Prerequisite | Owner | Status | Evidence / remaining gate |
 |---|---|---|---|
@@ -11,7 +13,7 @@ Statuses record verified facts, not assumed completion. The permanent project fo
 | Shared Zod contracts | Lane A + partner | Implemented; paired review pending | Eight contracts and inferred types; partner-owned detailed evidence payloads remain open. |
 | Example payloads | Both | Local examples prepared; partner review pending | Both categories, four evidence envelopes, both advocates, Judge, action, event, full run validation. |
 | Stub API | Lane A | Locally verified | Both categories, run creation/polling, error responses and concurrent run isolation tested; explicit stub labels and offline operation. |
-| Buddy access/evidence | Both | Project open verified; agent access and development captures pending | CodeBuddy desktop 4.12.1 has the renamed Tencent project open. Native window inspection and 00-project-open.png verify the Explorer contents. Keyboard automation was blocked by macOS, so no successful agent response or three development captures are claimed. |
+| Buddy access/evidence | Both | Closed in Lane B (see status update above) | CodeBuddy desktop 4.12.1 has the Tencent project open (00-project-open.png). Seven development-chat captures from LB-00 to LB-15 are in `docs/evidence/` with captions. |
 
 ## Current verification — 11 October 2026 (Kuala Lumpur)
 
@@ -24,15 +26,13 @@ Statuses record verified facts, not assumed completion. The permanent project fo
 
 ## Folder status
 
-- **Canonical folder:** `/Users/lane-a-owner/Documents/ChatGPT/Tencent`.
-- **Filesystem:** one Tencent project folder remains; its original Git metadata and relative npm workspace links are intact. The Codex trust configuration uses this path.
-- **Codex interface:** the project is named Tencent, but its saved folder and the existing chats' recorded working directories still refer to the former name. The two tooltip rows represent a project label and a working-directory record.
-- **Remaining app correction:** use Tencent → Edit project to select the canonical folder and make it primary. Existing chats may retain their original directory; new chats use the corrected primary folder. Desktop control rejects automating Codex itself, so the interface correction is pending rather than claimed complete.
+- **Canonical folder:** `<Project-Folder>`.
+- **Filesystem:** one Tencent project folder remains; its original Git metadata and relative npm workspace links are intact.
 
 ## External gates
 
-1. Verify CodeBuddy signed-in agent access with a successful review of project files. Installation, running state and the open Tencent project are verified; an agent response is still pending.
-2. Perform real development/debugging in CodeBuddy desktop and collect readable screenshots with captions. At least three are required across project development checkpoints by the existing execution plan; none are claimed so far.
+1. Verify CodeBuddy signed-in agent access with a successful review of project files. Closed: the Lane B tasks were run in CodeBuddy desktop (see `docs/evidence/`).
+2. Perform real development/debugging in CodeBuddy desktop and collect readable screenshots with captions. Closed: seven captures with captions are in `docs/evidence/README.md`.
 3. Both people confirm runtime versions and Buddy access. Partner contract review is necessary before a shared freeze.
 4. Real-provider checks are deferred at the user's request. When resumed, validate the private configuration and run check:model successfully; the earlier result was HTTP 401.
 
@@ -70,6 +70,6 @@ Ignore work assigned solely to Owner: You (the partner): demonstration policies,
 - `npm run check:setup` passed again after the folder-path update. Node 22.23.3 and npm 10.9.9 match the project pins.
 - Git exclusions cover populated `.env` files and private evidence captures; `.env.example` remains shareable.
 - The stub API started on `127.0.0.1:3001`. Live model connectivity remains pending; `check:model` correctly reported missing configuration without making a live request.
-- CodeBuddy desktop 4.12.1 and its open Tencent project were verified. The archived screenshot establishes project access only; signed-in agent access and development-chat evidence remain pending.
+- CodeBuddy desktop 4.12.1 and its open Tencent project were verified. The archived screenshot establishes project access only; development-chat evidence was captured later during the Lane B tasks.
 
-The local prerequisite scaffold is verified. Remaining gates are recorded above: the Codex interface reference, CodeBuddy agent access/development captures, partner verification/contract review, and live model credentials/connectivity.
+The local prerequisite scaffold is verified. The gates recorded above (CodeBuddy development captures, live model connectivity, release acceptance) were closed in Lane B; see the status update at the top.

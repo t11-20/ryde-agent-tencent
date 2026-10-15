@@ -1,5 +1,5 @@
 import { useId, useState } from 'react';
-import type { FixtureItem } from '../lib/api.js';
+import type { FixtureItem, RunListItem } from '../lib/api.js';
 import { categoryLabel } from '../lib/present.js';
 
 interface CaseBarProps {
@@ -10,14 +10,17 @@ interface CaseBarProps {
   onClaimChange: (claim: string) => void;
   busy: boolean;
   onResolve: () => void;
+  recentRuns: RunListItem[];
+  onOpenRun: (id: string) => void;
 }
 
-export function CaseBar({fixtures, selectedId, onSelect, claim, onClaimChange, busy, onResolve}: CaseBarProps) {
+export function CaseBar({fixtures, selectedId, onSelect, claim, onClaimChange, busy, onResolve, recentRuns, onOpenRun}: CaseBarProps) {
   const [editingClaim, setEditingClaim] = useState(false);
   const [showStatement, setShowStatement] = useState(false);
   const claimRegionId = useId();
   const statementRegionId = useId();
   const selectId = useId();
+  const recentId = useId();
   const selected = fixtures.find(fixture => fixture.id === selectedId) ?? null;
   const riderClaim = selected === null ? undefined : selected.riderClaim;
   const driverStatement = selected === null ? undefined : selected.driverStatement;
@@ -32,6 +35,22 @@ export function CaseBar({fixtures, selectedId, onSelect, claim, onClaimChange, b
             <option key={fixture.id} value={fixture.id}>{`${fixture.id} ${fixture.label}`}</option>
           ))}
         </select>
+        {recentRuns.length === 0 ? null : (
+          <>
+            <label htmlFor={recentId} className="visually-hidden">Recent runs</label>
+            <select
+              id={recentId}
+              className="casebar-select casebar-recent"
+              value=""
+              onChange={event => { if (event.target.value !== '') onOpenRun(event.target.value); }}
+            >
+              <option value="">Recent runs…</option>
+              {recentRuns.map(item => (
+                <option key={item.id} value={item.id}>{`${item.fixtureId} · ${item.status} · ${item.remedyId ?? '—'}${item.retryOf ? ' (re-run)' : ''}`}</option>
+              ))}
+            </select>
+          </>
+        )}
         {selected === null ? null : <span className="casebar-category">{categoryLabel(selected.category)}</span>}
         <button type="button" className="btn-primary casebar-resolve" onClick={onResolve} disabled={busy}>Resolve dispute</button>
       </div>

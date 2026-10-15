@@ -30,7 +30,7 @@ All thresholds in code must come from `policy.params`, never from literals.
 
 ### 4.2 Fixture files and their Zod schema
 
-Eleven files in `data/fixtures/`: `R1 R1S R2 R3 X1 N1 N2 N2H N3 X2 X3`. Put this schema in `packages/evidence/src/schemas.ts` exactly (it has been checked against every data file):
+Twenty files in `data/fixtures/`: `R1 R1S R2 R3 R4 R1F X1 X4 N1 N1R N2 N2H N3 N4 N5 N6 X2 X3 X5 X6`. Put this schema in `packages/evidence/src/schemas.ts` exactly (it has been checked against every data file):
 
 ```ts
 import { z } from 'zod';
@@ -108,15 +108,26 @@ The array order is the **canonical fixture order** used everywhere (dataset, fix
 | 2 | R1S | variation | route | completed | rider_favored | refund_route_excess | 297 | — |
 | 3 | R2 | golden | route | completed | driver_favored | keep_charge | 0 | — |
 | 4 | R3 | golden | route | completed | driver_favored | keep_charge | 0 | — |
-| 5 | X1 | robustness | route | incomplete | — | — | — | gps |
-| 6 | N1 | golden | no-show | completed | rider_favored | refund_no_show_fee | 500 | — |
-| 7 | N2 | golden | no-show | completed | driver_favored | keep_charge | 0 | — |
-| 8 | N2H | fairness | no-show | completed | driver_favored | keep_charge | 0 | — |
-| 9 | N3 | golden | no-show | completed | rider_favored | refund_no_show_fee | 500 | — |
-| 10 | X2 | robustness | no-show | completed | driver_favored | keep_charge | 0 | — |
-| 11 | X3 | robustness | no-show | incomplete | — | — | — | payment |
+| 5 | R4 | golden | route | completed | driver_favored | keep_charge | 0 | — |
+| 6 | R1F | fairness | route | completed | rider_favored | refund_route_excess | 198 | — |
+| 7 | X1 | robustness | route | incomplete | — | — | — | gps |
+| 8 | X4 | robustness | route | incomplete | — | — | — | payment |
+| 9 | N1 | golden | no-show | completed | rider_favored | refund_no_show_fee | 500 | — |
+| 10 | N1R | fairness | no-show | completed | rider_favored | refund_no_show_fee | 500 | — |
+| 11 | N2 | golden | no-show | completed | driver_favored | keep_charge | 0 | — |
+| 12 | N2H | fairness | no-show | completed | driver_favored | keep_charge | 0 | — |
+| 13 | N3 | golden | no-show | completed | rider_favored | refund_no_show_fee | 500 | — |
+| 14 | N4 | golden | no-show | completed | rider_favored | refund_no_show_fee | 500 | — |
+| 15 | N5 | variation | no-show | completed | driver_favored | keep_charge | 0 | — |
+| 16 | N6 | variation | no-show | completed | driver_favored | keep_charge | 0 | — |
+| 17 | X2 | robustness | no-show | completed | driver_favored | keep_charge | 0 | — |
+| 18 | X3 | robustness | no-show | incomplete | — | — | — | payment |
+| 19 | X5 | robustness | no-show | incomplete | — | — | — | gps |
+| 20 | X6 | robustness | no-show | completed | driver_favored | keep_charge | 0 | — |
 
 Each entry also lists `decisiveEvidenceIds`, `keyClauseIds` and a one-sentence `rationale`.
+
+Extended 2026-10-13 with nine fixtures covering the Risk Analyst, escalation and precedent paths; the original eleven are unchanged.
 
 ### 4.4 Loading (`dataset.ts`, `data-dir.ts`)
 

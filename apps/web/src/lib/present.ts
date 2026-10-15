@@ -1,8 +1,8 @@
 // Presentation helpers: pure functions that turn contracts data into view-ready
 // strings and gauge layouts. No React, no DOM.
-import type { ActivityEvent, Evidence, PolicyClause, Run } from '@fairtrip/contracts';
+import type { ActivityEvent, Evidence, PolicyClause, PolicyVerdict, Precedent, RiskAssessment, Run } from '@fairtrip/contracts';
 import { elapsedSeconds } from './events.js';
-import { actorLabel, eventLabel, formatSgd, remedyLabel } from './format.js';
+import { actorLabel, eventLabel, formatSgd, percent, remedyLabel } from './format.js';
 import type { PollPhase } from '../hooks/useRunPolling.js';
 import type { EvidenceCard } from './view-model.js';
 
@@ -216,8 +216,9 @@ export function formatSeconds(s: number): string {
   return s.toFixed(1);
 }
 
-export type HearingLane = 'rider' | 'judge' | 'driver';
-export const HEARING_LANES: readonly HearingLane[] = ['rider', 'judge', 'driver'];
+export const START_SNAP_SECONDS = 0.3;
+export type HearingLane = 'rider' | 'judge' | 'driver' | 'risk';
+export const HEARING_LANES: readonly HearingLane[] = ['rider', 'judge', 'driver', 'risk'];
 
 export interface HearingStation {
   sequence: number;
@@ -235,13 +236,14 @@ export interface HearingGeometry {
   rails: {lane: HearingLane; x1: 0; x2: 100}[];
   segments: {lane: HearingLane; x1: number; x2: number}[];
   stations: HearingStation[];
-  handoff: {x: number; seconds: number; title: string} | null;
+  handoff: {x: number; seconds: number; title: string; risk: boolean} | null;
   end: {kind: 'ruling' | 'incomplete' | 'failed'; x: number; seconds: number; label: string; title: string} | null;
 }
 
 function hearingLaneOf(actor: ActivityEvent['actor']): HearingLane {
   if (actor === 'rider') return 'rider';
   if (actor === 'driver') return 'driver';
+  if (actor === 'risk') return 'risk';
   return 'judge';
 }
 
@@ -261,12 +263,18 @@ export function hearingGeometry(events: ActivityEvent[], status: Run['status'] |
   const rails = HEARING_LANES.map(lane => ({lane, x1: 0 as const, x2: 100 as const}));
 
   const secondsOf = (event: ActivityEvent): number => Math.max(0, elapsedSeconds(events, event));
+  // Drawing only: the agents are all dispatched at run start, so stations within
+  // the first START_SNAP_SECONDS share the 0 s mark instead of showing clock jitter.
+  // Titles keep the exact time.
+  const drawX = (seconds: number): number => px100(seconds <= START_SNAP_SECONDS ? 0 : seconds);
   const handoffEvent = events.find(event => event.type === 'judge.started');
   const handoffSeconds = handoffEvent === undefined ? 0 : secondsOf(handoffEvent);
+  const hasRiskStations = events.some(event => event.actor === 'risk');
   const handoff = handoffEvent === undefined ? null : {
     x: px100(handoffSeconds),
     seconds: handoffSeconds,
     title: `Judge: Handoff to the Judge, +${formatSeconds(handoffSeconds)} s`,
+    risk: hasRiskStations,
   };
 
   let end: HearingGeometry['end'] = null;
@@ -289,15 +297,16 @@ export function hearingGeometry(events: ActivityEvent[], status: Run['status'] |
   for (const event of events) {
     const lane = hearingLaneOf(event.actor);
     const seconds = secondsOf(event);
-    const x = px100(seconds);
+    const x = drawX(seconds);
     const isHandoff = event === handoffEvent;
     const isEnd = end !== null && event === lastEvent;
     if (!isHandoff && !isEnd) {
-      stations.push({
-        sequence: event.sequence, lane, actor: event.actor, type: event.type,
-        seconds, x,
-        title: `${actorLabel(event.actor)}: ${eventLabel(event.type)}, +${formatSeconds(seconds)} s`,
-      });
+      const title = event.actor === 'risk'
+        ? `Risk Analyst: ${event.summary}, +${formatSeconds(seconds)} s`
+        : event.actor === 'precedent'
+          ? `Precedent: ${event.summary}, +${formatSeconds(seconds)} s`
+          : `${actorLabel(event.actor)}: ${eventLabel(event.type)}, +${formatSeconds(seconds)} s`;
+      stations.push({sequence: event.sequence, lane, actor: event.actor, type: event.type, seconds, x, title});
     }
     if (event.actor === 'rider' || event.actor === 'driver') {
       const span = spans.get(lane) ?? {first: x, last: x};
@@ -314,6 +323,10 @@ export function hearingGeometry(events: ActivityEvent[], status: Run['status'] |
     const x1 = judgeXs[0] ?? 0;
     const x2 = Math.max(judgeXs[judgeXs.length - 1] ?? 0, end === null ? 0 : end.x);
     segments.push({lane: 'judge', x1, x2});
+  }
+  const riskXs = events.filter(event => event.actor === 'risk').map(event => drawX(secondsOf(event)));
+  if (riskXs.length > 0) {
+    segments.push({lane: 'risk', x1: riskXs[0] ?? 0, x2: riskXs[riskXs.length - 1] ?? 0});
   }
 
   return {domainSeconds, ticks, rails, segments, stations, handoff, end};
@@ -486,4 +499,158 @@ export function paymentGauge(fare: Facts | null | undefined, remedy: Facts | nul
     }
   }
   return {lineItems, total: formatSgd(totalCents), paid: formatSgd(paidCents), remedies};
+}
+
+/* Stretch goals: risk, precedents, escalation and human review. */
+
+/** Actor label for the new actors; the label map in format.ts predates them. */
+export function actorDisplay(actor: ActivityEvent['actor']): string {
+  if (actor === 'risk') return 'Risk Analyst';
+  if (actor === 'precedent') return 'Precedent';
+  return actorLabel(actor);
+}
+
+/** Event label for the new event types; format.ts predates them. */
+export function eventDisplay(type: ActivityEvent['type']): string {
+  switch (type) {
+    case 'risk.assessed': return 'Risk assessed';
+    case 'precedent.retrieved': return 'Precedents retrieved';
+    case 'run.escalated': return 'Escalated for human review';
+    case 'review.decided': return 'Review decided';
+    default: return eventLabel(type);
+  }
+}
+
+export type ReviewState = 'none' | 'pending' | 'decided';
+
+/** Where a run stands with respect to human review. */
+export function reviewState(run: Run): ReviewState {
+  if (run.status !== 'completed' || run.escalation === undefined) return 'none';
+  return run.review === undefined ? 'pending' : 'decided';
+}
+
+/** Outcome label for the deterministic policy verdict — not every outcome is a remedy. */
+export function verdictOutcomeLabel(outcome: PolicyVerdict['outcome']): string {
+  switch (outcome) {
+    case 'keep_charge': return remedyLabel('keep_charge');
+    case 'refund_route_excess': return remedyLabel('refund_route_excess');
+    case 'refund_no_show_fee': return remedyLabel('refund_no_show_fee');
+    case 'incomplete': return 'Incomplete — decisive evidence missing';
+    case 'undetermined': return 'Undetermined by the policy rules';
+    default: {
+      const exhaustive: never = outcome;
+      return exhaustive;
+    }
+  }
+}
+
+/** One plain sentence per escalation reason, for the bench. Exhaustive over the enum. */
+export function escalationLines(run: Run): string[] {
+  if (run.status !== 'completed' || run.escalation === undefined) return [];
+  const escalation = run.escalation;
+  return escalation.reasons.map(reason => {
+    switch (reason) {
+      case 'high_risk':
+        return run.risk === undefined ? 'High risk' : `Risk ${run.risk.overall} — ${run.risk.summary}`;
+      case 'low_confidence':
+        return `Judge confidence ${escalation.confidence.toFixed(2)} is below the ${escalation.threshold} review threshold`;
+      case 'policy_divergence': {
+        const divergence = run.divergence;
+        const verdict = run.verdict;
+        if (divergence === undefined || verdict === undefined)
+          return 'The Judge ruling differs from the deterministic policy verdict.';
+        return `The policy rules give ${verdictOutcomeLabel(divergence.verdictOutcome)} under ${verdict.clauseIds.join(', ')}; the Judge chose ${remedyLabel(divergence.judgeRemedyId)}. Nothing is paid until a reviewer decides.`;
+      }
+      case 'policy_undetermined':
+        return `The policy rules could not determine this case${run.verdict === undefined ? '' : ` (${run.verdict.basis})`}; the Judge's ruling is a recommendation until a reviewer decides.`;
+      default: {
+        const exhaustive: never = reason;
+        return exhaustive;
+      }
+    }
+  });
+}
+
+/** Headline for the review state; divergent rulings are called out by name. */
+export function reviewHeadline(run: Run): string {
+  return run.status === 'completed' && run.divergence !== undefined
+    ? 'Sent to human review — Judge disagrees with the policy rules'
+    : 'Sent to human review';
+}
+
+/** Two-line comparison shown on the bench when the Judge diverges from the verdict. */
+export function divergenceComparison(run: Run): {policy: string; judge: string} | null {
+  if (run.status !== 'completed' || run.divergence === undefined || run.verdict === undefined) return null;
+  return {
+    policy: `Policy rules: ${verdictOutcomeLabel(run.divergence.verdictOutcome)} (${run.verdict.clauseIds.join(', ')})`,
+    judge: `Judge: ${remedyLabel(run.divergence.judgeRemedyId)} · confidence ${percent(run.result.confidence)}`,
+  };
+}
+
+/** The verdict outcome as an applyable remedy — only when it is a remedy that differs from the Judge's. */
+export function policyVerdictRemedy(run: Run): RemedyOption['id'] | null {
+  if (run.status !== 'completed' || run.verdict === undefined) return null;
+  const outcome = run.verdict.outcome;
+  if (outcome === 'incomplete' || outcome === 'undetermined') return null;
+  return outcome === run.result.action.remedyId ? null : outcome;
+}
+
+/** One-line policy-verdict summary for the Judge column. */
+export function verdictLine(verdict: PolicyVerdict): string {
+  return `${verdictOutcomeLabel(verdict.outcome)} — ${verdict.clauseIds.join(', ')} — ${verdict.basis}`;
+}
+
+/** 'Judge agrees with the policy rules.' when a completed ruling equals the verdict outcome. */
+export function verdictAgreement(verdict: PolicyVerdict | undefined, remedyId: string | null): string | null {
+  if (verdict === undefined || remedyId === null) return null;
+  return verdict.outcome === remedyId ? 'Judge agrees with the policy rules.' : null;
+}
+
+/** Bench note for a run that is the API's automatic re-run after a failed first attempt. */
+export function retryNote(errorMessage: string): string {
+  const kind = /timeout/i.test(errorMessage) ? 'provider timeout' : 'workflow failure';
+  return `First attempt failed (${kind}); this is the automatic re-run.`;
+}
+
+export interface RemedyOption {id: 'keep_charge' | 'refund_route_excess' | 'refund_no_show_fee'; label: string}
+
+/** Remedies a reviewer may apply, per dispute category. */
+export function remedyOptions(category: Run['dispute']['category']): RemedyOption[] {
+  const ids: RemedyOption['id'][] = category === 'no_show'
+    ? ['keep_charge', 'refund_no_show_fee']
+    : ['keep_charge', 'refund_route_excess'];
+  return ids.map(id => ({id, label: remedyLabel(id)}));
+}
+
+const riskLevelLabels: Record<RiskAssessment['overall'], string> = {
+  low: 'Low risk',
+  medium: 'Medium risk',
+  high: 'High risk',
+};
+
+export function riskLevelLabel(overall: RiskAssessment['overall']): string {
+  return riskLevelLabels[overall];
+}
+
+const signalLabels: Record<string, string> = {
+  frequent_filer: 'Frequent filer',
+  repeat_subject: 'Repeated complaints against',
+  low_rating: 'Low rating',
+  new_account: 'New account',
+  instruction_like_chat: 'Instruction-like chat',
+  threat_in_chat: 'Threat in chat',
+};
+
+export function signalLabel(code: string): string {
+  return signalLabels[code] ?? code;
+}
+
+const precedentOriginLabels: Record<Precedent['origin'], string> = {
+  seed: 'Seed case',
+  run: 'Earlier run',
+  human_override: 'Human override',
+};
+
+export function precedentOriginLabel(origin: Precedent['origin']): string {
+  return precedentOriginLabels[origin];
 }

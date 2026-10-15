@@ -133,9 +133,66 @@ describe('pickupMetrics golden values (SPEC §7)', () => {
     expect(m.checks.waitedMinimum).toBe(true);
   });
 
+  it('N1R matches all golden numbers (same trip as N1)', () => {
+    const f = findFixture(ds, 'N1R');
+    if (f === undefined) throw new Error('N1R not found');
+    const m = pickupMetrics(f, params);
+    expect(m).not.toBeNull();
+    if (m === null) return;
+
+    expect(m.closestApproachMeters).toBe(414);
+    expect(m.closestApproachTs).toBe('2026-10-04T08:01:58Z');
+    expect(m.firstWithinThresholdTs).toBeNull();
+    expect(m.waitSecondsWithinThreshold).toBeNull();
+    expect(m.driverMarkedArrivedAt).toBe('2026-10-04T08:01:58Z');
+    expect(m.cancelledAt).toBe('2026-10-04T08:07:58Z');
+    expect(m.checks.withinDistance).toBe(false);
+    expect(m.checks.waitedMinimum).toBe(false);
+  });
+
+  it.each(['N4', 'N5', 'X6'])('%s matches all golden numbers (same trip as N2)', (id) => {
+    const f = findFixture(ds, id);
+    if (f === undefined) throw new Error(`${id} not found`);
+    const m = pickupMetrics(f, params);
+    expect(m).not.toBeNull();
+    if (m === null) return;
+
+    expect(m.closestApproachMeters).toBe(31);
+    expect(m.closestApproachTs).toBe('2026-10-04T09:02:44Z');
+    expect(m.firstWithinThresholdTs).toBe('2026-10-04T09:02:44Z');
+    expect(m.waitSecondsWithinThreshold).toBe(430);
+    expect(m.driverMarkedArrivedAt).toBe('2026-10-04T09:02:44Z');
+    expect(m.cancelledAt).toBe('2026-10-04T09:09:54Z');
+    expect(m.checks.withinDistance).toBe(true);
+    expect(m.checks.waitedMinimum).toBe(true);
+  });
+
+  it('N6 matches all golden numbers (boundary: 145 m, exactly 300 s)', () => {
+    const f = findFixture(ds, 'N6');
+    if (f === undefined) throw new Error('N6 not found');
+    const m = pickupMetrics(f, params);
+    expect(m).not.toBeNull();
+    if (m === null) return;
+
+    expect(m.closestApproachMeters).toBe(145);
+    expect(m.closestApproachTs).toBe('2026-10-04T09:04:54Z');
+    expect(m.firstWithinThresholdTs).toBe('2026-10-04T09:04:54Z');
+    expect(m.waitSecondsWithinThreshold).toBe(300);
+    expect(m.driverMarkedArrivedAt).toBe('2026-10-04T09:04:54Z');
+    expect(m.cancelledAt).toBe('2026-10-04T09:09:54Z');
+    expect(m.checks.withinDistance).toBe(true);
+    expect(m.checks.waitedMinimum).toBe(true);
+  });
+
   it('returns null for R1 (wrong category)', () => {
     const f = findFixture(ds, 'R1');
     if (f === undefined) throw new Error('R1 not found');
+    expect(pickupMetrics(f, params)).toBeNull();
+  });
+
+  it('returns null for X5 (GPS unavailable)', () => {
+    const f = findFixture(ds, 'X5');
+    if (f === undefined) throw new Error('X5 not found');
     expect(pickupMetrics(f, params)).toBeNull();
   });
 });

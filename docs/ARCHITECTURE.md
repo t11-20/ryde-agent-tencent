@@ -17,6 +17,8 @@ FairTrip resolves ride-hailing disputes through three distinct LLM agents:
 2. **Driver Advocate** — Gathers evidence and builds the driver's defense
 3. **Judge** — Reviews both cases, applies policy, and selects a remedy
 
+A fourth, context-only **Risk Analyst** agent was added as a stretch goal: it runs in parallel with the advocates over deterministic, server-computed risk signals and provides context to the Judge — it can never create a signal or change a ruling (see §11.1).
+
 The server constructs the final monetary action from the Judge's remedy selection. The labeled mock calculations described below remain the stub/test path; live mode now uses Lane B fixtures and deterministic calculations through the `DisputeSource` seam (see §11).
 
 ### 1.2 Component Diagram
@@ -85,13 +87,15 @@ The server constructs the final monetary action from the Judge's remedy selectio
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
+The Risk Analyst (stretch goal, §11.1) executes in the same parallel phase as the two advocates; its assessment is handed to the Judge together with the matched precedents at the handoff.
+
 ### 1.3 Data Flow
 
 1. **Filing:** Client POSTs `fixtureId` + optional `riderClaim` → server creates Run (queued)
 2. **Advocacy:** Both advocates start in parallel, each with its own tool loop
    - Max 2 tool-request rounds per advocate
-   - Max 1 repair attempt per advocate
-   - 20-second timeout per model request
+   - Max 2 repair attempts per advocate
+   - 45-second timeout per model request attempt, 1 retry on timeout/network/5xx (95 s budget per call; the 90 s run deadline bounds a double timeout)
 3. **Validation:** Each advocate case is schema-validated and citation-checked against its retrieval scope
 4. **Judge Handoff:** Only after both cases pass validation does the Judge start
 5. **Adjudication:** Judge receives both cases + retrieved evidence + policy + permitted remedies
@@ -133,7 +137,7 @@ run.started
 ### 2.2 Installation
 
 ```bash
-cd /Users/lane-a-owner/Documents/ChatGPT/Tencent
+cd <Project-Folder>
 npm ci
 ```
 
@@ -145,7 +149,7 @@ npm run verify
 
 This runs: `typecheck` → `test` → `build` → `check:examples` → `check:setup`
 
-Expected output: all 280 root tests and 28 web tests pass, 0 build errors, examples validate.
+Expected output: all 924 root tests and 104 web tests pass, 0 build errors, examples validate.
 
 ### 2.4 Start the API (Stub Mode)
 
@@ -225,8 +229,8 @@ Discriminated union:
 | Limit | Value | Enforcement |
 |---|---|---|
 | Tool rounds per advocate | 2 | Loop counter in `runAdvocateToolLoop` |
-| Repair attempts per advocate | 1 | Counter in catch block |
-| Model request timeout | 20s | `AbortSignal.timeout(20000)` |
+| Repair attempts per advocate | 2 | Counter in catch block |
+| Model request timeout | 45s per attempt, 1 retry on timeout/network/5xx (95s budget per call) | `AbortSignal.timeout(45000)` per attempt; `createModelAdapter` retries |
 | Run deadline | 90s | `AbortController` with `setTimeout(90000)` |
 
 ### 4.3 Mock Evidence Provider
@@ -267,13 +271,13 @@ All provenance is marked `kind: 'contract_example'` with description noting mock
 
 | Scenario | Behavior | Event |
 |---|---|---|
-| Invalid advocate JSON | 1 repair attempt, then fail | `output.repair` → `run.failed` |
+| Invalid advocate JSON | 2 repair attempts, then fail | `output.repair` → `run.failed` |
 | Wrong advocate side | Fail immediately | `run.failed` |
 | Invented citation | Fail during validation | `run.failed` |
 | One advocate fails | Sibling cancelled, Judge not called | `run.failed` |
-| Model timeout | Abort signal triggers | `run.failed` |
+| Model timeout | Per-attempt abort, one retry, then abort | `run.failed` |
 | Run deadline exceeded | Abort controller triggers | `run.failed` |
-| Missing decisive evidence | `incomplete` ruling, no invented amount | `run.incomplete` |
+| Missing decisive evidence | `incomplete` ruling, no invented amount; the same guard turns a mid-workflow failure into `incomplete` instead of `failed` — the terminal status is predetermined by the missing family, whatever the model did | `run.incomplete` |
 | Wrong-category remedy | Run is incomplete with a validation error and no result/action | `run.incomplete` |
 | Excessive refund | Capped at paid charge when the calculation is otherwise valid | `run.completed` |
 
@@ -289,12 +293,12 @@ All provenance is marked `kind: 'contract_example'` with description noting mock
 | `workflow.test.ts` | 6 | Parallel advocates, Judge ordering, cancellation, event emission |
 | `api.test.ts` | 4 | End-to-end stub flow, concurrent isolation, input validation |
 | `config-model.test.ts` | 4 | Config parsing, model adapter, error sanitization |
-| `tool-loop.test.ts` | 11 | Tool protocol, repair, rounds, deduplication, sanitized errors |
+| `tool-loop.test.ts` | 12 | Tool protocol, repair, rounds, deduplication, sanitized errors |
 | `remedy-validation.test.ts` | 9 | Remedy construction, authoritative category validation, caps |
 | `failure-coverage.test.ts` | 7 | Advocate failure, sibling cancellation, citations; changed-history acceptance remains pending |
 | `live-wiring.test.ts` | 9 | Live callbacks with scripted responses, retrieval, Judge context/repair, incomplete outcomes, outages, deadline |
 | `codebuddy-env.test.ts` | 5 | Configuration fallback, explicit precedence, matching-provider checks |
-| **Total** | **67** | |
+| **Total** | **68** | |
 
 ### 6.2 Build and Verification
 
@@ -310,7 +314,7 @@ All provenance is marked `kind: 'contract_example'` with description noting mock
 
 - **Live model:** Resolved in Lane B (LB-11, LB-15): MiniMax-M3 through the OpenAI-compatible endpoint completes real three-agent runs; measured results are in §11 and `submission/metrics/`
 - **Partner calculations:** Resolved: live mode uses Lane B's `CalculationProvider` through the `DisputeSource` seam (§11); the mock provider remains the stub/test path
-- **Partner fixtures:** Resolved: 11 synthetic Lane B fixtures with expected outcomes live in `packages/evidence/data/`
+- **Partner fixtures:** Resolved: 20 synthetic Lane B fixtures with expected outcomes live in `packages/evidence/data/`
 - **Frontend:** Resolved: `apps/web` single-screen React UI (LB-12, LB-13)
 - **Evaluation:** Resolved: `packages/eval` runner with release gate; a real-model scorecard is saved in `submission/metrics/` (LB-14, LB-15)
 - **Persistence:** In-memory only; no database
@@ -432,33 +436,126 @@ Lane B adds the evidence layer, the web UI and the evaluation runner, and connec
 
 ```mermaid
 flowchart LR
-  subgraph LaneB["Lane B (you build)"]
-    DATA[("packages/evidence/data<br/>fixtures, policy, expected outcomes")]
-    EVID["@fairtrip/evidence<br/>calculations + evidence builder"]
+  subgraph LaneB["Lane B: evidence, UI, evaluation"]
+    DATA[("packages/evidence/data<br/>fixtures, policy, expected outcomes,<br/>seed precedents")]
+    EVID["@fairtrip/evidence<br/>calculations + evidence builder<br/>risk signals · features · precedent match"]
+    VERDICT["verdict.ts<br/>deterministic policy verdict"]
     SRC["createFixtureSource()<br/>DisputeSource"]
-    WEB["apps/web<br/>React UI"]
-    EVAL["packages/eval<br/>evaluation runner"]
+    WEB["apps/web React UI<br/>hearing lines, activity log,<br/>advocate / Judge / risk panels, bench"]
+    EVAL["packages/eval<br/>evaluation runner + release gate"]
   end
-  subgraph LaneA["Lane A (exists)"]
+  subgraph LaneA["Lane A: agents and API"]
     API["apps/api Express<br/>createApp(config, model, source)"]
-    WF["@fairtrip/agents<br/>Rider Advocate, Driver Advocate, Judge"]
+    subgraph AGENTS["@fairtrip/agents (LLM calls)"]
+      RA["Rider Advocate"]
+      DA["Driver Advocate"]
+      RISK["Risk Analyst<br/>deterministic signals + model summary"]
+      JUDGE["Judge<br/>ruling · confidence · reasoning<br/>explanations to both parties"]
+    end
+    STORE[("precedentStore<br/>seed + session runs + human overrides")]
+    REV["POST /api/runs/:id/review<br/>confirm / override"]
     REM["buildFinalAction<br/>server-side money"]
   end
   DATA --> EVID --> SRC --> API
-  API --> WF
-  WF -- "get_evidence / get_policy" --> SRC
-  WF --> REM
+  EVID --> VERDICT
+  VERDICT -- "deterministic verdict" --> API
+  API --> RA & DA & RISK
+  RA & DA -- "get_evidence / get_policy" --> SRC
+  RISK -- "history + chat records" --> SRC
+  RA & DA -- "both cited cases" --> JUDGE
+  RISK -- "risk assessment (context only)" --> JUDGE
+  STORE -- "similar precedents" --> JUDGE
+  JUDGE -- "remedy ID only" --> REM
   SRC -- "CalculationProvider" --> REM
-  WEB -- "HTTP poll /api" --> API
+  API -- "confidence below threshold, high risk,<br/>policy divergence or undetermined: escalation" --> REV
+  REV -- "rebuilt FinalAction" --> REM
+  API -- "completed + reviewed rulings" --> STORE
+  WEB -- "HTTP poll /api + POST review" --> API
   EVAL -- "HTTP /api" --> API
   EVAL -. "expected outcomes" .-> DATA
 ```
 
+Rendered image of this diagram: [docs/architecture.png](architecture.png) (generated from the block above; regenerate after editing it).
+
 **The `DisputeSource` seam.** `createApp(config, model, source)` takes an optional third argument. With `RUN_MODE=stub` the source is ignored and Lane A's labelled contract examples are served exactly as before, so Lane A's tests keep testing the mock path unchanged. With `RUN_MODE=live` the server passes `createFixtureSource()` from `@fairtrip/evidence`: the advocates' `get_evidence` / `get_policy` tool calls, the policy clauses and the `CalculationProvider` money all come from Lane B's synthetic fixtures and demonstration policy. The Judge never produces money — it selects a remedy ID and `buildFinalAction` asks Lane B's calculation provider for the integer-cents amount.
 
-**Decisive-evidence guard.** A deterministic guard marks a run `incomplete` when decisive evidence (GPS or payment) is unavailable, whatever the Judge said. No amount is invented and the UI shows the missing-evidence list with a human-review note (fixtures X1 and X3 exercise this path).
+**Decisive-evidence guard.** A deterministic guard marks a run `incomplete` when decisive evidence (GPS or payment) is unavailable, whatever the Judge said. No amount is invented and the UI shows the missing-evidence list with a human-review note (fixtures X1, X4, X3 and X5 exercise this path).
 
-**Evaluation runner.** `packages/eval` drives the live API over HTTP, compares each run against the expected outcomes in `packages/evidence/data` (status, remedy, amount, citations, trace completeness, consistency, latency), enforces the five-condition release gate and writes a scorecard to `submission/metrics/`. The web UI (`apps/web`) polls the same `/api` endpoints and renders every event, so the whole inter-agent exchange stays observable.
+**Evaluation runner.** `packages/eval` drives the live API over HTTP, compares each run against the expected outcomes in `packages/evidence/data` (status, remedy, amount, citations, trace completeness, consistency, latency, policy verdict), follows the API's automatic re-run after a provider failure, enforces the eight-condition release gate and writes a scorecard to `submission/metrics/`. The fixture set was extended on 2026-10-13 from eleven to twenty so that every policy branch, every Risk Analyst signal in both party directions, both prompt-injection directions, both missing-family cases per category and every precedent feature/seed is exercised; `packages/evidence/test/coverage.test.ts` guards that coverage. The release set is 26 planned runs (R1, N2 and R1F three consecutive attempts each, the rest once) plus one human-review feedback probe — confirm X2, override N2H, then re-run N2 — gated by the seventh condition `human-review-feedback`. The web UI (`apps/web`) polls the same `/api` endpoints and renders every event, so the whole inter-agent exchange stays observable.
+
+### 11.1 Stretch goals (contract 0.3.0)
+
+Three optional capabilities extend the loop without changing what decides a case.
+
+**Risk Analyst.** `packages/evidence/src/risk.ts` computes a deterministic `RiskAssessment` (overall severity plus per-party signals with evidence citations) from a dispute's history and chat records; the thresholds in `RISK_PARAMS` are demonstration heuristics, not Ryde rules. The optional `roles.risk` callback (`packages/agents/src/risk-analyst.ts`) runs in the same parallel phase as the advocates and asks the model only to write the summary text; if the model fails, the assessment is returned unchanged with `source: 'deterministic'`. The model never produces or removes a risk signal — the signal set is fixed by the evidence layer before the model is called, and every assessment carries the `RISK_CAVEAT` that risk never establishes fault.
+
+**Policy & precedent.** `packages/evidence/src/features.ts` derives case features from the evidence and `packages/evidence/src/precedents.ts` matches them against a store seeded from `packages/evidence/data/precedents.json` (synthetic seed entries). `runWorkflow` emits `precedent.retrieved` before the Judge starts and hands the matched precedents plus the risk assessment to the Judge as context; `JUDGE_CONTEXT_RULES` in `packages/agents/src/prompts.ts` instructs the Judge that both are for consistency only and may never override the case's evidence.
+
+**Escalation and review.** In `apps/api/src/app.ts` a completed live run escalates (`run.escalated`, status stays `completed`) when the model-assessed confidence falls below `ESCALATION_CONFIDENCE_THRESHOLD` (default 0.80) or the risk overall is `high`; the ruling and amount are then recommendations only. Across 141 completed live rulings in seven release-gate runs (2026-10-13/14) the lowest confidence on a correct ruling was 0.80 and the only incorrect ruling (R3, run 20261014-011142) carried 0.78; the default threshold was raised from 0.75 to 0.80 so that ruling would have been escalated. `POST /api/runs/:id/review` lets a human confirm — the Judge's action stands — or override with another permitted remedy, in which case `buildFinalAction` recomputes the money with the same server formulas and the run gains `review.decided`. Confirmed, overridden and unescalated completed rulings are written back into the in-memory precedent store (`GET /api/precedents`) so later runs can match them — the learning feedback loop.
+
+**Invariants.** Risk and precedents are context only: they never change a run's `status`, `remedyId` or `amountCents` — the evaluation runner enforces this with the `riskSignalsIntact` and `contextOnly` checks and the sixth release-gate condition `risk-context-only` (`packages/eval`). An override's money is not free text either: it is computed by the same server formulas in `buildFinalAction`. On the web side, `apps/web` renders the Risk Analyst on a fourth hearing-line lane and a Risk panel, lists the precedents considered in the Judge column, and drives confirm/override from the bench.
+
+### 11.2 Replay mode and deep links (contract 0.3.1)
+
+`RUN_MODE=replay` serves the recorded events of a completed release-gate run (default `apps/api/replays/20261013-144417`; `REPLAY_DIR`, `REPLAY_SPEED`) without calling a model. `apps/api/src/replay.ts` loads the raw eval records and the API re-emits each recorded event at its original offset divided by `REPLAY_SPEED`, re-stamped with a fresh run id — the UI renders a replay exactly like a live run while evidence, money, precedent matching and the review endpoint remain real server behaviour (a `runContexts` entry is registered so an escalated replay can still be confirmed or overridden, and those reviews append precedents that later replays match). `GET /api/runs` lists the session's runs newest first; the web header labels replay `Replay of live run · recorded <date>` and each run carries a `?run=<id>` deep link plus a recent-runs select. Contract 0.3.1 adds the `replay` mode and the optional `replay` provenance block on Run (`sourceRunId`, `recordedAt`, `sourceEvalRun`, `speed`).
+
+### 11.3 Deterministic policy verdict and finalisation (contract 0.3.2)
+
+**Verdict engine.** `packages/evidence/src/verdict.ts` computes a `PolicyVerdict` — outcome, clause ids, basis sentence, the features and missing families that decided it — purely from the computed case features and the evidence bundle's unavailable families: the same deterministic inputs the precedent matcher uses, no model involved. `DisputeSource.policyVerdict(dispute)` exposes it to the API (`packages/evidence/src/source.ts`); every live and replay run carries the verdict on the Run and emits a `verdict.computed` system event before the workflow starts.
+
+**Finalisation.** `apps/api/src/finalisation.ts` compares the Judge's remedy with the verdict after `buildFinalAction` succeeds. Equal → the run finalises as before (the existing `low_confidence` and `high_risk` escalations still apply). A remedy outcome that differs → `policy_divergence`: the run completes escalated, the Judge's ruling stays attached as a recommendation, and a `divergence` record carries the Judge's remedy, the verdict outcome and an explanatory sentence. An `undetermined` verdict — e.g. the chat shows both consent and objection — adds `policy_undetermined` and takes the same recommendation path. `incomplete` never reaches this point: the decisive-evidence guard already stops the run. Defence in depth: immediately before the completed snapshot is stored, the server enforces `VERDICT_INVARIANT` — a completed run without an escalation must have `action.remedyId === verdict.outcome` — and fails the run if that is ever violated.
+
+**What the model still produces:** the advocate cases, the findings, the rider/driver explanations and the confidence number. **What it never produces:** the verdict, the money and the status when decisive evidence is missing. A finalised payment can therefore never differ from the demonstration policy; disagreement is always a recommendation waiting for a human, and the bench offers "Apply policy verdict" on a divergent run (an override to the verdict remedy, with the money rebuilt server-side).
+
+**Automatic re-run.** When a first-attempt workflow fails — provider-side (attempt timeout, network failure, run deadline) or model-output (invalid JSON, schema violation, bad citations, wrong advocate side) — the API marks the run `failed` with `retriedBy`, emits `run.retrying` and starts exactly one automatic re-run for the same dispute (`retryOf` links back; `GET /api/runs/:id` on the first attempt still returns `failed` so a client can follow the link). The only non-retryable failures are internal ones the system itself guarantees never to reach: a `VERDICT_INVARIANT` violation or a `REPLAY_INVALID` tamper detection — re-running those would repeat the same guaranteed failure. A second failure is never re-run. Validation repairs inside an attempt now report a safe classified reason (`invalid JSON`, `schema: <paths>`, or the citation id) — never raw model text — in the `output.repair` event and the thrown error. The eval runner and the web UI both follow `retriedBy` automatically; the eval reports the re-run's own latency separately from the whole-round-trip wall time.
+
+**Latency controls (contract 0.3.3).** Three knobs cut model wall-time and wasted re-runs. **Thinking:** calls carry a `thinking` option — `off` for the cheap tool-request turn and the Risk Analyst (a rephrase-only role), `MODEL_THINKING` (`default`/`adaptive`/`off`, default `adaptive`) for the case and Judge calls; `reasoning_split: true` is sent on every request so thinking lands in `reasoning_content`, never in `content`. **Normalise vs repair:** before the strict schema parse, `normaliseJudgeOutput`/`normaliseAdvocateOutput` fix cosmetic faults — invented non-money keys are dropped, a missing/typo'd `ruling` is derived from a valid `remedyId`, a missing response `type` is inferred, singleton id strings are wrapped in arrays and an invalid `requestedRemedyId` is dropped (the field is now optional). Decision-bearing fields (remedy, ruling when both are bad, findings absent, claim text, side, any id value) are never normalised, and keys that look like money smuggling (`amount|action|recipient|currency|cents|pay|refund`) are deliberately left in place so the strict schema still rejects them — each normalisation emits `output.normalised`; only what survives goes to a directed repair. **Hedging:** a call unsettled past `hedgeAfterMs` (6 s tool-request / 20 s case / 20 s Judge) starts an identical lane-B request; the first lane to fulfil wins (a lane-B win emits `model.hedge` 'answered first'). **Retries:** network/HTTP transients (TypeError, 408/429/5xx) get up to 2 retries with 300/1000 ms backoff; per-attempt timeouts keep the single no-backoff retry. Recoveries surface as `model.retry`/`model.hedge` events — call-level, never a workflow re-run. `MODEL_SERVICE_TIER=priority` opts into the provider's priority lane. `MODEL_THINKING`, `MODEL_SERVICE_TIER`, `reasoning_split` and `thinking` body fields apply to the MiniMax profile only (detected by a `*.minimax.io` host or a `MiniMax*` model name); every other provider is generic and controls thinking exclusively via `MODEL_EXTRA_BODY` — e.g. Aliyun DashScope: `{"enable_thinking":false}`. Replay mode is unaffected.
+
+**Limits.** The chat-derived features are keyword heuristics over synthetic fixture text — a production system would need structured consent capture; where the heuristics see both consent and objection the verdict is `undetermined` and the case goes to a human instead of guessing. The verdict only covers what the rules cover, and a Judge `incomplete` on a technically decidable case is accepted as conservative.
+
+### 11.4 Adversarial guardrail suite
+
+A permanent suite (`tests/adversarial/`, `packages/evidence/test/adversarial-verdict.test.ts`, `packages/evidence/test/money-invariants.test.ts`) attacks the money path directly: hostile model outputs, hostile fixture inputs, hostile review requests and hostile lifecycle timing. Every guardrail is asserted to fail closed — a failing test is a finding, never weakened.
+
+| Attack class | Attack | Expected system behaviour | Test id |
+|---|---|---|---|
+| A. Judge | Smuggled `action`/`amountCents` fields | Strict schema rejects; repairs exhaust; run `failed`. A repaired clean output pays only the server-computed amount. | A1 |
+| | Over- or under-refund against the verdict | `completed` with `policy_divergence` escalation and a `divergence` record; no review, no run precedent | A2, A3 |
+| | Wrong-category remedy | `incomplete`, no result | A4 |
+| | Ruling/remedy contradiction | Public ruling normalised to follow the remedy; an `output.repair` event records it | A5 |
+| | Abstention on a determinable case | `incomplete`, no payment — conservative, never an automatic refund | A6 |
+| | Injection via the POST `riderClaim` | Text stored verbatim as data; verdict recomputed from evidence; obedience escalates as divergence | A7 |
+| | Invented evidence/policy citations | Citation validation fails; run `failed` after repairs | A8 |
+| | Out-of-range confidence | Strict schema rejects; run `failed` | A9 |
+| | Poisoned precedent store | Precedents retrieved as context, never obeyed; divergence escalates | A10 |
+| B. Advocate | Fabricated narrative citing a real record | Divergence escalation; no finalisation | B1 |
+| | False `missingFacts` | Never drives status; verdict unaffected | B2 |
+| | Oversized case (300 arguments, 60 KB summary) | Terminal within the run deadline; API stays healthy | B3 |
+| | Side swap | `failed`, no result | B4 |
+| | Advocate-declared remedy | Ignored; money comes only from the Judge remedy + server calculation | B5 |
+| C. Verdict inputs | Driver manufacturing rider consent | Consent features only ever tag rider text | C1 |
+| | Negated agreement | Tags consent AND objection → `undetermined`, never `keep_charge` | C2 |
+| | Feature words in chat/dispute text | Text is data; `documented_reroute` needs a real nav/advisory record; dispute text has no effect | C3, C4 |
+| | Message flood | 10,000 messages analysed in < 2 s; verdict unchanged | C5 |
+| | NS-1 boundary nudges | Each single-condition flip produces the refund verdict | C6 |
+| D. Money | Mutated payment facts (surge, paid, items, currency) | Any fare anomaly nulls both refunds; non-null amounts stay integer, ≥ 0, ≤ paid, ≤ their formula cap; `keep_charge` is always 0 | D |
+| | Hostile calculation providers | Non-finite/non-integer amounts (`-5`, `NaN`, `Infinity`, `12.5`) error and produce a zero action; finite overshoots are capped at what the rider paid | D |
+| E. Review | Money fields in the body | Strict schema → 400 | E1 |
+| | Non-remedy / wrong-category remedy | 400 / 422 | E2 |
+| | Repeat or out-of-state review | 409 (already reviewed, not escalated, running) / 404 unknown | E3, E4 |
+| | Oversized / injection note | 400 over the limit; otherwise stored verbatim, action unchanged | E5 |
+| | Concurrent overrides | Exactly one wins; exactly one `human_override` precedent | E6 |
+| F. Lifecycle | Late model response after the deadline | The `failed` first run never gains a result; the single automatic re-run pays once | F1 |
+| | Re-run chains | At most two runs: one automatic re-run per first-attempt failure (invariant/replay failures excepted), never a third | F2 |
+| | Concurrent starts | Documented gap — no dedupe; see Known gaps | F3 |
+| | Tampered replay record | Recorded money is recomputed server-side; mismatch → `failed` with `REPLAY_INVALID` naming both amounts | F4 |
+
+**Known gaps (documented, not hidden):**
+- **No per-dispute idempotency** — five concurrent POSTs produce five independent rulings (F3). Payments are recommendations; a real execution layer must key on dispute id.
+- **Chat-consent heuristics** — keyword tags over untrusted text; a crafted negation can tag consent and objection together. The verdict fails safe to `undetermined` and a human decides (C2).
+- **Judge abstention is conservative, not automatic** — `incomplete` on a decidable case produces an incomplete run, never a payment (A6).
+- **Divergent replay escalates like a live divergence** — a recorded run whose remedy differs from the recomputed verdict replays as an escalated recommendation with a `divergence` record, never finalised (F4); `VERDICT_INVARIANT` remains as defence in depth for the case where divergence detection itself fails to escalate.
+- **Provider amounts are validated before capping** — a non-finite, negative or non-integer `CalculationProvider` amount or cap is rejected (`INVALID_CALCULATION`, zero action); a finite overshoot is capped at the paid charge (D).
 
 ---
 

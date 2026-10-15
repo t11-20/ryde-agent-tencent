@@ -3,7 +3,7 @@
 **Project:** FairTrip — Ryde Multi-Agent Dispute Resolution Prototype
 **Owner:** Lane A (the Lane A owner)
 **Collaboration repository:** https://github.com/t11-20/ryde-agent-tencent.git
-**Local workspace:** /Users/lane-a-owner/Documents/ChatGPT/Tencent
+**Local workspace:** <Project-Folder>
 **Foundation commit:** ea37153
 **Current branch:** lane-a
 
@@ -73,7 +73,7 @@
 - The Judge receives both validated cases and retrieved source records.
 - The model selects remedy identifiers; the server constructs monetary actions from validated partner calculations.
 - Enforce two tool-request rounds per advocate, one directed output repair per role, a 20-second model-request ceiling, and a 90-second run deadline.
-- Provider failures terminate the run; another attempt starts a new run.
+- A first-attempt workflow failure (except `VERDICT_INVARIANT`/`REPLAY_INVALID`) terminates the run and starts exactly one new run (`retriedBy`/`retryOf`).
 - Missing decisive evidence produces `incomplete`. Provider or unrecoverable validation failure produces `failed`.
 - Keep credentials private. Do not print keys or include them in commits, screenshots, traces, or frontend configuration.
 

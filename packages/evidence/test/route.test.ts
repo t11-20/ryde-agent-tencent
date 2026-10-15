@@ -127,6 +127,65 @@ describe('routeMetrics golden values (SPEC §7)', () => {
     expect(m.pingCount).toBe(18);
   });
 
+  it('R4 matches all golden numbers (over 500 m but not material)', () => {
+    const f = findFixture(ds, 'R4');
+    if (f === undefined) throw new Error('R4 not found');
+    const m = routeMetrics(f, params);
+    expect(m).not.toBeNull();
+    if (m === null) return;
+
+    expect(m.referenceMeters).toBe(7956);
+    expect(m.actualMeters).toBe(8603);
+    expect(m.excessMeters).toBe(647);
+    expect(m.excessPct).toBe(8.1);
+    expect(m.thresholdMeters).toBe(796);
+    expect(m.exceedsThreshold).toBe(false);
+    expect(m.referenceDurationSec).toBe(716);
+    expect(m.actualDurationSec).toBe(1265);
+    expect(m.extraDurationSec).toBe(549);
+    expect(m.unexpectedStops).toEqual([]);
+    expect(m.pingCount).toBe(24);
+  });
+
+  it('R1F matches all golden numbers (same trip as R1)', () => {
+    const f = findFixture(ds, 'R1F');
+    if (f === undefined) throw new Error('R1F not found');
+    const m = routeMetrics(f, params);
+    expect(m).not.toBeNull();
+    if (m === null) return;
+
+    expect(m.referenceMeters).toBe(7956);
+    expect(m.actualMeters).toBe(10598);
+    expect(m.excessMeters).toBe(2642);
+    expect(m.excessPct).toBe(33.2);
+    expect(m.thresholdMeters).toBe(796);
+    expect(m.exceedsThreshold).toBe(true);
+    expect(m.actualDurationSec).toBe(1134);
+    expect(m.extraDurationSec).toBe(418);
+    expect(m.pingCount).toBe(22);
+    expect(m.unexpectedStops).toEqual([
+      { startTs: '2026-10-04T11:13:58Z', endTs: '2026-10-04T11:16:58Z', durationSec: 180, lat: 1.315, lng: 103.885 },
+    ]);
+  });
+
+  it('X4 matches all golden numbers (same trip as R1, payment missing)', () => {
+    const f = findFixture(ds, 'X4');
+    if (f === undefined) throw new Error('X4 not found');
+    const m = routeMetrics(f, params);
+    expect(m).not.toBeNull();
+    if (m === null) return;
+
+    expect(m.actualMeters).toBe(10598);
+    expect(m.excessMeters).toBe(2642);
+    expect(m.excessPct).toBe(33.2);
+    expect(m.exceedsThreshold).toBe(true);
+    expect(m.actualDurationSec).toBe(1134);
+    expect(m.unexpectedStops).toEqual([
+      { startTs: '2026-10-04T11:13:58Z', endTs: '2026-10-04T11:16:58Z', durationSec: 180, lat: 1.315, lng: 103.885 },
+    ]);
+    expect(m.pingCount).toBe(22);
+  });
+
   it('returns null for X1 (GPS unavailable)', () => {
     const f = findFixture(ds, 'X1');
     if (f === undefined) throw new Error('X1 not found');

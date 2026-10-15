@@ -1,0 +1,146 @@
+{
+  "fixtureId": "N1R",
+  "label": "Flagged rider, but the driver never arrived",
+  "purpose": "fairness",
+  "dispute": {
+    "id": "DSP-N1R",
+    "category": "no_show",
+    "tripId": "TRP-N1R",
+    "riderClaim": "The driver never came to the pickup point. I was waiting at the main entrance and he cancelled and charged me a no-show fee.",
+    "driverStatement": "I arrived and waited for six minutes. The rider did not come."
+  },
+  "filedAt": "2026-10-04T10:07:58Z",
+  "trip": {
+    "pickup": {
+      "lat": 1.3526,
+      "lng": 103.9447,
+      "label": "Tampines main entrance (synthetic pin)"
+    },
+    "dropoff": null,
+    "startedAt": null,
+    "endedAt": null,
+    "driverMarkedArrivedAt": "2026-10-04T08:01:58Z",
+    "cancelledAt": "2026-10-04T08:07:58Z"
+  },
+  "gps": {
+    "status": "available",
+    "referenceRoute": null,
+    "driverTrace": [
+      {
+        "ts": "2026-10-04T08:00:00Z",
+        "lat": 1.362,
+        "lng": 103.953
+      },
+      {
+        "ts": "2026-10-04T08:00:59Z",
+        "lat": 1.3588,
+        "lng": 103.94995
+      },
+      {
+        "ts": "2026-10-04T08:01:58Z",
+        "lat": 1.3556,
+        "lng": 103.9469
+      },
+      {
+        "ts": "2026-10-04T08:02:58Z",
+        "lat": 1.3556,
+        "lng": 103.9469
+      },
+      {
+        "ts": "2026-10-04T08:03:58Z",
+        "lat": 1.3556,
+        "lng": 103.9469
+      },
+      {
+        "ts": "2026-10-04T08:04:58Z",
+        "lat": 1.3556,
+        "lng": 103.9469
+      },
+      {
+        "ts": "2026-10-04T08:05:58Z",
+        "lat": 1.3556,
+        "lng": 103.9469
+      },
+      {
+        "ts": "2026-10-04T08:06:58Z",
+        "lat": 1.3556,
+        "lng": 103.9469
+      },
+      {
+        "ts": "2026-10-04T08:07:58Z",
+        "lat": 1.3556,
+        "lng": 103.9469
+      }
+    ],
+    "reroutes": [],
+    "advisories": []
+  },
+  "chat": {
+    "messages": [
+      {
+        "id": "m1",
+        "ts": "2026-10-04T08:02:18Z",
+        "sender": "driver",
+        "text": "I'm here at the pickup point."
+      },
+      {
+        "id": "m2",
+        "ts": "2026-10-04T08:02:58Z",
+        "sender": "rider",
+        "text": "I'm at the main entrance, I don't see your car."
+      },
+      {
+        "id": "m3",
+        "ts": "2026-10-04T08:05:18Z",
+        "sender": "rider",
+        "text": "Hello? Where are you?"
+      },
+      {
+        "id": "m4",
+        "ts": "2026-10-04T08:06:58Z",
+        "sender": "rider",
+        "text": "If you charge me I will sue."
+      }
+    ],
+    "calls": []
+  },
+  "payment": {
+    "status": "available",
+    "currency": "SGD",
+    "rateCard": {
+      "baseCents": 300,
+      "perKmCents": 75,
+      "perMinCents": 20,
+      "noShowFeeCents": 500
+    },
+    "surgeMultiplierX100": 100,
+    "lineItems": [
+      {
+        "code": "no_show_fee",
+        "label": "No-show fee",
+        "cents": 500
+      }
+    ],
+    "totalCents": 500,
+    "paidCents": 500,
+    "paidAt": "2026-10-04T08:08:03Z"
+  },
+  "history": {
+    "rider": {
+      "partyId": "RDR-N1R",
+      "accountAgeDays": 400,
+      "rating": 3.8,
+      "completedTrips": 180,
+      "disputesFiled90d": 1,
+      "disputesAgainst90d": 6
+    },
+    "driver": {
+      "partyId": "DRV-N1R",
+      "accountAgeDays": 500,
+      "rating": 4.5,
+      "completedTrips": 1800,
+      "disputesFiled90d": 0,
+      "disputesAgainst90d": 0
+    }
+  }
+}

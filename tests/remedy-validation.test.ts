@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildFinalAction, createMockCalculationProvider } from '@fairtrip/agents';
+import { buildFinalAction, createMockCalculationProvider, type CalculationProvider } from '@fairtrip/agents';
 import { FinalActionSchema } from '@fairtrip/contracts';
 import type { JudgeModelResponse, Evidence } from '@fairtrip/contracts';
 
@@ -98,5 +98,32 @@ describe('remedy validation and FinalAction construction', () => {
     expect(error).toBeUndefined();
     expect(Number.isInteger(action.amountCents)).toBe(true);
     expect(action.currency).toBe('SGD');
+  });
+
+  it('rejects a non-finite or non-integer provider amount before the paid-charge cap', () => {
+    for (const amountCents of [NaN, Infinity, -Infinity, 12.5]) {
+      const hostile: CalculationProvider = {
+        calculateRouteExcess: () => ({amountCents, eligible: true}),
+        getNoShowFee: () => ({amountCents, eligible: true}),
+        getPaidChargeCap: () => 500,
+      };
+      const route = buildFinalAction(modelResponse('refund_route_excess'), routeEvidence, hostile, 'route_deviation');
+      expect(route.error?.code).toBe('INVALID_CALCULATION');
+      expect(route.action.amountCents).toBe(0);
+      const noShow = buildFinalAction(modelResponse('refund_no_show_fee'), noShowEvidence, hostile, 'no_show');
+      expect(noShow.error?.code).toBe('INVALID_CALCULATION');
+      expect(noShow.action.amountCents).toBe(0);
+    }
+  });
+
+  it('rejects a non-finite paid-charge cap instead of using it', () => {
+    const hostileCap: CalculationProvider = {
+      calculateRouteExcess: () => ({amountCents: 200, eligible: true}),
+      getNoShowFee: () => ({amountCents: 200, eligible: true}),
+      getPaidChargeCap: () => NaN,
+    };
+    const {action, error} = buildFinalAction(modelResponse('refund_route_excess'), routeEvidence, hostileCap, 'route_deviation');
+    expect(error?.code).toBe('INVALID_CALCULATION');
+    expect(action.amountCents).toBe(0);
   });
 });

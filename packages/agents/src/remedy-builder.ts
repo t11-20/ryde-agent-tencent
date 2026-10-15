@@ -47,6 +47,10 @@ export interface RemedyValidationError {
   message: string;
 }
 
+// A provider amount or cap must be a finite, non-negative integer cent value
+// before it can be trusted — validated before the paid-charge cap is applied.
+const validCents = (n: number): boolean => Number.isFinite(n) && Number.isInteger(n) && n >= 0;
+
 export function buildFinalAction(
   modelResponse: JudgeModelResponse,
   evidence: Evidence[],
@@ -89,6 +93,12 @@ export function buildFinalAction(
       };
     }
     const cap = calculationProvider.getPaidChargeCap(evidence);
+    if (!validCents(calculation.amountCents) || !validCents(cap)) {
+      return {
+        action: createNoAction(),
+        error: {code: 'INVALID_CALCULATION', message: 'Calculation provider returned a non-finite or non-integer amount'}
+      };
+    }
     amountCents = Math.min(calculation.amountCents, cap);
     recipient = 'rider';
     recommendation = `Refund ${amountCents} SGD cents for route excess charge.`;
@@ -101,6 +111,12 @@ export function buildFinalAction(
       };
     }
     const cap = calculationProvider.getPaidChargeCap(evidence);
+    if (!validCents(calculation.amountCents) || !validCents(cap)) {
+      return {
+        action: createNoAction(),
+        error: {code: 'INVALID_CALCULATION', message: 'Calculation provider returned a non-finite or non-integer amount'}
+      };
+    }
     amountCents = Math.min(calculation.amountCents, cap);
     recipient = 'rider';
     recommendation = `Refund ${amountCents} SGD cents for no-show fee.`;

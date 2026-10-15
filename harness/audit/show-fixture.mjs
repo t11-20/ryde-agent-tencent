@@ -13,7 +13,7 @@ const id = process.argv[2];
 const raw = process.argv.includes('--raw');
 const fixturePath = join(here, '..', 'data', 'fixtures', `${id}.json`);
 if (!id || !existsSync(fixturePath)) {
-  console.log('Usage: node harness/audit/show-fixture.mjs <R1|R1S|R2|R3|X1|N1|N2|N2H|N3|X2|X3> [--raw]');
+  console.log('Usage: node harness/audit/show-fixture.mjs <R1|R1S|R2|R3|R4|R1F|X1|X4|N1|N1R|N2|N2H|N3|N4|N5|N6|X2|X3|X5|X6> [--raw]');
   process.exit(1);
 }
 if (!existsSync(entry)) { console.log('Run `npm run build` first.'); process.exit(1); }

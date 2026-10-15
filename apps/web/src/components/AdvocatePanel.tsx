@@ -46,7 +46,7 @@ export function AdvocatePanel({actor, side, status}: AdvocatePanelProps) {
           <p className="placeholder">{status === 'queued' || status === 'running' || status === null ? 'Gathering evidence' : 'Stopped before submitting a case'}</p>
         ) : (
           <>
-            <p className="advocate-asks">{`Asks for: ${remedyLabel(advocateCase.requestedRemedyId)}`}</p>
+            <p className="advocate-asks">{`Asks for: ${advocateCase.requestedRemedyId === undefined ? '—' : remedyLabel(advocateCase.requestedRemedyId)}`}</p>
             <p className={expanded ? 'clamp clamp-4 clamp-open' : 'clamp clamp-4'}>{advocateCase.summary}</p>
             {advocateCase.arguments.length === 0 ? null : (
               <ul className="argument-list">
