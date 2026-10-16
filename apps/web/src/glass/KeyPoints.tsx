@@ -1,9 +1,9 @@
 import { useContext } from 'react';
 import { flushSync } from 'react-dom';
-import type { AdvocateCase, Run } from '@fairtrip/contracts';
+import type { AdvocateCase, PolicyVerdict, Precedent, Run } from '@fairtrip/contracts';
 import { ChipContext } from '../components/Chip.js';
 import { remedyLabel } from '../lib/format.js';
-import { clauseLabel } from '../lib/present.js';
+import { clauseLabel, precedentOriginLabel, verdictAgreement, verdictLine } from '../lib/present.js';
 import type { CompletedResult, SidePanel } from '../lib/view-model.js';
 
 type Argument = AdvocateCase['arguments'][number];
@@ -239,13 +239,27 @@ export interface CompactJudgePanelProps {
   status: Run['status'];
   reviewPending?: boolean;
   reviewed?: boolean;
+  verdict?: PolicyVerdict;
+  precedents?: Precedent[];
+  precedentsSeen?: boolean;
 }
 
-export function CompactJudgePanel({result, status, reviewPending = false, reviewed = false}: CompactJudgePanelProps) {
+export function CompactJudgePanel({result, status, reviewPending = false, reviewed = false, verdict, precedents = [], precedentsSeen = false}: CompactJudgePanelProps) {
   const waiting = status === 'queued' || status === 'running';
+  // Agreement is only meaningful once a final ruling exists.
+  const agreement = verdictAgreement(verdict, status === 'completed' && result !== null && !reviewPending ? result.action.remedyId : null);
   return (
     <section className="panel judge-panel hearing-judge glass-summary-panel" aria-labelledby="judge-heading">
       <h2 id="judge-heading" className="advocate-title judge-title">Judge findings</h2>
+      {verdict === undefined ? null : (
+        <div className="judge-verdict glass-summary-verdict">
+          <h3 className="glass-summary-label">Policy verdict</h3>
+          <ul className="glass-key-points">
+            <li>{verdictLine(verdict)}</li>
+            {agreement === null ? null : <li>{agreement}</li>}
+          </ul>
+        </div>
+      )}
       {reviewPending || reviewed ? <ul className="glass-key-points"><li>{reviewPending ? 'Judge recommendation · Awaiting human review' : 'Original Judge findings · See the verdict for the human decision'}</li></ul> : null}
       {result === null ? <ul className="glass-key-points"><li>{waiting ? 'Waiting for both cases' : 'No final ruling'}</li>{waiting ? null : <li>{status === 'failed' ? 'Hearing ended before a decision' : 'Decisive evidence missing'}</li>}</ul> : (
         <>
@@ -262,6 +276,21 @@ export function CompactJudgePanel({result, status, reviewPending = false, review
           </details>
         </>
       )}
+      {precedentsSeen ? (
+        <div className="precedents glass-summary-precedents">
+          <h3 className="glass-summary-label">Precedents considered</h3>
+          {precedents.length === 0 ? <ul className="glass-key-points"><li>No similar past ruling</li></ul> : (
+            <ul className="glass-key-points">
+              {precedents.map(precedent => (
+                <li key={precedent.id}>
+                  <KeyPoints text={`${precedentOriginLabel(precedent.origin)} · ${remedyLabel(precedent.remedyId)} · ${precedent.summary}`} maxPoints={1} fullTextLabel="Full summary" showSource={false} compact={false} />
+                </li>
+              ))}
+            </ul>
+          )}
+          <ul className="glass-key-points"><li>For consistency only; never overrides this case’s evidence.</li></ul>
+        </div>
+      ) : null}
     </section>
   );
 }

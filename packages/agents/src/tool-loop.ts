@@ -40,6 +40,9 @@ export async function runAdvocateToolLoop(
 ): Promise<ToolLoopResult> {
   const retrievedEvidence: Evidence[] = [];
   const retrievedPolicies: PolicyClause[] = [];
+  // Sources/categories already requested — a request covering only these is redundant.
+  const requestedSources = new Set<Evidence['source']>();
+  const requestedCategories = new Set<PolicyClause['category']>();
   const conversation: {role: 'system' | 'user' | 'assistant'; content: string}[] = [
     {role: 'system', content: systemPrompt}
   ];
@@ -134,13 +137,46 @@ export async function runAdvocateToolLoop(
       return {case: response.case, retrievedEvidence, retrievedPolicies};
     }
 
-    // Tool request: execute tools and feed results back
+    // Tool request: record the assistant turn, execute tools and feed results back
     if (response.type === 'tool_request') {
-      if (toolRounds >= config.maxRounds) throw new Error(`Advocate ${side} exceeded maximum tool rounds (${config.maxRounds}) without producing a final case`);
+      conversation.push({role: 'assistant', content: rawResponse});
+      const redundant = response.tools.every(tool =>
+        tool.name === 'get_evidence'
+          ? tool.input.sources.every(source => requestedSources.has(source))
+          : requestedCategories.has(tool.input.category));
+      const overBudget = toolRounds >= config.maxRounds;
+      // A request that re-asks for already-returned material — or arrives after the
+      // round budget — gets a directed repair nudge rather than another round: some
+      // providers re-ask when the transcript lacks the assistant turn, and extra
+      // retrieval never changes what the model can cite.
+      if (redundant || overBudget) {
+        if (repairAttempts >= config.maxRepairAttempts)
+          throw new Error(`Advocate ${side} exceeded maximum tool rounds (${config.maxRounds}) without producing a final case`);
+        repairAttempts++;
+        emitter?.emit({
+          actor: side,
+          type: 'output.repair',
+          summary: redundant
+            ? `${side} repeated a tool request for material already provided; repair attempt ${repairAttempts}`
+            : `${side} requested tools after using all ${config.maxRounds} rounds; repair attempt ${repairAttempts}`,
+          evidenceIds: [],
+          policyClauseIds: []
+        });
+        const evidenceIds = retrievedEvidence.map(record => record.id).join(', ') || 'none';
+        const policyIds = retrievedPolicies.map(clause => clause.id).join(', ') || 'none';
+        conversation.push({
+          role: 'user',
+          content: `${redundant
+            ? 'All requested evidence and policy were already returned above'
+            : `You have used all ${config.maxRounds} tool rounds. The material available to you is already above`} (evidence IDs: ${evidenceIds}; policy IDs: ${policyIds}). No further information is available. Respond now with your final_case JSON, citing only those IDs.`
+        });
+        continue;
+      }
       toolRounds++;
       for (const tool of response.tools) {
         signal.throwIfAborted();
         if (tool.name === 'get_evidence') {
+          for (const source of tool.input.sources) requestedSources.add(source);
           emitter?.emit({
             actor: side,
             type: 'tool.requested',
@@ -166,6 +202,7 @@ export async function runAdvocateToolLoop(
             content: `Evidence retrieval results:\n${JSON.stringify(evidence, null, 2)}`
           });
         } else if (tool.name === 'get_policy') {
+          requestedCategories.add(tool.input.category);
           emitter?.emit({
             actor: side,
             type: 'tool.requested',

@@ -1,9 +1,11 @@
 import { useEffect, useId, useMemo, useState } from 'react';
-import type { ActivityEvent, AdvocateCase, JudgeResult, Run } from '@fairtrip/contracts';
+import type { ActivityEvent, AdvocateCase, JudgeResult, Precedent, RiskAssessment, Run } from '@fairtrip/contracts';
 import { remedyLabel, rulingLabel } from '../lib/format.js';
-import { actionHeadline, firstSentence } from '../lib/present.js';
+import { actionHeadline, firstSentence, riskLevelLabel } from '../lib/present.js';
 import type { PollPhase } from '../hooks/useRunPolling.js';
+import { Timeline } from '../components/Timeline.js';
 import { HearingSymbol } from './HearingSymbol.js';
+import type { HearingSymbolName } from './HearingSymbol.js';
 import { KeyPoints } from './KeyPoints.js';
 import { hearingProgress } from './hearing-progress.js';
 
@@ -12,28 +14,33 @@ interface LiquidHearingLinesProps {
   status: Run['status'] | null;
   result?: JudgeResult | null;
   cases?: AdvocateCase[];
+  risk?: RiskAssessment;
+  precedents?: Precedent[];
   replayProgress?: number;
   progressMode?: 'replay' | 'live';
   phase?: PollPhase;
   reviewPending?: boolean;
 }
 
-const HEARING_LANES = ['rider', 'judge', 'driver'] as const;
-type HearingLane = typeof HEARING_LANES[number];
+type HearingLane = 'rider' | 'judge' | 'driver' | 'risk';
 type Stage = 'evidence' | 'case' | 'review' | 'decision';
 interface DecisionPoint {
   event: ActivityEvent;
   lane: HearingLane;
   stage: Stage;
   label: string;
+  /** Plot override (0–100); defaults to the stage column. */
+  x?: number;
+  symbol?: HearingSymbolName;
 }
 
 const MIN_WIDTH = 780;
 const LABEL_WIDTH = 190;
 const RIGHT_PADDING = 76;
 const HEIGHT = 256;
-const LANE_Y: Record<HearingLane, number> = {rider: 70, judge: 140, driver: 210};
-const LANE_LABEL: Record<HearingLane, string> = {rider: 'Rider Advocate', judge: 'Judge', driver: 'Driver Advocate'};
+const RISK_LANE_HEIGHT = 70;
+const LANE_Y: Record<HearingLane, number> = {rider: 70, judge: 140, driver: 210, risk: 280};
+const LANE_LABEL: Record<HearingLane, string> = {rider: 'Rider Advocate', judge: 'Judge', driver: 'Driver Advocate', risk: 'Risk Analyst'};
 const STAGES: {id: Stage; label: string; x: number}[] = [
   {id: 'evidence', label: 'Evidence reviewed', x: 0},
   {id: 'case', label: 'Case ready', x: 31},
@@ -41,6 +48,8 @@ const STAGES: {id: Stage; label: string; x: number}[] = [
   {id: 'decision', label: 'Decision', x: 100},
 ];
 const STAGE_X: Record<Stage, number> = {evidence: 0, case: 31, review: 65, decision: 100};
+// Precedent retrieval sits just before the Judge review column.
+const PRECEDENT_X = 56;
 
 function useCanvasWidth(): [(element: HTMLDivElement | null) => void, number] {
   const [element, setElement] = useState<HTMLDivElement | null>(null);
@@ -58,7 +67,7 @@ function useCanvasWidth(): [(element: HTMLDivElement | null) => void, number] {
 }
 
 /** Show milestones from recorded events, without exposing the internal event log. */
-function hearingPoints(events: ActivityEvent[], result: JudgeResult | null, reviewPending: boolean): DecisionPoint[] {
+export function hearingPoints(events: ActivityEvent[], result: JudgeResult | null, reviewPending: boolean): DecisionPoint[] {
   const points: DecisionPoint[] = [];
   for (const lane of ['rider', 'driver'] as const) {
     const evidence = events.filter(event => event.actor === lane && event.type === 'evidence.retrieved').at(-1);
@@ -66,6 +75,10 @@ function hearingPoints(events: ActivityEvent[], result: JudgeResult | null, revi
     if (evidence !== undefined) points.push({event: evidence, lane, stage: 'evidence', label: 'Evidence reviewed'});
     if (completed !== undefined) points.push({event: completed, lane, stage: 'case', label: 'Case ready'});
   }
+  const risk = events.find(event => event.actor === 'risk' && event.type === 'risk.assessed');
+  if (risk !== undefined) points.push({event: risk, lane: 'risk', stage: 'case', label: 'Assessment ready', symbol: 'risk'});
+  const precedent = events.find(event => event.type === 'precedent.retrieved');
+  if (precedent !== undefined) points.push({event: precedent, lane: 'judge', stage: 'review', label: 'Precedents checked', x: PRECEDENT_X, symbol: 'case'});
   const review = events.find(event => event.type === 'judge.started');
   if (review !== undefined) points.push({event: review, lane: 'judge', stage: 'review', label: 'Judge review'});
   const decision = events.find(event => event.type === 'run.completed' || event.type === 'run.incomplete' || event.type === 'run.failed');
@@ -80,7 +93,15 @@ function hearingPoints(events: ActivityEvent[], result: JudgeResult | null, revi
   return points.sort((a, b) => a.event.sequence - b.event.sequence);
 }
 
-function checkpointSummary(point: DecisionPoint, cases: AdvocateCase[], result: JudgeResult | null, reviewPending: boolean): string[] {
+function checkpointSummary(point: DecisionPoint, cases: AdvocateCase[], result: JudgeResult | null, reviewPending: boolean, risk: RiskAssessment | undefined, precedents: Precedent[]): string[] {
+  if (point.lane === 'risk') {
+    return risk === undefined
+      ? ['The Risk Analyst assessment is ready.', 'Context only; never decides the outcome.']
+      : [`Risk level: ${riskLevelLabel(risk.overall)}`, firstSentence(risk.summary), 'Context only; never decides the outcome.'];
+  }
+  if (point.label === 'Precedents checked') {
+    return [precedents.length === 0 ? 'No similar past ruling' : `${precedents.length} similar past ruling${precedents.length === 1 ? '' : 's'} considered`, 'For consistency only; never overrides this case’s evidence.'];
+  }
   if (point.stage === 'evidence') return [`Trip evidence collected for the ${point.lane === 'rider' ? 'rider' : 'driver'} case.`];
   if (point.stage === 'case') {
     const advocateCase = cases.find(item => item.side === point.lane);
@@ -99,7 +120,7 @@ function checkpointSummary(point: DecisionPoint, cases: AdvocateCase[], result: 
 }
 
 /** Preview-only, interactive milestones. Every completed point comes from the run. */
-export function LiquidHearingLines({events, status, result = null, cases = [], replayProgress, progressMode = 'live', phase, reviewPending = false}: LiquidHearingLinesProps) {
+export function LiquidHearingLines({events, status, result = null, cases = [], risk, precedents = [], replayProgress, progressMode = 'live', phase, reviewPending = false}: LiquidHearingLinesProps) {
   const id = useId();
   const [canvasRef, width] = useCanvasWidth();
   const [hovered, setHovered] = useState<number | null>(null);
@@ -113,17 +134,24 @@ export function LiquidHearingLines({events, status, result = null, cases = [], r
   const px = (x: number) => LABEL_WIDTH + (x / 100) * plotWidth;
   const activeSequence = hovered ?? focused ?? pinned;
   const active = points.find(point => point.event.sequence === activeSequence) ?? null;
-  const reviewStarted = points.some(point => point.stage === 'review');
+  // 'Precedents checked' shares the review stage column but precedes judge.started.
+  const reviewStarted = points.some(point => point.event.type === 'judge.started');
   const decisionReached = points.some(point => point.stage === 'decision');
   const waiting = status === null || status === 'queued' || status === 'running';
   const finalDecision = status === 'completed' && result !== null && result.ruling !== 'incomplete' && !reviewPending;
   const needsInformation = status === 'incomplete' || (status === 'completed' && result?.ruling === 'incomplete');
   const progress = hearingProgress({events, status, result, replayProgress, progressMode, phase, reviewPending});
+  // The Risk Analyst lane appears only when the run has an assessment.
+  const hasRiskLane = risk !== undefined || points.some(point => point.lane === 'risk');
+  const height = hasRiskLane ? HEIGHT + RISK_LANE_HEIGHT : HEIGHT;
+  const lanes: HearingLane[] = hasRiskLane ? ['rider', 'judge', 'driver', 'risk'] : ['rider', 'judge', 'driver'];
 
   const completedRoute = (lane: HearingLane) => lane === 'judge'
     ? reviewStarted && decisionReached
-    : points.some(point => point.lane === lane && point.stage === 'evidence')
-      && points.some(point => point.lane === lane && point.stage === 'case');
+    : lane === 'risk'
+      ? points.some(point => point.lane === 'risk')
+      : points.some(point => point.lane === lane && point.stage === 'evidence')
+        && points.some(point => point.lane === lane && point.stage === 'case');
 
   return (
     <section className="panel lines glass-timeline" aria-labelledby={`${id}-heading`}>
@@ -144,11 +172,11 @@ export function LiquidHearingLines({events, status, result = null, cases = [], r
       <ul id={`${id}-help`} className="glass-timeline-help">
         <li>Hover or focus for a summary · Tap to pin · Escape to close</li>
       </ul>
-      <div ref={canvasRef} className="glass-timeline-scroll" role="region" aria-label="Three agent tracks, from evidence to decision; scroll horizontally on smaller screens" tabIndex={0}>
-        <div className="glass-timeline-canvas" style={{width, height: HEIGHT}}>
-          <svg className="glass-timeline-figure" viewBox={`0 0 ${width} ${HEIGHT}`} width={width} height={HEIGHT} aria-hidden="true">
+      <div ref={canvasRef} className="glass-timeline-scroll" role="region" aria-label="Agent tracks, from evidence to decision; scroll horizontally on smaller screens" tabIndex={0}>
+        <div className="glass-timeline-canvas" style={{width, height}}>
+          <svg className="glass-timeline-figure" viewBox={`0 0 ${width} ${height}`} width={width} height={height} aria-hidden="true">
             {STAGES.map(stage => <text key={stage.id} x={px(stage.x)} y={24} textAnchor="middle" className="glass-timeline-tick glass-timeline-stage" data-reached={points.some(point => point.stage === stage.id)}>{stage.label}</text>)}
-            {HEARING_LANES.map(lane => {
+            {lanes.map(lane => {
               if (!completedRoute(lane)) return null;
               const start = lane === 'judge' ? px(STAGE_X.review) : px(STAGE_X.evidence);
               const end = lane === 'judge' ? px(STAGE_X.decision) : px(STAGE_X.case);
@@ -168,8 +196,11 @@ export function LiquidHearingLines({events, status, result = null, cases = [], r
                 <path key={lane} pathLength={1} d={`M ${px(STAGE_X.case)} ${LANE_Y[lane]} C ${px(48)} ${LANE_Y[lane]}, ${px(48)} ${LANE_Y.judge}, ${px(STAGE_X.review)} ${LANE_Y.judge}`} className="glass-timeline-connection glass-timeline-reveal" data-lane={lane} data-ready="true" data-route="handoff" />
               ) : null;
             })}
+            {reviewStarted && points.some(point => point.lane === 'risk') ? (
+              <path pathLength={1} d={`M ${px(STAGE_X.case)} ${LANE_Y.risk} C ${px(48)} ${LANE_Y.risk}, ${px(48)} ${LANE_Y.judge}, ${px(STAGE_X.review)} ${LANE_Y.judge}`} className="glass-timeline-connection glass-timeline-reveal" data-lane="risk" data-ready="true" data-route="handoff" />
+            ) : null}
           </svg>
-          {HEARING_LANES.map(lane => (
+          {lanes.map(lane => (
             <div key={lane} className="glass-timeline-lane" data-lane={lane} style={{top: LANE_Y[lane]}}><span className="glass-timeline-lane-symbol" aria-hidden="true"><HearingSymbol name={lane} /></span><span>{LANE_LABEL[lane]}</span></div>
           ))}
           {points.map(point => (
@@ -177,7 +208,7 @@ export function LiquidHearingLines({events, status, result = null, cases = [], r
               key={point.event.sequence}
               type="button"
               className="glass-timeline-point"
-              style={{left: px(STAGE_X[point.stage]), top: LANE_Y[point.lane]}}
+              style={{left: px(point.x ?? STAGE_X[point.stage]), top: LANE_Y[point.lane]}}
               data-lane={point.lane}
               data-active={activeSequence === point.event.sequence}
               data-pinned={pinned === point.event.sequence}
@@ -193,7 +224,7 @@ export function LiquidHearingLines({events, status, result = null, cases = [], r
               onClick={() => { setPinned(value => value === point.event.sequence ? null : point.event.sequence); }}
               onKeyDown={event => { if (event.key === 'Escape') { setHovered(null); setFocused(null); setPinned(null); event.currentTarget.blur(); } }}
             >
-              <span className="glass-timeline-orb" aria-hidden="true"><HearingSymbol name={point.stage === 'evidence' ? 'trip' : point.stage === 'case' ? 'case' : point.stage === 'decision' && finalDecision ? 'check' : 'review'} /></span>
+              <span className="glass-timeline-orb" aria-hidden="true"><HearingSymbol name={point.symbol ?? (point.stage === 'evidence' ? 'trip' : point.stage === 'case' ? 'case' : point.stage === 'decision' && finalDecision ? 'check' : 'review')} /></span>
               {point.stage === 'decision' && !finalDecision ? <span className="glass-timeline-point-label" aria-hidden="true">{point.label}</span> : null}
             </button>
           ))}
@@ -205,10 +236,16 @@ export function LiquidHearingLines({events, status, result = null, cases = [], r
         ) : (
           <>
             <div className="glass-timeline-summary-heading"><strong>{active.label}</strong><span className="glass-timeline-meta">{LANE_LABEL[active.lane]}</span>{pinned === active.event.sequence ? <span className="glass-timeline-pinned">Pinned</span> : null}</div>
-            <KeyPoints text={checkpointSummary(active, cases, result, reviewPending)} maxPoints={3} showSource={false} />
+            <KeyPoints text={checkpointSummary(active, cases, result, reviewPending, risk, precedents)} maxPoints={3} showSource={false} />
           </>
         )}
       </div>
+      {events.length === 0 ? null : (
+        <details className="lines-log glass-activity-log">
+          <summary>Show full activity log</summary>
+          <Timeline events={events} />
+        </details>
+      )}
     </section>
   );
 }

@@ -45,6 +45,8 @@ Import schemas and types from `@fairtrip/contracts`: `DisputeSchema`, `EvidenceS
 | judge | `model.start`, `model.finish` | Judge model call | — |
 | system | `run.completed` / `run.incomplete` / `run.failed` | terminal | — |
 
+`output.repair` also fires for tool-request guards: the advocate loop records its own assistant turn each round, and a request that only re-asks for already-returned material — or arrives after the round budget — gets a shared-budget repair nudge to answer with `final_case` instead of spending another round.
+
 ### 2.3 `@fairtrip/agents` interfaces
 
 ```ts

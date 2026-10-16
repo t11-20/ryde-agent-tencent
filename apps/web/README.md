@@ -1,6 +1,6 @@
 # @fairtrip/web
 
-FairTrip web UI — a single-page React/Vite prototype that shows Ryde dispute resolution end to end. The page reads top to bottom like a hearing:
+FairTrip web UI — a single-page React/Vite prototype that shows Ryde dispute resolution end to end. The default entry `/` is the hearing-room ("glass") UI in `src/glass/` (see `src/glass/README.md`); the interface described below remains available as **Classic** at `/classic.html`. The page reads top to bottom like a hearing:
 
 - **Case bar** — pick a synthetic fixture, edit the rider claim, read the driver statement, and select Resolve dispute.
 - **Bench** — the run status band: stage tracker and elapsed timer while the hearing runs; on completion the ruling, the server-calculated action (completed runs only — failed and incomplete runs never show an amount), model-assessed confidence and Export case file. An escalated run shows an amber "Sent to human review" bench instead, with the Judge's recommendation clearly marked as a recommendation.
@@ -18,7 +18,7 @@ Case files can be exported as JSON. Clicking any chip scrolls to the matching ev
 
 ## Replay mode (demo safety net)
 
-Start the API with `RUN_MODE=replay npm run dev` (optionally `REPLAY_SPEED=20` to compress the timeline). The UI then replays the recorded events of a past live release-gate run — the header reads **Replay of live run · recorded \<date\>**. No model is called; the evidence locker, money, precedents and human-review controls still behave exactly as in a live run because they are served by the real API. Every run also gets a shareable deep link (`?run=<id>` — pasted into the address bar it resumes the same run), and a **Recent runs…** select next to the case picker lists this session's runs newest first.
+Start the API with `RUN_MODE=replay npm run dev` (optionally `REPLAY_SPEED=20` to compress the timeline). The UI then replays the recorded events of a past live release-gate run — the header reads **Replay of live run · recorded \<date\>**. No model is called; the evidence locker, money, precedents and human-review controls still behave exactly as in a live run because they are served by the real API. Every run also gets a shareable deep link (`?run=<id>` — pasted into the address bar it resumes the same run), and earlier runs on the same server are listed newest first — in the hearing room UI under the collapsed **Earlier runs on this server** disclosure at the bottom of the board, in the classic UI via the **Recent runs…** select next to the case picker.
 
 ## Running
 

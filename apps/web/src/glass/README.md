@@ -1,8 +1,8 @@
-# FairTrip glass preview
+# FairTrip hearing room (glass)
 
-This preview has its own entry point and styles. The original interface remains
-independent; no existing application source, dependency, or environment setting
-is changed by the preview.
+This interface is the main web UI. The original interface remains available as
+**Classic** at `/classic.html`; no existing application source, dependency, or
+environment setting is changed by this edition.
 
 ## Try it
 
@@ -12,12 +12,13 @@ From the repository root, start the normal web development server:
 npm run dev:web
 ```
 
-Open **http://127.0.0.1:5173/glass.html**. The original interface remains at `/`.
+Open **http://127.0.0.1:5173/**. The original interface remains at `/classic.html`
+(the toolbar's **Classic view** link goes there).
 
-- **Explore cases** opens the scenario selector in the **Case** segment. All 11
-  included synthetic scenarios are available without the API or a model key. Eight use
-  validated live recordings; three use the repository's deterministic scripted
-  model, with real evidence and server calculations. Each scenario shows its
+- **Explore cases** opens the scenario selector in the **Case** segment. All 20
+  included synthetic scenarios are available without the API or a model key; every
+  one is a validated live recording captured from the server's replay mode
+  (`npm run capture:demo-scenarios`). Each scenario shows its
   example label. Hearings automatically begin at the first event when opened or
   selected. **View case review** restarts the saved events, evidence,
   cases, and final result in order. **Pause review** pauses this sequence; **Continue review**
@@ -39,10 +40,18 @@ Open **http://127.0.0.1:5173/glass.html**. The original interface remains at `/`
   If the connected API runs in replay mode, its source and action are labelled as
   recorded case reviews and claim editing is hidden. A completed Judge
   recommendation awaiting human review is labelled **Human review**, with a proposed
-  amount rather than a final payment. After review, the verdict and final checkpoint
+  amount rather than a final payment, the escalation reasons, and — when the Judge
+  diverged from the policy rules — both outcomes side by side. In connected mode the
+  verdict offers **Confirm ruling**, **Override…**, and **Apply policy verdict** when
+  the deterministic verdict names a different remedy; offline it notes that reviewer
+  actions need a connected hearing. After review, the verdict and final checkpoint
   use the human decision; the original Judge findings remain labelled separately.
   Recorded playback can reach 100% even when that recording needs human review;
   the status describes playback completion and the unavailable decision clearly.
+  Runs retried by the API after a failed first attempt show a re-run note above the
+  verdict; earlier runs on the same server sit in a collapsed **Earlier runs on
+  this server** disclosure at the bottom of the hearing board and resume an
+  earlier run, and `?run=<id>` deep links open the same run directly.
 - The moon/sun button switches the theme. Interactive motion is part of the default
   interface; there is no application motion preference or 3D opt-in label.
   The CSS and pointer handlers silently honor the operating system's reduced
@@ -87,14 +96,17 @@ curated bundled design system, not an upstream brand specification. The desktop
 interface timed out during automation; this preview uses the installed local
 design resources directly.
 
-The recorded JSON is the completed synthetic R1 run saved by the live golden
-evaluation on 13 October 2026. It contains synthetic evidence and a demonstration
-policy; it does not contain configuration or model credentials. Confidence remains
-model-assessed. The recording and calculations were not rewritten for this design.
+The recorded JSON holds all 20 synthetic fixtures, replayed through the server's
+replay mode so each run carries its risk assessment, policy verdict, escalation
+decision, and precedents exactly as a live run produced them. It contains
+synthetic evidence and a demonstration policy; it does not contain configuration
+or model credentials. Confidence remains model-assessed. Escalated runs without a
+human decision stay pending review — that is the honest offline state. The
+recordings and calculations were not rewritten for this design.
 
-The liquid edition adds a draggable three-layer glass sculpture. Drag with a mouse
+The liquid edition adds a draggable four-layer glass sculpture. Drag with a mouse
 or pen to rotate it, or focus it and use the arrow keys; Home resets its pose.
-Rider / Judge / Driver buttons explain each perspective. Touch devices retain
+Rider / Driver / Risk / Judge buttons explain each of the four agent perspectives. Touch devices retain
 normal page scrolling and can use those buttons. Every main section, the toolbar,
 footer, claim cards, evidence cards, policy cards, and gauges share dimensional
 glass rims and stacked shadows even at rest. Hovering those surfaces moves their
@@ -126,16 +138,24 @@ Pending, failed, incomplete, and stub-example states do not
 render a final monetary verdict. Confidence on scripted scenarios is explicitly
 illustrative, rather than a model measurement.
 
-Hearing Lines has three agent tracks and four fixed stages: evidence reviewed,
-case ready, judge review, and decision. At most six raised markers are shown,
-only when the corresponding recorded events exist. Future routes are absent from
-the DOM: advocate paths require evidence and a completed case, handoffs require
-that case and judge review, and the final path requires a terminal event.
+Hearing Lines has four fixed stages — evidence reviewed, case ready, judge review,
+and decision — over three agent tracks, plus a fourth **Risk Analyst** track when
+the run produced a risk assessment. Raised markers appear only when the
+corresponding recorded events exist: advocate evidence and case points, an
+**Assessment ready** risk point, a **Precedents checked** point just before the
+review column, the Judge review, and the decision. Future routes are absent from
+the DOM: advocate paths require evidence and a completed case, handoffs (including
+the risk lane's) require that case and `judge.started`, and the final path requires
+a terminal event.
 Reached paths draw with normalized SVG strokes in process order. Hover/focus shows concise
-key points; click/tap pins them, and Escape dismisses them. Raw logs, internal
-tool activity, IDs, and timestamps are omitted. Keyboard and horizontal scrolling
-are supported on narrow screens. The three-agent 3D panel is visible at the top
+key points; click/tap pins them, and Escape dismisses them. The full activity log
+— every event with actor, elapsed time, summary, and citation chips — is available
+under a collapsed **Show full activity log** disclosure below the checkpoints. Keyboard and horizontal scrolling
+are supported on narrow screens. The four-agent 3D panel is visible at the top
 right on desktop, with selectable explanations and a draggable glass sculpture.
+A **Risk analyst** panel sits below the hearing columns whenever the run carries
+an assessment — context only; it never decides the outcome — and the Judge column
+lists the policy verdict and the precedents considered.
 
 Motion uses React state, CSS opacity/transform transitions, and normalized SVG
 strokes. The pointer light and
@@ -176,24 +196,31 @@ family appears in navigation, action tiles, agent cards, checkpoints, and eviden
 
 ## Files
 
-- `../../glass.html`: alternate HTML entry.
-- `../../vite.glass.config.ts`: independent preview build configuration.
+- `../../index.html`: the main entry — this interface.
+- `../../classic.html`: the original interface, kept as Classic.
+- `../../vite.config.ts`: multi-page build for both entries.
+- `../../vite.glass.config.ts`: independent single-file offline preview build.
 - `main.tsx`: React mount and isolated stylesheet imports.
-- `GlassPreview.tsx`: preview toolbar, ambient layers, theme, and source switch.
+- `GlassPreview.tsx`: toolbar, ambient layers, theme, prism, and source switch.
 - `RecordedHearing.tsx`: offline recording replay using existing hearing components.
-- `demo-scenarios.json`: validated recordings/scripted outcomes for all 11 fixtures.
+- `demo-scenarios.json`: validated recorded runs for all 20 fixtures.
 - `demo-data.ts`: validated catalogue and cached recording access.
-- `LiveHearing.tsx`: live workflow using the same concise presentation.
-- `HearingPresentation.tsx`: scenario selector, distinct verdict, compact evidence/policy.
+- `LiveHearing.tsx`: connected workflow using the same concise presentation.
+- `HearingPresentation.tsx`: scenario selector, distinct verdict, review actions, compact evidence/policy.
 - `KeyPoints.tsx`: source-based bullet excerpts and compact advocate/Judge panels.
+- `RiskSummary.tsx`: compact context-only Risk Analyst panel.
+- `review-actions.ts`: which reviewer actions a run is eligible for.
 - `LiquidHearingLines.tsx`: raised interactive hearing checkpoints and source summaries.
 - `hearing-progress.ts`: playback percentages and observed live review milestones.
 - `hearing-progress.test.ts`: progress bounds, pause, retries, and terminal-state checks.
+- `hearing-lines.test.ts`: risk lane, precedent checkpoint, and ordering.
 - `verdict.test.ts`: final decisions, pending human review, and reviewer overrides.
+- `review-actions.test.ts`: reviewer-action eligibility per run state.
 - `HearingSymbol.tsx`: original shared SVG symbol family.
 - `demo-run.json`: validated synthetic R1 recording.
 - `opendesign-tokens.css`: copied Open Design tokens.
 - `glass.css`: scoped glassmorphism theme and responsive motion styles.
+- `../../../../scripts/capture-demo-scenarios.ts`: regenerates `demo-scenarios.json` from the replay API.
 
-The preview is kept in these separate files so it can be tested before integrating
-it with the original interface. The original UI does not import them.
+These files are the main interface; the Classic UI in `../components` and `../App.tsx`
+remains independent and does not import them.

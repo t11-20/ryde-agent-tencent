@@ -3,7 +3,7 @@ import { runAdvocateToolLoop, createMockEvidenceTools, defaultToolLoopConfig, EX
 import { validateCitations } from '@fairtrip/contracts';
 import type { AdvocateCase, Evidence, PolicyClause } from '@fairtrip/contracts';
 import { catalog } from '../apps/api/src/catalog.js';
-import type { ModelAdapter } from '@fairtrip/agents';
+import type { EvidenceTools, ModelAdapter } from '@fairtrip/agents';
 
 const withCitationValidation = () => ({
   ...defaultToolLoopConfig(),
@@ -194,9 +194,103 @@ describe('advocate tool loop', () => {
     const model = mockModel([
       JSON.stringify({type: 'tool_request', tools: [{name: 'get_evidence', input: {sources: ['gps']}}]}),
       JSON.stringify({ type: 'tool_request', tools: [{ name: 'get_evidence', input: { sources: ['gps'] } }] }),
-      JSON.stringify({ type: 'tool_request', tools: [{ name: 'get_evidence', input: { sources: ['chat'] } }] })
+      JSON.stringify({ type: 'tool_request', tools: [{ name: 'get_evidence', input: { sources: ['chat'] } }] }),
+      JSON.stringify({ type: 'tool_request', tools: [{ name: 'get_evidence', input: { sources: ['history'] } }] })
     ]);
     await expect(runAdvocateToolLoop('rider', dispute, model, evidenceTools, emitter, signal(), 'test prompt', { maxRounds: 2, maxRepairAttempts: 1, modelTimeoutMs: 20000 })).rejects.toThrow('exceeded maximum tool rounds');
+  });
+
+  it('records the assistant turn before the tool results so the model sees its own request', async () => {
+    const seen: {role: string; content: string}[][] = [];
+    const round1 = JSON.stringify({type: 'tool_request', tools: [{name: 'get_evidence', input: {sources: ['gps']}}]});
+    const model: ModelAdapter = {
+      async complete(messages, _signal) {
+        seen.push(messages.map(message => ({role: message.role, content: message.content})));
+        if (seen.length === 1) return round1;
+        return JSON.stringify({type: 'final_case', case: {...catalog.riderCase, side: 'rider'}});
+      }
+    };
+    await runAdvocateToolLoop('rider', dispute, model, evidenceTools, emitter, signal(), 'test prompt');
+    const secondCall = seen[1];
+    expect(secondCall).toBeDefined();
+    const assistantIndex = secondCall?.findIndex(message => message.role === 'assistant' && message.content === round1) ?? -1;
+    const resultsIndex = secondCall?.findIndex(message => message.role === 'user' && message.content.startsWith('Evidence retrieval results')) ?? -1;
+    expect(assistantIndex).toBeGreaterThan(-1);
+    expect(resultsIndex).toBeGreaterThan(assistantIndex);
+  });
+
+  it('nudges instead of re-running a tool request that only re-asks for returned material', async () => {
+    emitter.emit.mockClear();
+    const request = JSON.stringify({type: 'tool_request', tools: [
+      {name: 'get_evidence', input: {sources: ['gps', 'chat', 'payment', 'history']}},
+      {name: 'get_policy', input: {category: 'route_deviation'}}
+    ]});
+    let evidenceCalls = 0;
+    const conversations: {role: string; content: string}[][] = [];
+    const tools: EvidenceTools = {
+      async getEvidence(input, _signal) {
+        evidenceCalls += 1;
+        return evidenceTools.getEvidence(input, _signal);
+      },
+      getPolicy: (input, _signal) => evidenceTools.getPolicy(input, _signal)
+    };
+    const responses = [request, request, JSON.stringify({type: 'final_case', case: {...catalog.riderCase, side: 'rider'}})];
+    const model: ModelAdapter = {
+      async complete(messages, _signal) {
+        conversations.push(messages.map(message => ({role: message.role, content: message.content})));
+        const response = responses.shift();
+        if (response === undefined) throw new Error('No more mock responses');
+        return response;
+      }
+    };
+    const output = await runAdvocateToolLoop('rider', dispute, model, tools, emitter, signal(), 'test prompt');
+    expect(output.case.side).toBe('rider');
+    expect(evidenceCalls).toBe(1);
+    const repairs = emitter.emit.mock.calls
+      .map(call => call[0] as {type: string; summary: string})
+      .filter(event => event.type === 'output.repair');
+    expect(repairs).toHaveLength(1);
+    expect(repairs[0]?.summary).toContain('repeated a tool request');
+    const lastCall = conversations.at(-1) ?? [];
+    const nudge = lastCall.find(message => message.role === 'user' && message.content.includes('already returned above'));
+    expect(nudge?.content).toContain('evidence IDs:');
+    expect(nudge?.content).toContain('Respond now with your final_case JSON');
+  });
+
+  it('throws when a redundant tool request exhausts the repair budget', async () => {
+    const request = JSON.stringify({type: 'tool_request', tools: [{name: 'get_evidence', input: {sources: ['gps']}}]});
+    const model = mockModel([request, request, request, request]);
+    await expect(runAdvocateToolLoop('rider', dispute, model, evidenceTools, emitter, signal(), 'test prompt',
+      {maxRounds: 2, maxRepairAttempts: 2, modelTimeoutMs: 20000})).rejects.toThrow('exceeded maximum tool rounds');
+  });
+
+  it('nudges once when a fresh request arrives over the round budget, then accepts the case', async () => {
+    emitter.emit.mockClear();
+    const conversations: {role: string; content: string}[][] = [];
+    const responses = [
+      JSON.stringify({type: 'tool_request', tools: [{name: 'get_evidence', input: {sources: ['gps']}}]}),
+      JSON.stringify({type: 'tool_request', tools: [{name: 'get_evidence', input: {sources: ['chat']}}]}),
+      JSON.stringify({type: 'tool_request', tools: [{name: 'get_evidence', input: {sources: ['payment']}}]}),
+      JSON.stringify({type: 'final_case', case: {...catalog.riderCase, side: 'rider'}})
+    ];
+    const model: ModelAdapter = {
+      async complete(messages, _signal) {
+        conversations.push(messages.map(message => ({role: message.role, content: message.content})));
+        const response = responses.shift();
+        if (response === undefined) throw new Error('No more mock responses');
+        return response;
+      }
+    };
+    const output = await runAdvocateToolLoop('rider', dispute, model, evidenceTools, emitter, signal(), 'test prompt',
+      {maxRounds: 2, maxRepairAttempts: 2, modelTimeoutMs: 20000});
+    expect(output.case.side).toBe('rider');
+    const repairs = emitter.emit.mock.calls
+      .map(call => call[0] as {type: string; summary: string})
+      .filter(event => event.type === 'output.repair');
+    expect(repairs).toHaveLength(1);
+    expect(repairs[0]?.summary).toContain('requested tools after using all 2 rounds');
+    const lastCall = conversations.at(-1) ?? [];
+    expect(lastCall.some(message => message.role === 'user' && message.content.includes('You have used all 2 tool rounds.'))).toBe(true);
   });
 
   it('derives its default limits from EXECUTION_LIMITS', async () => {

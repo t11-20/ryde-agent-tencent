@@ -32,12 +32,12 @@ The project was built in CodeBuddy desktop. Lane B was developed as a sequence o
 ## Stretch goals implemented
 
 - **Fraud & Bad-Faith Detection Agent (Risk Analyst).** A fourth agent runs in parallel with the advocates and surfaces risk signals derived from the dispute's history and chat records (frequent filers, repeat complaint subjects, low ratings, instruction-like or threatening chat), each cited to the evidence that produced it. What it may NOT do: it never produces or removes a signal — the server computes the signal set deterministically and the model only writes the summary — and it never establishes fault; every assessment carries the caveat that risk is context only. The demo shows it on fixture N2H, where driver-side signals raise the assessment to high on the Risk Analyst lane and panel while the ruling itself still follows the evidence.
-- **Escalation Protocol.** A completed live run escalates for human review when the model-assessed confidence falls below a configured threshold or the risk assessment is high. The status stays `completed` but the ruling and amount become recommendations: the bench switches to a human-review state with Confirm and Override controls, and an override rebuilds the monetary action with the same server formulas — a reviewer can change the remedy but never type an amount. What it may NOT do: escalation never changes the computed outcome by itself; only a human review decision recorded via `POST /api/runs/:id/review` does. The demo shows the N2H bench read "Sent to human review" and an override to a no-show fee refund.
+- **Escalation Protocol.** A completed live run escalates for human review when the model-assessed confidence falls below a configured threshold or the risk assessment is high. The status stays `completed` but the ruling and amount become recommendations: the verdict card (the bench in the classic UI) switches to a human-review state with Confirm and Override controls, and an override rebuilds the monetary action with the same server formulas — a reviewer can change the remedy but never type an amount. What it may NOT do: escalation never changes the computed outcome by itself; only a human review decision recorded via `POST /api/runs/:id/review` does. The demo shows the N2H verdict read "Sent to human review" and an override to a no-show fee refund.
 - **Policy & Precedent Agent with Learning Feedback Loop.** Each run is summarised into case features and matched against a precedent store — a synthetic seed plus rulings written back from completed runs and human overrides — so the Judge sees how similar past cases were decided. What it may NOT do: precedents are for consistency only and can never override this case's evidence, and they never change the status, remedy or amount; the release gate enforces that in code. The demo shows the matched precedents listed in the Judge column, and the reviewer's override appearing in a later run's "Precedents considered".
 
 ## Business value
 
-Measured prototype results, live model MiniMax-M3, release-gate run `20261013-144417` on 2026-10-13 against contract 0.3.0, copied from `submission/metrics/scorecard.md`:
+Measured prototype results, live model MiniMax-M3, release-gate run `20261013-144417` on 2026-10-13 against contract 0.3.0 (the seven-condition gate that preceded the deterministic policy verdict), copied from `submission/metrics/scorecard.md`:
 
 - Runs passed: 27 / 27 (26 planned runs plus one human-review feedback probe)
 - Fixtures passed: 20 / 20
@@ -50,7 +50,7 @@ Measured prototype results, live model MiniMax-M3, release-gate run `20261013-14
 - Consistency: 3 / 3 repeated fixtures (R1, N2, R1F)
 - p50 latency: 16.1 s; max latency: 19.2 s
 - Token usage: not measured (the API does not report it)
-- Release gate: PASS (all seven named conditions)
+- Release gate: PASS (all seven conditions of that gate version)
 
 In the seven escalated runs the flagged party's side still won on the evidence in six (R1F ×3, N1R, N2H, X6) and lost in one (X2 — the flagged rider's instruction-like chat never overrode the trip evidence); escalation changed no outcome either way. The feedback probe demonstrates the learning loop end-to-end: a synthetic human override of N2H became the most recent precedent and was surfaced to the next N2 run as consistency context without altering its ruling.
 

@@ -30,6 +30,11 @@ export function recordedFrame(count: number, source: Run = initialScenario.run):
     cases: source.cases.filter(advocateCase => events.some(event => event.actor === advocateCase.side && event.type === 'case.completed')),
     retrievedEvidence: source.retrievedEvidence.filter(record => evidenceIds.has(record.id)),
     retrievedPolicies: source.retrievedPolicies.filter(clause => policyIds.has(clause.id)),
+    // Enriched fields appear only once their own event has been revealed.
+    ...(source.risk !== undefined && events.some(event => event.type === 'risk.assessed') ? {risk: source.risk} : {}),
+    ...(source.precedents !== undefined && events.some(event => event.type === 'precedent.retrieved') ? {precedents: source.precedents} : {}),
+    ...(source.verdict !== undefined && events.some(event => event.type === 'verdict.computed') ? {verdict: source.verdict} : {}),
+    ...(source.replay === undefined ? {} : {replay: source.replay}),
   };
 }
 

@@ -1,0 +1,335 @@
+1
+00:00:00,000 --> 00:00:07,839
+Ryde. Multi-Agent Autonomous Dispute Resolution System. This is FairTrip, a working prototype built with CodeBuddy for ride-hailing disputes.
+
+2
+00:00:07,839 --> 00:00:14,372
+FairTrip represents both the rider and the driver, gathers evidence, and explains the recommended outcome.
+
+3
+00:00:14,372 --> 00:00:21,340
+This edited walkthrough covers the project, two end-to-end dispute categories, human oversight, and lessons from development.
+
+4
+00:00:21,340 --> 00:00:27,438
+The route-deviation and no-show demonstrations were captured from live model runs during this walkthrough.
+
+5
+00:00:27,438 --> 00:00:30,922
+Later examples use clearly labelled recorded case reviews.
+
+6
+00:00:30,922 --> 00:00:38,761
+All cases are synthetic, the rules are a demonstration policy, and the prototype does not execute real payments.
+
+7
+00:00:40,261 --> 00:00:43,944
+The intended users are riders, drivers, and support operations.
+
+8
+00:00:43,944 --> 00:00:51,308
+A rider may challenge an unexpected detour, while a driver may maintain that a no-show charge was justified.
+
+9
+00:00:51,308 --> 00:00:56,628
+Instead of asking one assistant to accept either account, FairTrip assigns separate advocates.
+
+10
+00:00:56,628 --> 00:01:04,401
+Both advocates request GPS, chat, payment, history, and policy records through tools, then build cited arguments and acknowledge counterevidence.
+
+11
+00:01:04,401 --> 00:01:12,175
+The Judge reviews both cases. The Risk Analyst summarises signals calculated by the server; it does not decide fault.
+
+12
+00:01:12,175 --> 00:01:19,949
+The React interface shows the hearing, while an Express and TypeScript backend orchestrates the agents and validates their outputs.
+
+13
+00:01:19,949 --> 00:01:24,041
+The model selects a remedy. The server calculates the money.
+
+14
+00:01:25,541 --> 00:01:28,479
+Here is the first dispute category: route deviation.
+
+15
+00:01:28,479 --> 00:01:34,724
+In the unapproved-detour scenario, the rider says the driver took a much longer route and charged more.
+
+16
+00:01:34,724 --> 00:01:38,397
+The driver says the alternative was intended to avoid congestion.
+
+17
+00:01:38,397 --> 00:01:41,335
+We select the scenario and start the review.
+
+18
+00:01:41,335 --> 00:01:47,947
+The hearing lines show the advocates gathering evidence independently, preparing their cases, and handing them to the Judge.
+
+19
+00:01:47,947 --> 00:01:53,456
+The Judge considers the actual route, the reference route, the conversation, and the demonstration policy.
+
+20
+00:01:53,456 --> 00:01:57,129
+In this live capture, the rider's claim is upheld and
+
+21
+00:01:57,129 --> 00:02:00,803
+the recommended refund is one Singapore dollar and ninety-eight cents.
+
+22
+00:02:00,803 --> 00:02:03,741
+The independent policy check agrees with the Judge.
+
+23
+00:02:03,741 --> 00:02:07,414
+The amount comes from server-side calculations using the recorded fare.
+
+24
+00:02:08,914 --> 00:02:13,954
+The evidence is available for inspection rather than hidden inside a generated answer.
+
+25
+00:02:13,954 --> 00:02:17,831
+Selecting a citation takes the reviewer to the underlying record.
+
+26
+00:02:17,831 --> 00:02:21,708
+Route evidence compares the actual journey with a reference route.
+
+27
+00:02:21,708 --> 00:02:26,360
+Conversation records show whether the rider approved or objected to the route.
+
+28
+00:02:26,360 --> 00:02:29,849
+Payment records show the fare and eligible refund calculation.
+
+29
+00:02:29,849 --> 00:02:35,277
+Each advocate can cite only records it retrieved, and the backend validates those references.
+
+30
+00:02:35,277 --> 00:02:39,154
+Prompts require structured JSON and explicit evidence and policy identifiers.
+
+31
+00:02:39,154 --> 00:02:44,582
+The Judge must choose from permitted remedy identifiers and cannot supply a monetary amount.
+
+32
+00:02:44,582 --> 00:02:49,234
+This separates generated reasoning from the calculations that determine the recommended action.
+
+33
+00:02:50,734 --> 00:02:53,300
+The second category is a no-show charge.
+
+34
+00:02:53,300 --> 00:02:57,331
+We select the case where pickup and waiting conditions were met.
+
+35
+00:02:57,331 --> 00:03:00,996
+The rider says they were only a few minutes late.
+
+36
+00:03:00,996 --> 00:03:05,394
+The driver says they arrived, contacted the rider, and waited before cancelling.
+
+37
+00:03:05,394 --> 00:03:12,358
+Again, both advocates retrieve the evidence. This time, the pickup record, waiting interval, and contact attempts support the driver.
+
+38
+00:03:12,358 --> 00:03:17,122
+In the live capture, the Judge upholds the charge and recommends no refund.
+
+39
+00:03:17,122 --> 00:03:23,353
+The policy check agrees. FairTrip therefore demonstrates outcomes in favour of either party, depending on the evidence.
+
+40
+00:03:23,353 --> 00:03:28,118
+It does not assume that filing a complaint means a refund is deserved.
+
+41
+00:03:28,118 --> 00:03:33,982
+Both parties receive explanations, and reviewers can inspect the arguments and policy checks behind the result.
+
+42
+00:03:35,482 --> 00:03:40,701
+This next example is a recorded case review, labelled as such in the interface.
+
+43
+00:03:40,701 --> 00:03:46,667
+The trip conditions support keeping the no-show charge, but the driver's history produces a high-risk assessment.
+
+44
+00:03:46,667 --> 00:03:51,887
+The case is sent for human review, and the displayed amount remains a proposal.
+
+45
+00:03:51,887 --> 00:03:56,361
+Risk never establishes fault and does not automatically reverse the trip-based recommendation.
+
+46
+00:03:56,361 --> 00:04:01,953
+The connected backend supports reviewer confirmation and remedy overrides, with amounts rebuilt by the server.
+
+47
+00:04:01,953 --> 00:04:07,173
+Completed and reviewed cases can become precedents for later cases, as consistency context only.
+
+48
+00:04:07,173 --> 00:04:12,393
+A live attempt at this history variation was interrupted during this walkthrough; we are
+
+49
+00:04:12,393 --> 00:04:17,613
+showing the saved successful review here, not presenting it as a fresh live result.
+
+50
+00:04:19,113 --> 00:04:21,959
+FairTrip also shows when it cannot decide.
+
+51
+00:04:21,959 --> 00:04:28,057
+In this recorded missing-route-evidence case, the GPS data needed to assess the detour is unavailable.
+
+52
+00:04:28,057 --> 00:04:32,530
+The result is incomplete, with no ruling or payment amount issued.
+
+53
+00:04:32,530 --> 00:04:38,222
+Separately, the interrupted live history-variation attempt showed a workflow failure after the automatic re-run.
+
+54
+00:04:38,222 --> 00:04:43,507
+The interface reported that the decision was unavailable and issued no payment amount.
+
+55
+00:04:43,507 --> 00:04:51,232
+These are distinct states: missing evidence requires more facts, while a failed workflow requires another attempt or operational intervention.
+
+56
+00:04:51,232 --> 00:04:54,891
+Policy disagreement and uncertain outcomes also require human review.
+
+57
+00:04:54,891 --> 00:04:58,957
+Instruction-like text inside chat evidence is treated as case material,
+
+58
+00:04:58,957 --> 00:05:03,023
+and history and precedents cannot override the current trip evidence.
+
+59
+00:05:04,523 --> 00:05:12,380
+The submission folder includes a saved live evaluation from the thirteenth of October, twenty twenty-six, using MiniMax M3.
+
+60
+00:05:12,380 --> 00:05:16,308
+All twenty-seven evaluation runs passed across twenty synthetic fixtures.
+
+61
+00:05:16,308 --> 00:05:23,292
+The scorecard recorded passing monetary correctness, citation validity, trace completeness, and risk-signal checks across the runs.
+
+62
+00:05:23,292 --> 00:05:28,967
+Three repeated fixtures passed the consistency check, and the human-review feedback probe passed.
+
+63
+00:05:28,967 --> 00:05:36,824
+Median latency was sixteen point one seconds, and the maximum was nineteen point two seconds in that evaluation.
+
+64
+00:05:36,824 --> 00:05:43,808
+These are results from that recorded evaluation, not a claim that every future request will succeed.
+
+65
+00:05:43,808 --> 00:05:47,736
+Today's interrupted example illustrates why operational failure handling matters.
+
+66
+00:05:47,736 --> 00:05:52,101
+Production savings and customer-satisfaction improvements have not yet been measured.
+
+67
+00:05:53,601 --> 00:05:58,022
+The repository includes genuine CodeBuddy development-chat screenshots covering setup, GPS
+
+68
+00:05:58,022 --> 00:06:02,444
+calculations, API integration, a running interface, live evaluation, and debugging.
+
+69
+00:06:02,444 --> 00:06:09,076
+The build approach used small task cards, a written specification, and checks after each step.
+
+70
+00:06:09,076 --> 00:06:14,381
+Shared contracts defined the interface between agent orchestration and the evidence layer.
+
+71
+00:06:14,381 --> 00:06:17,476
+Golden-value tests checked calculations against specified outcomes.
+
+72
+00:06:17,476 --> 00:06:22,782
+A practical prompting lesson was to show the exact object shape required
+
+73
+00:06:22,782 --> 00:06:28,088
+for counterevidence: argument objects with claims and citations, rather than plain strings.
+
+74
+00:06:28,088 --> 00:06:33,393
+A practical development tip is to give the coding agent a bounded
+
+75
+00:06:33,393 --> 00:06:38,699
+task and explicit verification commands, then inspect the output before moving on.
+
+76
+00:06:38,699 --> 00:06:43,120
+Keep arithmetic in tested functions, validate generated structures at boundaries,
+
+77
+00:06:43,120 --> 00:06:47,541
+and preserve traces so that a failure can be diagnosed.
+
+78
+00:06:49,041 --> 00:06:58,034
+FairTrip is currently a local prototype with synthetic cases, a demonstration policy, in-memory records, and no authenticated reviewer identity.
+
+79
+00:06:58,034 --> 00:07:05,134
+Live model calls depend on provider availability, and confidence is model-assessed rather than calibrated accuracy.
+
+80
+00:07:05,134 --> 00:07:14,127
+The next steps are persistent storage, authenticated support workflows, real platform evidence and policy integrations, and broader operational evaluation.
+
+81
+00:07:14,127 --> 00:07:18,860
+The intended business value is less manual evidence review, more
+
+82
+00:07:18,860 --> 00:07:23,594
+consistent policy application, and clearer explanations for riders and drivers.
+
+83
+00:07:23,594 --> 00:07:30,693
+Those benefits still need production measurement. FairTrip demonstrates two complete dispute workflows, inspectable evidence, constrained
+
+84
+00:07:30,693 --> 00:07:37,793
+monetary calculations, and a clear path to human oversight when the system cannot safely finish.

@@ -2,7 +2,8 @@ import type { ReactNode } from 'react';
 
 export type HearingSymbolName =
   | 'rider' | 'driver' | 'judge' | 'case' | 'hearing' | 'decision'
-  | 'trip' | 'conversation' | 'payment' | 'history' | 'brand' | 'check' | 'review';
+  | 'trip' | 'conversation' | 'payment' | 'history' | 'brand' | 'check' | 'review'
+  | 'risk';
 
 // Original paths share an inset grid, open counters, and a quiet tint at 24px.
 const symbols: Record<HearingSymbolName, ReactNode> = {
@@ -67,6 +68,12 @@ const symbols: Record<HearingSymbolName, ReactNode> = {
   review: <>
     <circle cx="10.5" cy="10.5" r="6.8" fill="currentColor" fillOpacity=".08" />
     <path d="m15.5 15.5 5 5M7.7 8.7h5.6m-5.6 3.6h3.8" />
+  </>,
+  risk: <>
+    <path d="M12 3.2 5.2 5.9v5.3c0 4.2 2.8 7.3 6.8 8.8 4-1.5 6.8-4.6 6.8-8.8V5.9L12 3.2Z" fill="currentColor" fillOpacity=".09" stroke="none" />
+    <path d="M12 3.2 5.2 5.9v5.3c0 4.2 2.8 7.3 6.8 8.8 4-1.5 6.8-4.6 6.8-8.8V5.9L12 3.2Z" />
+    <path d="M12 8.2v4" />
+    <circle cx="12" cy="14.9" r=".9" fill="currentColor" stroke="none" />
   </>,
 };
 

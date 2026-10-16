@@ -16,7 +16,7 @@ export default mergeConfig(baseConfig, {
       if (scriptName === undefined || styleName === undefined) throw new Error('Missing glass preview assets');
       const script = readFileSync(join(directory, 'assets', scriptName), 'utf8').replace(/<\/script/gi, '<\\/script');
       const style = readFileSync(join(directory, 'assets', styleName), 'utf8').replace(/<\/style/gi, '<\\/style');
-      let html = readFileSync(join(directory, 'glass.html'), 'utf8');
+      let html = readFileSync(join(directory, 'index.html'), 'utf8');
       html = html.replace(/<script\b[^>]*src="[^"]+"[^>]*><\/script>/, () => `<script type="module">${script}</script>`)
         .replace(/<link\b[^>]*rel="stylesheet"[^>]*>/, () => `<style>${style}</style>`);
       const offlineControls = `<script>const observer=new MutationObserver(()=>{const button=document.querySelector('.glass-source button:nth-child(2)');if(!button)return;button.disabled=true;button.title='Live hearings are available in the connected preview';observer.disconnect()});observer.observe(document.getElementById('root'),{childList:true,subtree:true});</script>`;
@@ -25,6 +25,6 @@ export default mergeConfig(baseConfig, {
   }],
   build: {
     outDir: 'dist/glass-preview',
-    rolldownOptions: {input: fileURLToPath(new URL('./glass.html', import.meta.url))},
+    rolldownOptions: {input: fileURLToPath(new URL('./index.html', import.meta.url))},
   },
 });

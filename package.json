@@ -19,6 +19,7 @@
     "typecheck": "npm run build -w @fairtrip/contracts && npm run build -w @fairtrip/agents && npm run build -w @fairtrip/evidence && tsc --noEmit",
     "test": "vitest run",
     "check:examples": "tsx scripts/check-examples.ts",
+    "capture:demo-scenarios": "tsx scripts/capture-demo-scenarios.ts",
     "check:setup": "tsx scripts/check-setup.ts",
     "check:model": "tsx --import ./scripts/codebuddy-env.ts --env-file-if-exists=.env scripts/check-model.ts",
     "eval": "npm run eval -w @fairtrip/eval --",

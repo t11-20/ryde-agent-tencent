@@ -18,11 +18,11 @@ Statuses below record verified facts at the time of writing, not assumed complet
 ## Current verification — 11 October 2026 (Kuala Lumpur)
 
 - Updated local Lane A: 67 tests across nine files, typechecks, builds, contract examples and setup checks passed.
-- A clean source copy passed the locked dependency install and full verification with all 67 tests; results are recorded in [Lane A status](LANE_A_STATUS.md).
+- A clean source copy passed the locked dependency install and full verification with all 67 tests at that time.
 - The actual development server started in stub mode on an isolated local port. Health, fixture listing, both category runs, and sequence polling passed.
 - `check:model` reached the configured MiniMax provider and returned HTTP 401. Further credential investigation and real-model execution are deferred at the user's request.
 - Lane B remains separate. The old combined history and post-merge edits are preserved in the local backup branch and stash.
-- The detailed current package status and outstanding Lane A/shared gates are in [LANE_A_STATUS.md](LANE_A_STATUS.md). Historical foundation notes below do not supersede that record.
+- Historical foundation notes below do not supersede the status update at the top of this document.
 
 ## Folder status
 

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { KeyboardEvent, PointerEvent } from 'react';
+import { runIdFromLocation } from '../lib/deep-link.js';
 import { RecordedHearing } from './RecordedHearing.js';
 import { LiveHearing } from './LiveHearing.js';
 import { HearingSymbol } from './HearingSymbol.js';
@@ -8,11 +9,12 @@ const PERSPECTIVES = [
   {id: 'rider', label: 'Rider', title: 'Rider advocate', detail: ['Represents the rider’s concern', 'Builds a case from trip evidence']},
   {id: 'judge', label: 'Judge', title: 'Independent judge', detail: ['Weighs both sides', 'Applies the demonstration policy']},
   {id: 'driver', label: 'Driver', title: 'Driver advocate', detail: ['Represents the driver’s response', 'Reviews the same trip evidence']},
+  {id: 'risk', label: 'Risk', title: 'Risk Analyst', detail: ['Flags account and chat risk signals for the Judge', 'Adds context only; never decides the outcome']},
 ] as const;
 
 const JOURNEY = [
   {label: 'Choose a case', detail: 'Explore a trip scenario', target: '.glass-case-segment', icon: 'case'},
-  {label: 'Follow the hearing', detail: 'See both sides unfold', target: '.glass-timeline', icon: 'hearing'},
+  {label: 'Follow the hearing', detail: 'See both sides, the risk check and the ruling', target: '.glass-timeline', icon: 'hearing'},
   {label: 'See the decision', detail: 'Understand the outcome', target: '.glass-verdict', icon: 'decision'},
 ] as const;
 
@@ -70,8 +72,8 @@ function LiquidPrism() {
 
   return (
     <div className="glass-intro-card glass-lens" data-perspective={current.id}>
-      <div className="glass-lens-head"><span className="glass-eyebrow">Meet your three agents</span></div>
-      <div className="glass-prism" role="group" aria-label="Rotate the three glass perspectives" aria-describedby="glass-prism-help" tabIndex={0} data-dragging={dragging} onPointerDown={begin} onPointerMove={move} onPointerUp={end} onPointerCancel={end} onLostPointerCapture={() => { start.current = null; setDragging(false); }} onKeyDown={key}>
+      <div className="glass-lens-head"><span className="glass-eyebrow">Meet your four agents</span></div>
+      <div className="glass-prism" role="group" aria-label="Rotate the four glass perspectives" aria-describedby="glass-prism-help" tabIndex={0} data-dragging={dragging} onPointerDown={begin} onPointerMove={move} onPointerUp={end} onPointerCancel={end} onLostPointerCapture={() => { start.current = null; setDragging(false); }} onKeyDown={key}>
         <div className="glass-prism-floor" aria-hidden="true" />
         <div className="glass-prism-stack" style={{transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`}} aria-hidden="true">
           {PERSPECTIVES.map((side, index) => (
@@ -85,7 +87,7 @@ function LiquidPrism() {
         </div>
       </div>
       <div className="glass-perspectives" role="group" aria-label="Explore a perspective">
-        {PERSPECTIVES.map((side, index) => <button key={side.id} type="button" aria-pressed={index === perspective} onClick={() => { setPerspective(index); setRotation({x: 14, y: index === 0 ? -24 : index === 2 ? 16 : -12}); }}><HearingSymbol name={side.id} />{side.label}</button>)}
+        {PERSPECTIVES.map((side, index) => <button key={side.id} type="button" aria-pressed={index === perspective} onClick={() => { setPerspective(index); setRotation({x: 14, y: index === 0 ? -24 : index === 2 ? 16 : index === 3 ? 28 : -12}); }}><HearingSymbol name={side.id} />{side.label}</button>)}
       </div>
       <div className="glass-lens-copy" aria-live="polite"><p>{current.title}</p><ul>{current.detail.map(point => <li key={point}>{point}</li>)}</ul></div>
       <p id="glass-prism-help" className="glass-prism-help">Choose an agent · Drag to rotate<span className="visually-hidden">. Keyboard: arrow keys to rotate, Home to reset.</span></p>
@@ -95,7 +97,9 @@ function LiquidPrism() {
 
 export function GlassPreview() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
-  const [source, setSource] = useState<'recorded' | 'live'>('recorded');
+  const [source, setSource] = useState<'recorded' | 'live'>(() =>
+    // A ?run=<id> deep link opens the live hearing (which resumes the run).
+    typeof window !== 'undefined' && runIdFromLocation(window.location.search) !== null ? 'live' : 'recorded');
   const preview = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -172,6 +176,7 @@ export function GlassPreview() {
           <button type="button" aria-pressed={source === 'live'} onClick={() => { setSource('live'); }}>Live hearing</button>
         </div>
         <div className="glass-settings">
+          <a className="glass-classic-link" href="/classic.html">Classic view</a>
           <button type="button" className="glass-icon-button" onClick={() => { setTheme(value => value === 'light' ? 'dark' : 'light'); }} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}>
             {theme === 'light' ? (
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z" /></svg>

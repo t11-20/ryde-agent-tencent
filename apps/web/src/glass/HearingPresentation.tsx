@@ -4,10 +4,13 @@ import type { ActivityEvent, PolicyClause, Run } from '@fairtrip/contracts';
 import { ChipContext } from '../components/Chip.js';
 import type { PollPhase } from '../hooks/useRunPolling.js';
 import { formatSgd, percent, remedyLabel, rulingLabel } from '../lib/format.js';
-import { actionHeadline, categoryLabel, clauseLabel, evidenceLabel, formatCount, partitionClauses } from '../lib/present.js';
+import { actionHeadline, categoryLabel, clauseLabel, divergenceComparison, escalationLines, evidenceLabel, formatCount, partitionClauses, remedyOptions } from '../lib/present.js';
+import type { RemedyOption } from '../lib/present.js';
 import { buildViewModel } from '../lib/view-model.js';
 import type { EvidenceCard, Family, SidePanel } from '../lib/view-model.js';
 import { CompactAdvocatePanel, CompactJudgePanel, KeyPoints } from './KeyPoints.js';
+import { CompactRiskPanel } from './RiskSummary.js';
+import { reviewActions } from './review-actions.js';
 import { LiquidHearingLines } from './LiquidHearingLines.js';
 import { HearingSymbol } from './HearingSymbol.js';
 
@@ -19,6 +22,11 @@ const SCENARIO_LABELS: Record<string, string> = {
   R2: 'Longer route approved by the rider', R3: 'Road closure diversion', X1: 'Missing route evidence',
   N1: 'Driver too far from pickup', N2: 'Pickup and waiting conditions met', N2H: 'Pickup with different party histories',
   N3: 'Driver cancelled too early', X2: 'Pickup with an unusual chat message', X3: 'Missing payment evidence',
+  R4: 'Small detour within the policy threshold', R1F: 'Detour with a flagged rider history',
+  X4: 'Missing payment evidence on a route dispute', N1R: 'Flagged rider, driver never arrived',
+  N4: 'Driver waited but never contacted the rider', N5: 'Threatening chat, pickup conditions met',
+  N6: 'Pickup conditions met at the minimum', X5: 'Missing route evidence on a no-show',
+  X6: 'Driver message tries to instruct the Judge',
 };
 
 export interface CaseOption {id: string; label: string; category: 'route_deviation' | 'no_show'}
@@ -52,20 +60,63 @@ export function CaseSegment({options, selectedId, onSelect, claim, statement, so
   );
 }
 
-export function VerdictSegment({run, phase, illustrative = false}: {run: Run | null; phase: PollPhase; problem: string | null; illustrative?: boolean}) {
+/** Human-review actions wired to the connected API; undefined for offline playback. */
+export interface ReviewControls {
+  busy: boolean;
+  error: string | null;
+  onConfirm: () => void;
+  onOverride: (remedyId: RemedyOption['id'], note: string) => void;
+}
+
+function OverrideForm({options, defaultId, busy, onApply, onCancel}: {
+  options: RemedyOption[];
+  defaultId: RemedyOption['id'];
+  busy: boolean;
+  onApply: (remedyId: RemedyOption['id'], note: string) => void;
+  onCancel: () => void;
+}) {
+  const [remedyId, setRemedyId] = useState<RemedyOption['id']>(defaultId);
+  const [note, setNote] = useState('');
+  return (
+    <div className="review-form glass-review-form">
+      <div className="review-field">
+        <label className="review-label" htmlFor="glass-review-remedy">Replacement remedy</label>
+        <select id="glass-review-remedy" className="casebar-select" value={remedyId} disabled={busy} onChange={event => { setRemedyId(event.target.value as RemedyOption['id']); }}>
+          {options.map(option => <option key={option.id} value={option.id}>{option.label}</option>)}
+        </select>
+      </div>
+      <div className="review-field">
+        <label className="review-label" htmlFor="glass-review-note">Reviewer note (optional)</label>
+        <textarea id="glass-review-note" className="casebar-textarea" rows={3} maxLength={2000} value={note} disabled={busy} onChange={event => { setNote(event.target.value); }} />
+      </div>
+      <div className="glass-review-buttons">
+        <button type="button" className="btn-primary" disabled={busy} onClick={() => { onApply(remedyId, note); }}>Apply override</button>
+        <button type="button" className="btn-text" disabled={busy} onClick={onCancel}>Cancel</button>
+      </div>
+    </div>
+  );
+}
+
+export function VerdictSegment({run, phase, illustrative = false, note, review}: {run: Run | null; phase: PollPhase; problem: string | null; illustrative?: boolean; note?: string | null; review?: ReviewControls}) {
   const completed = run?.status === 'completed' ? run : null;
-  const review = completed?.review;
-  const reviewPending = completed?.escalation !== undefined && review === undefined;
-  const result = completed === null ? null : review !== undefined
-    ? {...completed.result, ruling: review.ruling, remedyId: review.action.remedyId, action: review.action}
+  const humanReview = completed?.review;
+  const reviewPending = completed?.escalation !== undefined && humanReview === undefined;
+  const actions = reviewActions(run);
+  const [overrideOpen, setOverrideOpen] = useState(false);
+  const runId = completed === null ? null : completed.id;
+  useEffect(() => { setOverrideOpen(false); }, [runId, reviewPending]);
+  const divergence = completed === null ? null : divergenceComparison(completed);
+  const result = completed === null ? null : humanReview !== undefined
+    ? {...completed.result, ruling: humanReview.ruling, remedyId: humanReview.action.remedyId, action: humanReview.action}
     : completed.result.ruling !== 'incomplete' ? completed.result : null;
-  const incomplete = run?.status === 'incomplete' || (completed?.result.ruling === 'incomplete' && review === undefined);
-  const exampleOnly = completed?.mode === 'stub' && completed.result.ruling === 'incomplete' && review === undefined;
+  const incomplete = run?.status === 'incomplete' || (completed?.result.ruling === 'incomplete' && humanReview === undefined);
+  const exampleOnly = completed?.mode === 'stub' && completed.result.ruling === 'incomplete' && humanReview === undefined;
   const failed = run?.status === 'failed' || phase === 'start_failed' || phase === 'contract_mismatch' || phase === 'connection_lost';
   const state = reviewPending ? 'incomplete' : result !== null ? result.ruling : incomplete ? 'incomplete' : failed ? 'failed' : 'pending';
   return (
     <section className="panel glass-verdict" data-verdict={state} aria-labelledby="glass-verdict-heading" aria-live="polite">
       <div className="glass-section-heading"><h2 id="glass-verdict-heading" className="glass-verdict-label">Verdict</h2><span className="glass-verdict-status">{reviewPending ? 'Human review' : result !== null ? 'Final decision' : exampleOnly ? 'Example only' : incomplete ? 'Human review' : failed ? 'No decision' : 'Awaiting decision'}</span></div>
+      {note === undefined || note === null || note === '' ? null : <p className="glass-action-status" role="status">{note}</p>}
       <div className="glass-verdict-body">
         <div className="glass-verdict-seal" data-seal={reviewPending ? 'review' : result !== null ? 'complete' : incomplete ? 'review' : failed ? 'failed' : 'pending'} aria-hidden="true">
           <svg viewBox="0 0 96 96" fill="none">
@@ -76,10 +127,43 @@ export function VerdictSegment({run, phase, illustrative = false}: {run: Run | n
           <span>{reviewPending ? 'Review' : result !== null ? 'Decision' : incomplete ? 'Review' : failed ? 'Unavailable' : 'Pending'}</span>
         </div>
       {result !== null ? (
+        <>
         <div className="glass-verdict-grid">
-          <div><p className="glass-verdict-title">{reviewPending ? 'Judge recommendation' : rulingLabel(result.ruling)}</p><ul className="glass-key-points">{reviewPending ? <li>{rulingLabel(result.ruling)}</li> : null}<li>{remedyLabel(result.remedyId)}</li><li>{`${illustrative ? 'Illustrative confidence' : 'AI-assessed confidence'}: ${percent(result.confidence)}`}</li>{review === undefined ? null : <li>{review.decision === 'confirmed' ? 'Confirmed by a human reviewer' : 'Overridden by a human reviewer'}</li>}</ul>{review === undefined || review.note.trim() === '' ? null : <KeyPoints text={review.note} maxPoints={2} fullTextLabel="Reviewer note" />}</div>
+          <div><p className="glass-verdict-title">{reviewPending ? 'Judge recommendation' : rulingLabel(result.ruling)}</p><ul className="glass-key-points">{reviewPending ? <li>{rulingLabel(result.ruling)}</li> : null}<li>{remedyLabel(result.remedyId)}</li><li>{`${illustrative ? 'Illustrative confidence' : 'AI-assessed confidence'}: ${percent(result.confidence)}`}</li>{humanReview === undefined ? null : <li>{humanReview.decision === 'confirmed' ? 'Confirmed by a human reviewer' : 'Overridden by a human reviewer'}</li>}</ul>{humanReview === undefined || humanReview.note.trim() === '' ? null : <KeyPoints text={humanReview.note} maxPoints={2} fullTextLabel="Reviewer note" />}</div>
           <div className="glass-verdict-action">{reviewPending ? <span>Proposed amount</span> : null}<span className="glass-verdict-amount">{formatSgd(result.action.amountCents)}</span><ul className="glass-key-points"><li>{`${reviewPending ? 'Proposed: ' : ''}${actionHeadline(result.action)}`}</li><li>{reviewPending ? 'No payment amount issued · Awaiting a human reviewer' : 'Based on the recorded fare'}</li></ul></div>
         </div>
+        {reviewPending && completed !== null ? (
+          <div className="glass-verdict-review">
+            <ul className="glass-key-points glass-escalation-lines">
+              {escalationLines(completed).map(line => <li key={line}>{line}</li>)}
+              {divergence === null ? null : <li>{divergence.policy}</li>}
+              {divergence === null ? null : <li>{divergence.judge}</li>}
+            </ul>
+            {review === undefined ? (
+              <ul className="glass-key-points"><li>Reviewer actions are available in a connected hearing</li></ul>
+            ) : (
+              <div className="glass-review-actions">
+                <div className="glass-review-buttons">
+                  {actions.confirm ? <button type="button" className="btn-primary" disabled={review.busy} onClick={review.onConfirm}>Confirm ruling</button> : null}
+                  {actions.override ? <button type="button" className="btn-secondary" disabled={review.busy} aria-expanded={overrideOpen} onClick={() => { setOverrideOpen(value => !value); }}>Override…</button> : null}
+                  {actions.applyVerdictId === null ? null : <button type="button" className="btn-secondary" disabled={review.busy} onClick={() => { if (actions.applyVerdictId !== null) review.onOverride(actions.applyVerdictId, 'Applied the deterministic policy verdict.'); }}>Apply policy verdict</button>}
+                  {review.busy ? <span className="glass-verdict-meta">Saving…</span> : null}
+                </div>
+                {review.error === null ? null : <p className="glass-action-status" role="alert">{review.error}</p>}
+                {overrideOpen ? (
+                  <OverrideForm
+                    options={remedyOptions(completed.dispute.category)}
+                    defaultId={remedyOptions(completed.dispute.category).find(option => option.id !== completed.result.action.remedyId)?.id ?? 'keep_charge'}
+                    busy={review.busy}
+                    onApply={review.onOverride}
+                    onCancel={() => { setOverrideOpen(false); }}
+                  />
+                ) : null}
+              </div>
+            )}
+          </div>
+        ) : null}
+        </>
       ) : (
         <div className="glass-verdict-grid"><div><p className="glass-verdict-title">{exampleOnly ? 'Example hearing' : incomplete ? 'No final ruling' : failed ? 'Decision unavailable' : phase === 'stopped' ? 'Updates paused' : run === null ? 'Ready when you are' : 'Hearing in progress'}</p><ul className="glass-key-points"><li>{exampleOnly ? 'This example does not issue a final decision' : run?.status === 'incomplete' ? 'Decisive evidence is missing' : incomplete ? 'No final decision was issued' : failed ? 'Try the hearing again or choose another case' : run === null ? 'Choose a scenario to begin' : 'A verdict appears after the Judge rules'}</li><li>No payment amount issued</li></ul></div><div>{run?.status === 'incomplete' ? <KeyPoints text={run.missingEvidence} maxPoints={2} fullTextLabel="Missing evidence" /> : null}{failed ? <ul className="glass-key-points"><li>{phase === 'connection_lost' ? 'The connection was interrupted. You can keep waiting for the hearing.' : 'The hearing could not be completed. Please try again.'}</li></ul> : null}</div></div>
       )}</div>
@@ -182,7 +266,7 @@ function CompactPolicy({policies, citedIds}: {policies: PolicyClause[]; citedIds
   return <section className="panel policy" aria-labelledby="policy-heading"><div className="glass-section-heading"><h2 id="policy-heading" className="panel-title">Policy</h2><span className="policy-note">Demonstration policy</span></div><ul className="policy-list">{(cited.length === 0 ? rest : cited).map(clause => <PolicyItem key={clause.id} clause={clause} />)}</ul>{cited.length === 0 || rest.length === 0 ? null : <details className="policy-more"><summary>{rest.length} more clauses</summary><ul className="policy-list">{rest.map(clause => <PolicyItem key={clause.id} clause={clause} />)}</ul></details>}</section>;
 }
 
-export function HearingBoard({run, events, caseContent, phase, problem, controls, illustrative = false, replayProgress, progressMode = 'live'}: {run: Run | null; events: ActivityEvent[]; caseContent: ReactNode; phase: PollPhase; problem: string | null; controls?: ReactNode; illustrative?: boolean; replayProgress?: number; progressMode?: 'replay' | 'live'}) {
+export function HearingBoard({run, events, caseContent, phase, problem, controls, illustrative = false, replayProgress, progressMode = 'live', note, review, footer}: {run: Run | null; events: ActivityEvent[]; caseContent: ReactNode; phase: PollPhase; problem: string | null; controls?: ReactNode; illustrative?: boolean; replayProgress?: number; progressMode?: 'replay' | 'live'; note?: string | null; review?: ReviewControls; footer?: ReactNode}) {
   const vm = useMemo(() => run === null ? null : buildViewModel(run, events), [run, events]);
   const reviewPending = run?.status === 'completed' && run.escalation !== undefined && run.review === undefined;
   const reviewed = run?.status === 'completed' && run.review !== undefined;
@@ -197,10 +281,12 @@ export function HearingBoard({run, events, caseContent, phase, problem, controls
   const citedIds = vm?.result?.findings.flatMap(finding => finding.policyClauseIds) ?? [];
   return <ChipContext.Provider value={context}><main className="app glass-recorded glass-concise">
     {caseContent}
-    <VerdictSegment run={run} phase={phase} problem={problem} illustrative={illustrative} />
+    <VerdictSegment run={run} phase={phase} problem={problem} illustrative={illustrative} note={note} {...(review === undefined ? {} : {review})} />
     {controls}
-    <LiquidHearingLines events={events} status={run?.status ?? null} result={reviewedResult} cases={run?.cases ?? []} phase={phase} progressMode={progressMode} reviewPending={reviewPending} {...(replayProgress === undefined ? {} : {replayProgress})} />
-    <div className="hearing"><CompactAdvocatePanel actor="rider" side={vm?.rider ?? EMPTY_SIDE} status={run?.status ?? null} /><CompactJudgePanel result={vm?.result ?? null} status={run?.status ?? 'queued'} reviewPending={reviewPending} reviewed={reviewed} /><CompactAdvocatePanel actor="driver" side={vm?.driver ?? EMPTY_SIDE} status={run?.status ?? null} /></div>
+    <LiquidHearingLines events={events} status={run?.status ?? null} result={reviewedResult} cases={run?.cases ?? []} phase={phase} progressMode={progressMode} reviewPending={reviewPending} {...(run?.risk === undefined ? {} : {risk: run.risk})} precedents={run?.precedents ?? []} {...(replayProgress === undefined ? {} : {replayProgress})} />
+    <div className="hearing"><CompactAdvocatePanel actor="rider" side={vm?.rider ?? EMPTY_SIDE} status={run?.status ?? null} /><CompactJudgePanel result={vm?.result ?? null} status={run?.status ?? 'queued'} reviewPending={reviewPending} reviewed={reviewed} {...(run?.verdict === undefined ? {} : {verdict: run.verdict})} precedents={run?.precedents ?? []} precedentsSeen={events.some(event => event.type === 'precedent.retrieved')} /><CompactAdvocatePanel actor="driver" side={vm?.driver ?? EMPTY_SIDE} status={run?.status ?? null} /></div>
+    <CompactRiskPanel risk={run?.risk} />
     {vm === null ? null : <><CompactEvidence evidence={vm.evidence} /><CompactPolicy policies={vm.policies} citedIds={citedIds} /></>}
+    {footer}
   </main></ChipContext.Provider>;
 }

@@ -27,6 +27,7 @@
   --driver-line: #8d3e82;
   --driver-text: #813574;
   --judge: #9b405f;
+  --glass-risk: #84510c;
   --system: #826477;
   --warn: #b82e40;
   --amber-text: #84510c;
@@ -72,6 +73,7 @@
   --driver-line: #e9afdf;
   --driver-text: #e9afdf;
   --judge: #f8bfd0;
+  --glass-risk: #efc783;
   --system: #cbb0c1;
   --meta: #ffc3d5;
   --warn: #ff97a6;
@@ -94,6 +96,8 @@
 .glass-settings { display: flex; align-items: center; gap: 12px; }
 .glass-icon-button { width: 44px; height: 44px; display: grid; place-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: 50%; color: var(--fg); }
 .glass-icon-button svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.glass-classic-link { color: var(--muted); text-decoration: none; font-size: 12px; font-weight: 500; }
+.glass-classic-link:hover { color: var(--fg); text-decoration: underline; }
 .glass-original { color: var(--fg-2); text-decoration: none; font-size: 13px; }
 .glass-original span { margin-left: 5px; }
 .glass-intro { padding: 42px 36px 36px; display: flex; justify-content: space-between; align-items: end; gap: 32px; }
@@ -189,8 +193,10 @@
 .glass-preview .bubble { max-width: 100%; font-size: 13px; border-radius: 13px; }
 .glass-preview .policy-clause { padding: 16px; background: var(--surface-warm); border: 1px solid var(--border-soft); border-radius: 14px; scroll-margin-block: 24px; }
 .glass-preview .timeline-item { padding-block: 8px; }
-.glass-preview .timeline-meta { font-size: 11px; }
-.glass-preview .timeline-summary { font-size: 13px; }
+.glass-preview .timeline-meta { font-size: 13px; }
+.glass-preview .timeline-summary { font-size: 16px; }
+.glass-preview .timeline-actor-risk .timeline-dot { background: var(--glass-risk); }
+.glass-preview .timeline-actor-risk .timeline-actor { color: var(--glass-risk); }
 .glass-preview details pre { background: var(--surface-warm); font-size: 11px; }
 .glass-replay-paused { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; padding-inline: 8px; font-size: 13px; color: var(--muted); }
 .glass-footer { padding: 0 36px 30px; display: flex; justify-content: space-between; gap: 16px; color: var(--muted); font-size: 11px; }
@@ -285,9 +291,10 @@
 .glass-prism-floor { position: absolute; width: 260px; height: 80px; left: calc(50% - 130px); bottom: 8px; border-radius: 50%; background: radial-gradient(ellipse, color-mix(in oklab, var(--rider) 16%, transparent), transparent 70%); transform: rotateX(60deg); filter: blur(8px); pointer-events: none; }
 .glass-prism-stack { position: relative; width: 230px; height: 164px; transform-style: preserve-3d; pointer-events: none; }
 .glass-prism-sheet { position: absolute; inset: 0; border-radius: 22px; border: 1px solid var(--liquid-rim); background: linear-gradient(135deg, var(--surface), color-mix(in oklab, var(--surface) 66%, transparent)); box-shadow: inset 0 2px 3px var(--liquid-rim), inset 0 -3px 8px var(--liquid-edge-shadow), 0 16px 28px var(--liquid-edge-shadow);  padding: 18px; display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto 1fr auto; overflow: hidden; }
-.glass-prism-rider { transform: translate3d(-40px, -18px, -46px); color: var(--rider); }
-.glass-prism-judge { transform: translateZ(0); color: var(--judge); }
-.glass-prism-driver { transform: translate3d(40px, 18px, 46px); color: var(--driver-text); }
+.glass-prism-rider { transform: translate3d(-48px, -22px, -58px); color: var(--rider); }
+.glass-prism-judge { transform: translate3d(-16px, -7px, -19px); color: var(--judge); }
+.glass-prism-driver { transform: translate3d(16px, 7px, 19px); color: var(--driver-text); }
+.glass-prism-risk { transform: translate3d(48px, 22px, 58px); color: var(--glass-risk); }
 .glass-prism-sheet[data-active="true"] { transform: translateZ(72px); border-color: currentColor; background: linear-gradient(135deg, color-mix(in oklab, currentColor 10%, var(--surface)), var(--surface)); box-shadow: inset 0 2px 3px var(--liquid-rim), inset 0 -3px 8px var(--liquid-edge-shadow), 0 20px 32px var(--liquid-edge-shadow), 0 0 0 1px color-mix(in oklab, currentColor 14%, transparent); }
 .glass-prism-caustic { position: absolute; inset: -20%; border-radius: inherit; background: conic-gradient(from 120deg at 65% 40%, transparent 20%, var(--liquid-glint) 34%, transparent 44%, var(--liquid-glint) 55%, transparent 68%); opacity: .6; pointer-events: none; }
 .glass-prism-index { font: 11px var(--font-body); font-variant-numeric: tabular-nums; z-index: 1; }
@@ -381,8 +388,10 @@
 @media (max-width: 460px) {
   .glass-intro-card { padding: 20px; border-radius: 20px; }
   .glass-prism-stack { width: 190px; height: 140px; }
-  .glass-prism-rider { transform: translate3d(-25px, -12px, -35px); }
-  .glass-prism-driver { transform: translate3d(25px, 12px, 35px); }
+  .glass-prism-rider { transform: translate3d(-30px, -14px, -43px); }
+  .glass-prism-judge { transform: translate3d(-10px, -5px, -14px); }
+  .glass-prism-driver { transform: translate3d(10px, 5px, 14px); }
+  .glass-prism-risk { transform: translate3d(30px, 14px, 43px); }
   .glass-process { gap: 7px; }
   .glass-process > :is(div, button) { padding: 10px 8px; }
   .glass-lens-head .glass-eyebrow { font-size: 8px; letter-spacing: .08em; }
@@ -423,11 +432,16 @@
   background: var(--surface-warm); min-width: 0;
   background-image: radial-gradient(ellipse at var(--liquid-x, 40%) var(--liquid-y, 0%), var(--liquid-glint), transparent 65%);
 }
-.glass-preview :is(.lines-log, .policy-more, .tech-details) {
+.glass-preview :is(.lines-log, .policy-more, .tech-details, .glass-recent-runs) {
   border: 1px solid var(--border); border-radius: 12px; padding: 12px;
   background: var(--surface-warm);
   box-shadow: inset 0 2px 4px var(--liquid-edge-shadow), inset 0 -1px 0 var(--liquid-rim);
 }
+.glass-preview .glass-recent-runs { color: var(--muted); }
+.glass-preview .glass-recent-runs > summary {
+  font-size: 13px; color: var(--muted); cursor: pointer;
+}
+.glass-preview .glass-recent-runs select { max-width: 420px; width: 100%; margin-top: 10px; }
 .glass-preview .glass-claim-points {
   list-style: disc outside; padding-left: 20px; display: grid; gap: 10px;
   color: var(--fg); font-size: 16px; line-height: 1.7;
@@ -530,6 +544,14 @@
 .glass-verdict-title { font-size: clamp(23px, 2.4vw, 32px); line-height: 1.2; letter-spacing: -.035em; font-weight: 600; }
 .glass-verdict-action { border-left: 1px solid var(--control); padding-left: 24px; }
 .glass-verdict-amount { font-size: 36px; line-height: 1.1; font-weight: 600; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+.glass-verdict-review { grid-column: 1 / -1; display: grid; gap: 12px; }
+.glass-escalation-lines { border-left: 3px solid var(--amber-text); padding-left: 12px; }
+.glass-review-actions { display: grid; gap: 12px; margin-top: 16px; }
+.glass-review-buttons { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.glass-review-form { padding: 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-warm); }
+.glass-verdict-meta { color: var(--muted); font-size: 12px; }
+.glass-risk-level { margin: 0; }
+.glass-summary-verdict, .glass-summary-precedents { display: grid; gap: 8px; padding-top: 10px; border-top: 1px solid var(--rule); }
 .glass-concise .hearing { align-items: stretch; }
 .glass-preview .glass-concise .hearing > .glass-summary-panel { height: auto; min-height: 0; overflow: visible; display: flex; flex-direction: column; gap: 14px; }
 .glass-preview .glass-concise .hearing > .glass-summary-panel > .advocate-title { position: static; background: transparent; padding: 0; }
@@ -574,6 +596,7 @@
 .glass-timeline-track[data-lane="rider"], .glass-timeline-segment[data-lane="rider"], .glass-timeline-connection[data-lane="rider"], .glass-timeline-lane[data-lane="rider"], .glass-timeline-point[data-lane="rider"] { color: var(--rider); }
 .glass-timeline-track[data-lane="driver"], .glass-timeline-segment[data-lane="driver"], .glass-timeline-connection[data-lane="driver"], .glass-timeline-lane[data-lane="driver"], .glass-timeline-point[data-lane="driver"] { color: var(--driver-text); }
 .glass-timeline-track[data-lane="judge"], .glass-timeline-segment[data-lane="judge"], .glass-timeline-lane[data-lane="judge"], .glass-timeline-point[data-lane="judge"] { color: var(--judge); }
+.glass-timeline-track[data-lane="risk"], .glass-timeline-segment[data-lane="risk"], .glass-timeline-connection[data-lane="risk"], .glass-timeline-lane[data-lane="risk"], .glass-timeline-point[data-lane="risk"] { color: var(--glass-risk); }
 .glass-timeline-rail-shadow { stroke: var(--liquid-edge-shadow); stroke-width: 7; stroke-linecap: round; }
 .glass-timeline-rail-highlight { stroke: var(--liquid-rim); stroke-width: 2; stroke-linecap: round; }
 .glass-timeline-segment, .glass-timeline-connection { stroke: currentColor; stroke-width: 4; stroke-linecap: round; fill: none; }
@@ -586,6 +609,7 @@
 .glass-timeline-point[data-lane="rider"] { --point-color: var(--rider); }
 .glass-timeline-point[data-lane="driver"] { --point-color: var(--driver-line); }
 .glass-timeline-point[data-lane="judge"] { --point-color: var(--judge); }
+.glass-timeline-point[data-lane="risk"] { --point-color: var(--glass-risk); }
 .glass-timeline-point[data-active="true"] .glass-timeline-orb { background: var(--point-color); color: var(--accent-on); border-color: var(--accent); box-shadow: inset 0 2px 2px var(--liquid-glint), 0 4px 0 var(--liquid-edge-shadow), 0 8px 16px var(--liquid-edge-shadow), 0 0 0 4px color-mix(in oklab, var(--accent) 15%, transparent); }
 .glass-preview[data-theme="dark"] .glass-timeline-point[data-active="true"] .glass-timeline-orb { color: var(--bg); }
 .glass-timeline-point[data-pinned="true"] .glass-timeline-orb { outline: 2px solid var(--accent); outline-offset: 3px; }

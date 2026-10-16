@@ -1,0 +1,49 @@
+FairTrip
+Every side heard. A clearer way forward.
+
+Ryde. Multi-Agent Autonomous Dispute Resolution System. This is FairTrip, a working prototype built with CodeBuddy for ride-hailing disputes. FairTrip represents both the rider and the driver, gathers evidence, and explains the recommended outcome. This edited walkthrough covers the project, two end-to-end dispute categories, human oversight, and lessons from development. The route-deviation and no-show demonstrations were captured from live model runs during this walkthrough. Later examples use clearly labelled recorded case reviews. All cases are synthetic, the rules are a demonstration policy, and the prototype does not execute real payments.
+
+Four agents. One visible hearing.
+Retrieve evidence → build cases → adjudicate → explain
+
+The intended users are riders, drivers, and support operations. A rider may challenge an unexpected detour, while a driver may maintain that a no-show charge was justified. Instead of asking one assistant to accept either account, FairTrip assigns separate advocates. Both advocates request GPS, chat, payment, history, and policy records through tools, then build cited arguments and acknowledge counterevidence. The Judge reviews both cases. The Risk Analyst summarises signals calculated by the server; it does not decide fault. The React interface shows the hearing, while an Express and TypeScript backend orchestrates the agents and validates their outputs. The model selects a remedy. The server calculates the money.
+
+Route deviation
+Live capture · R1 · recommended refund S$1.98
+
+Here is the first dispute category: route deviation. In the unapproved-detour scenario, the rider says the driver took a much longer route and charged more. The driver says the alternative was intended to avoid congestion. We select the scenario and start the review. The hearing lines show the advocates gathering evidence independently, preparing their cases, and handing them to the Judge. The Judge considers the actual route, the reference route, the conversation, and the demonstration policy. In this live capture, the rider's claim is upheld and the recommended refund is one Singapore dollar and ninety-eight cents. The independent policy check agrees with the Judge. The amount comes from server-side calculations using the recorded fare.
+
+Evidence you can inspect
+Arguments link back to trip, chat, payment and policy records
+
+The evidence is available for inspection rather than hidden inside a generated answer. Selecting a citation takes the reviewer to the underlying record. Route evidence compares the actual journey with a reference route. Conversation records show whether the rider approved or objected to the route. Payment records show the fare and eligible refund calculation. Each advocate can cite only records it retrieved, and the backend validates those references. Prompts require structured JSON and explicit evidence and policy identifiers. The Judge must choose from permitted remedy identifiers and cannot supply a monetary amount. This separates generated reasoning from the calculations that determine the recommended action.
+
+No-show charge
+Live capture · N2 · charge upheld
+
+The second category is a no-show charge. We select the case where pickup and waiting conditions were met. The rider says they were only a few minutes late. The driver says they arrived, contacted the rider, and waited before cancelling. Again, both advocates retrieve the evidence. This time, the pickup record, waiting interval, and contact attempts support the driver. In the live capture, the Judge upholds the charge and recommends no refund. The policy check agrees. FairTrip therefore demonstrates outcomes in favour of either party, depending on the evidence. It does not assume that filing a complaint means a refund is deserved. Both parties receive explanations, and reviewers can inspect the arguments and policy checks behind the result.
+
+Human oversight
+Recorded case review · risk is context, never proof of fault
+
+This next example is a recorded case review, labelled as such in the interface. The trip conditions support keeping the no-show charge, but the driver's history produces a high-risk assessment. The case is sent for human review, and the displayed amount remains a proposal. Risk never establishes fault and does not automatically reverse the trip-based recommendation. The connected backend supports reviewer confirmation and remedy overrides, with amounts rebuilt by the server. Completed and reviewed cases can become precedents for later cases, as consistency context only. A live attempt at this history variation was interrupted during this walkthrough; we are showing the saved successful review here, not presenting it as a fresh live result.
+
+Safe failure
+Missing decisive evidence means no ruling or amount
+
+FairTrip also shows when it cannot decide. In this recorded missing-route-evidence case, the GPS data needed to assess the detour is unavailable. The result is incomplete, with no ruling or payment amount issued. Separately, the interrupted live history-variation attempt showed a workflow failure after the automatic re-run. The interface reported that the decision was unavailable and issued no payment amount. These are distinct states: missing evidence requires more facts, while a failed workflow requires another attempt or operational intervention. Policy disagreement and uncertain outcomes also require human review. Instruction-like text inside chat evidence is treated as case material, and history and precedents cannot override the current trip evidence.
+
+Measured prototype results
+Saved live evaluation · 13 October 2026 · MiniMax-M3
+
+The submission folder includes a saved live evaluation from the thirteenth of October, twenty twenty-six, using MiniMax M3. All twenty-seven evaluation runs passed across twenty synthetic fixtures. The scorecard recorded passing monetary correctness, citation validity, trace completeness, and risk-signal checks across the runs. Three repeated fixtures passed the consistency check, and the human-review feedback probe passed. Median latency was sixteen point one seconds, and the maximum was nineteen point two seconds in that evaluation. These are results from that recorded evaluation, not a claim that every future request will succeed. Today's interrupted example illustrates why operational failure handling matters. Production savings and customer-satisfaction improvements have not yet been measured.
+
+Built with CodeBuddy
+Small task cards · golden-value tests · explicit output schemas
+
+The repository includes genuine CodeBuddy development-chat screenshots covering setup, GPS calculations, API integration, a running interface, live evaluation, and debugging. The build approach used small task cards, a written specification, and checks after each step. Shared contracts defined the interface between agent orchestration and the evidence layer. Golden-value tests checked calculations against specified outcomes. A practical prompting lesson was to show the exact object shape required for counterevidence: argument objects with claims and citations, rather than plain strings. A practical development tip is to give the coding agent a bounded task and explicit verification commands, then inspect the output before moving on. Keep arithmetic in tested functions, validate generated structures at boundaries, and preserve traces so that a failure can be diagnosed.
+
+Next steps
+Prototype today. Platform integrations and operational validation next.
+
+FairTrip is currently a local prototype with synthetic cases, a demonstration policy, in-memory records, and no authenticated reviewer identity. Live model calls depend on provider availability, and confidence is model-assessed rather than calibrated accuracy. The next steps are persistent storage, authenticated support workflows, real platform evidence and policy integrations, and broader operational evaluation. The intended business value is less manual evidence review, more consistent policy application, and clearer explanations for riders and drivers. Those benefits still need production measurement. FairTrip demonstrates two complete dispute workflows, inspectable evidence, constrained monetary calculations, and a clear path to human oversight when the system cannot safely finish.

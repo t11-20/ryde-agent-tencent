@@ -1,6 +1,6 @@
 # FairTrip — seven-minute demonstration script
 
-Adapted from `Ryde_Two_Lane_Execution_Plan.md` §14. Replay mode by default (a recording of the passing live gate run `20261013-144417`), with an optional live R1 run when the model pre-flight passes; fixtures preloaded; UI at `http://127.0.0.1:5173` with the API at `http://127.0.0.1:3001`. Expected outcomes: R1 → refund S$1.98; N2 → keep the charge; N2H → completed but escalated for human review; X1 → incomplete.
+Replay mode by default (a recording of the passing live gate run `20261013-144417`), with an optional live R1 run when the model pre-flight passes; fixtures preloaded; UI at `http://127.0.0.1:5173` with the API at `http://127.0.0.1:3001`. The UI opens on the glass hearing room at `/` (the classic interface remains at `/classic.html`); in glass the N2H human-review step uses the **Confirm ruling** / **Override…** buttons on the Verdict card instead of the bench. Expected outcomes: R1 → refund S$1.98; N2 → keep the charge; N2H → completed but escalated for human review; X1 → incomplete.
 
 | Time | Content | Operator clicks | Narrator points at | Presenter |
 |---|---|---|---|---|
